@@ -1,0 +1,20 @@
+/*
+ *  Copyright (c) 1992-2019 by Standard Performance Evaluation Corporation
+ *      All rights reserved.
+ *              Standard Performance Evaluation Corporation (SPEC)
+ *		7001 Heritage Village Plaza
+ *		Suite 225
+ * 		Gainesville, VA 20155
+ *
+ *      This product contains benchmarks acquired from several sources who
+ *      understand and agree with SPEC's goal of creating fair and objective
+ *      benchmarks to measure computer performance.
+ *
+ *      This copyright notice is placed here only to protect SPEC in the
+ *      event the source is misused in any manner that is contrary to the
+ *      spirit, the goals and the intent of SPEC.
+ *
+ *      The source code is provided to the user or company under the license
+ *      agreement for the SPEC Benchmark Suite for this product.
+ */
+

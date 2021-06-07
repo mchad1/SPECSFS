@@ -1,0 +1,342 @@
+
+<<< Wed Apr 28 19:09:03 2021: Run 1 of 2 >>>
+--------------------------------------------------------------------
+Client            rmchad-redhat8-base                  ID:          0
+Workload Name:                      EDA_BACKEND
+Run time                                298
+Ops/sec                               75.01
+Avg Latency                           0.866
+Total file ops                        22418
+Read throughput                    1031.510 Kbytes/sec
+Read kbytes                      308287.439 Kbytes
+Write throughput                   1378.978 Kbytes/sec
+Write Kbytes                     412135.109 Kbytes
+Native_read throughput             1031.510 Kbytes/sec
+Native read kbytes               308287.439 Kbytes
+Native_write throughput            1378.978 Kbytes/sec
+Native_write Kbytes              412135.109 Kbytes
+Meta_write throughput                 0.000 Kbytes/sec
+Meta_write Kbytes                     0.000 Kbytes
+Meta_read throughput                  0.000 Kbytes/sec
+Meta_read Kbytes                      0.000 Kbytes
+Initialized dirs                        130 
+Initialized files                      1300 
+Initialized files with space              0 
+Per proc file space             ~         0 Mbytes
+Min Direct I/O size =                   512
+
+Details
+	Write                               ops =       5504 	Avg Latency:   0.002516  Min Latency:   0.000059  Max Latency:   0.021705
+	Write_file                          ops =          0 	Avg Latency:   Not collected
+	Mmap_write                          ops =          0 	Avg Latency:   Not collected
+	Mmap_read                           ops =          0 	Avg Latency:   Not collected
+	Read                                ops =       5492 	Avg Latency:   0.000981  Min Latency:   0.000010  Max Latency:   0.016582
+	Read_file                           ops =          0 	Avg Latency:   Not collected
+	Mkdir                               ops =          0 	Avg Latency:   Not collected
+	Rmdir                               ops =          0 	Avg Latency:   Not collected
+	Unlink                              ops =          0 	Avg Latency:   Not collected
+	Unlink2                             ops =          0 	Avg Latency:   Not collected
+	Create                              ops =          0 	Avg Latency:   Not collected
+	Stat                                ops =          0 	Avg Latency:   Not collected
+	Neg_stat                            ops =          0 	Avg Latency:   Not collected
+	Append                              ops =          0 	Avg Latency:   Not collected
+	Lock                                ops =          0 	Avg Latency:   Not collected
+	Access                              ops =          0 	Avg Latency:   Not collected
+	Chmod                               ops =          0 	Avg Latency:   Not collected
+	Readdir                             ops =          0 	Avg Latency:   Not collected
+	Random_write                        ops =          0 	Avg Latency:   Not collected
+	Random_read                         ops =          0 	Avg Latency:   Not collected
+	Read_modify_write                   ops =          0 	Avg Latency:   Not collected
+	Open file                           ops =       5711	Avg Latency:   Not collected
+	Close file                          ops =       5711	Avg Latency:   Not collected
+	Copyfile                            ops =          0 	Avg Latency:   Not collected
+	Rename                              ops =          0 	Avg Latency:   Not collected
+	Statfs                              ops =          0 	Avg Latency:   Not collected
+	Pathconf                            ops =          0 	Avg Latency:   Not collected
+	Trunc                               ops =          0 	Avg Latency:   Not collected
+	Custom1                             ops =          0 	Avg Latency:   Not collected
+	Custom2                             ops =          0 	Avg Latency:   Not collected
+
+	Band 1:  20us:102      40us:153      60us:64       80us:56      100us:57      
+	Band 2: 200us:286     400us:70      600us:1744    800us:2209      1ms:1654    
+	Band 3:   2ms:1269      4ms:1930      6ms:1175      8ms:157      10ms:50      
+	Band 4:  12ms:8        14ms:3        16ms:3        18ms:3        20ms:0       
+	Band 5:  40ms:3        60ms:0        80ms:0       100ms:0       
+	Band 6: 200ms:0       400ms:0       600ms:0       800ms:0          1s:0       
+	Band 7:    2s:0          4s:0          6s:0          8s:0         10s:0       
+	Band 8:   20s:0         40s:0         60s:0         80s:0        120s:0       
+	Band 9: 120+s:0       
+
+
+--------------------------------------------------------------------
+Client            rmchad-redhat8-base                  ID:          1
+Workload Name:                      EDA_BACKEND
+Run time                                298
+Ops/sec                               75.01
+Avg Latency                           0.873
+Total file ops                        22421
+Read throughput                    1028.656 Kbytes/sec
+Read kbytes                      307473.021 Kbytes
+Write throughput                   1362.916 Kbytes/sec
+Write Kbytes                     407385.913 Kbytes
+Native_read throughput             1028.656 Kbytes/sec
+Native read kbytes               307473.021 Kbytes
+Native_write throughput            1362.916 Kbytes/sec
+Native_write Kbytes              407385.913 Kbytes
+Meta_write throughput                 0.000 Kbytes/sec
+Meta_write Kbytes                     0.000 Kbytes
+Meta_read throughput                  0.000 Kbytes/sec
+Meta_read Kbytes                      0.000 Kbytes
+Initialized dirs                        130 
+Initialized files                      1300 
+Initialized files with space              0 
+Per proc file space             ~         0 Mbytes
+Min Direct I/O size =                   512
+
+Details
+	Write                               ops =       5479 	Avg Latency:   0.002491  Min Latency:   0.000057  Max Latency:   0.020695
+	Write_file                          ops =          0 	Avg Latency:   Not collected
+	Mmap_write                          ops =          0 	Avg Latency:   Not collected
+	Mmap_read                           ops =          0 	Avg Latency:   Not collected
+	Read                                ops =       5478 	Avg Latency:   0.001049  Min Latency:   0.000011  Max Latency:   0.034342
+	Read_file                           ops =          0 	Avg Latency:   Not collected
+	Mkdir                               ops =          0 	Avg Latency:   Not collected
+	Rmdir                               ops =          0 	Avg Latency:   Not collected
+	Unlink                              ops =          0 	Avg Latency:   Not collected
+	Unlink2                             ops =          0 	Avg Latency:   Not collected
+	Create                              ops =          0 	Avg Latency:   Not collected
+	Stat                                ops =          0 	Avg Latency:   Not collected
+	Neg_stat                            ops =          0 	Avg Latency:   Not collected
+	Append                              ops =          0 	Avg Latency:   Not collected
+	Lock                                ops =          0 	Avg Latency:   Not collected
+	Access                              ops =          0 	Avg Latency:   Not collected
+	Chmod                               ops =          0 	Avg Latency:   Not collected
+	Readdir                             ops =          0 	Avg Latency:   Not collected
+	Random_write                        ops =          0 	Avg Latency:   Not collected
+	Random_read                         ops =          0 	Avg Latency:   Not collected
+	Read_modify_write                   ops =          0 	Avg Latency:   Not collected
+	Open file                           ops =       5732	Avg Latency:   Not collected
+	Close file                          ops =       5732	Avg Latency:   Not collected
+	Copyfile                            ops =          0 	Avg Latency:   Not collected
+	Rename                              ops =          0 	Avg Latency:   Not collected
+	Statfs                              ops =          0 	Avg Latency:   Not collected
+	Pathconf                            ops =          0 	Avg Latency:   Not collected
+	Trunc                               ops =          0 	Avg Latency:   Not collected
+	Custom1                             ops =          0 	Avg Latency:   Not collected
+	Custom2                             ops =          0 	Avg Latency:   Not collected
+
+	Band 1:  20us:68       40us:110      60us:55       80us:59      100us:45      
+	Band 2: 200us:275     400us:84      600us:1716    800us:2197      1ms:1677    
+	Band 3:   2ms:1306      4ms:2015      6ms:1134      8ms:144      10ms:42      
+	Band 4:  12ms:9        14ms:5        16ms:1        18ms:5        20ms:4       
+	Band 5:  40ms:6        60ms:0        80ms:0       100ms:0       
+	Band 6: 200ms:0       400ms:0       600ms:0       800ms:0          1s:0       
+	Band 7:    2s:0          4s:0          6s:0          8s:0         10s:0       
+	Band 8:   20s:0         40s:0         60s:0         80s:0        120s:0       
+	Band 9: 120+s:0       
+
+
+--------------------------------------------------------------------
+Client            rmchad-redhat8-base                  ID:          2
+Workload Name:                     EDA_FRONTEND
+Run time                                299
+Ops/sec                              100.00
+Avg Latency                           0.430
+Total file ops                        29948
+Read throughput                     577.097 Kbytes/sec
+Read kbytes                      172823.091 Kbytes
+Write throughput                    244.265 Kbytes/sec
+Write Kbytes                      73149.818 Kbytes
+Native_read throughput              173.183 Kbytes/sec
+Native read kbytes                51863.091 Kbytes
+Native_write throughput             198.504 Kbytes/sec
+Native_write Kbytes               59445.818 Kbytes
+Meta_write throughput                45.833 Kbytes/sec
+Meta_write Kbytes                 13704.000 Kbytes
+Meta_read throughput                404.548 Kbytes/sec
+Meta_read Kbytes                 120960.000 Kbytes
+Initialized dirs                        270 
+Initialized files                      2700 
+Initialized files with space              0 
+Per proc file space             ~         0 Mbytes
+Min Direct I/O size =                   512
+
+Details
+	Write                               ops =          0 	Avg Latency:   Not collected
+	Write_file                          ops =       2844 	Avg Latency:   0.000609  Min Latency:   0.000042  Max Latency:   0.025876
+	Mmap_write                          ops =          0 	Avg Latency:   Not collected
+	Mmap_read                           ops =          0 	Avg Latency:   Not collected
+	Read                                ops =          0 	Avg Latency:   Not collected
+	Read_file                           ops =       1902 	Avg Latency:   0.000015  Min Latency:   0.000006  Max Latency:   0.000581
+	Mkdir                               ops =        311 	Avg Latency:   0.001668  Min Latency:   0.001119  Max Latency:   0.022600
+	Rmdir                               ops =          0 	Avg Latency:   Not collected
+	Unlink                              ops =        586 	Avg Latency:   0.001133  Min Latency:   0.001134  Max Latency:   0.012469
+	Unlink2                             ops =        275 	Avg Latency:   0.002424  Min Latency:   0.001079  Max Latency:   0.018129
+	Create                              ops =        557 	Avg Latency:   0.002088  Min Latency:   0.001090  Max Latency:   0.014908
+	Stat                                ops =      10959 	Avg Latency:   0.000082  Min Latency:   0.000004  Max Latency:   0.011785
+	Neg_stat                            ops =          0 	Avg Latency:   Not collected
+	Append                              ops =          0 	Avg Latency:   Not collected
+	Lock                                ops =          0 	Avg Latency:   Not collected
+	Access                              ops =       4161 	Avg Latency:   0.000020  Min Latency:   0.000004  Max Latency:   0.003668
+	Chmod                               ops =        295 	Avg Latency:   0.002282  Min Latency:   0.001009  Max Latency:   0.011199
+	Readdir                             ops =          0 	Avg Latency:   Not collected
+	Random_write                        ops =       4212 	Avg Latency:   0.000473  Min Latency:   0.000009  Max Latency:   0.019475
+	Random_read                         ops =       2186 	Avg Latency:   0.000014  Min Latency:   0.000003  Max Latency:   0.000121
+	Read_modify_write                   ops =          0 	Avg Latency:   Not collected
+	Open file                           ops =        278	Avg Latency:   Not collected
+	Close file                          ops =       1382	Avg Latency:   Not collected
+	Copyfile                            ops =          0 	Avg Latency:   Not collected
+	Rename                              ops =          0 	Avg Latency:   Not collected
+	Statfs                              ops =          0 	Avg Latency:   Not collected
+	Pathconf                            ops =          0 	Avg Latency:   Not collected
+	Trunc                               ops =          0 	Avg Latency:   Not collected
+	Custom1                             ops =          0 	Avg Latency:   Not collected
+	Custom2                             ops =          0 	Avg Latency:   Not collected
+
+	Band 1:  20us:15787    40us:4704     60us:2706     80us:1153    100us:172     
+	Band 2: 200us:184     400us:118     600us:139     800us:13        1ms:4       
+	Band 3:   2ms:956       4ms:1817      6ms:187       8ms:8        10ms:7       
+	Band 4:  12ms:8        14ms:4        16ms:4        18ms:2        20ms:2       
+	Band 5:  40ms:2        60ms:0        80ms:0       100ms:0       
+	Band 6: 200ms:0       400ms:0       600ms:0       800ms:0          1s:0       
+	Band 7:    2s:0          4s:0          6s:0          8s:0         10s:0       
+	Band 8:   20s:0         40s:0         60s:0         80s:0        120s:0       
+	Band 9: 120+s:0       
+
+
+--------------------------------------------------------------------
+Client            rmchad-redhat8-base                  ID:          3
+Workload Name:                     EDA_FRONTEND
+Run time                                299
+Ops/sec                              100.00
+Avg Latency                           0.420
+Total file ops                        29939
+Read throughput                     583.949 Kbytes/sec
+Read kbytes                      174822.774 Kbytes
+Write throughput                    237.634 Kbytes/sec
+Write Kbytes                      71142.855 Kbytes
+Native_read throughput              176.868 Kbytes/sec
+Native read kbytes                52950.774 Kbytes
+Native_write throughput             193.436 Kbytes/sec
+Native_write Kbytes               57910.855 Kbytes
+Meta_write throughput                44.254 Kbytes/sec
+Meta_write Kbytes                 13232.000 Kbytes
+Meta_read throughput                407.599 Kbytes/sec
+Meta_read Kbytes                 121872.000 Kbytes
+Initialized dirs                        270 
+Initialized files                      2700 
+Initialized files with space              0 
+Per proc file space             ~         0 Mbytes
+Min Direct I/O size =                   512
+
+Details
+	Write                               ops =          0 	Avg Latency:   Not collected
+	Write_file                          ops =       2742 	Avg Latency:   0.000617  Min Latency:   0.000042  Max Latency:   0.019288
+	Mmap_write                          ops =          0 	Avg Latency:   Not collected
+	Mmap_read                           ops =          0 	Avg Latency:   Not collected
+	Read                                ops =          0 	Avg Latency:   Not collected
+	Read_file                           ops =       1897 	Avg Latency:   0.000017  Min Latency:   0.000004  Max Latency:   0.000906
+	Mkdir                               ops =        257 	Avg Latency:   0.001673  Min Latency:   0.001133  Max Latency:   0.014711
+	Rmdir                               ops =          0 	Avg Latency:   Not collected
+	Unlink                              ops =        532 	Avg Latency:   0.001165  Min Latency:   0.001023  Max Latency:   0.007041
+	Unlink2                             ops =        273 	Avg Latency:   0.002358  Min Latency:   0.001096  Max Latency:   0.014726
+	Create                              ops =        575 	Avg Latency:   0.002073  Min Latency:   0.001040  Max Latency:   0.013894
+	Stat                                ops =      11029 	Avg Latency:   0.000081  Min Latency:   0.000004  Max Latency:   0.012135
+	Neg_stat                            ops =          0 	Avg Latency:   Not collected
+	Append                              ops =          0 	Avg Latency:   Not collected
+	Lock                                ops =          0 	Avg Latency:   Not collected
+	Access                              ops =       4205 	Avg Latency:   0.000024  Min Latency:   0.000004  Max Latency:   0.010885
+	Chmod                               ops =        274 	Avg Latency:   0.002586  Min Latency:   0.001099  Max Latency:   0.025818
+	Readdir                             ops =          0 	Avg Latency:   Not collected
+	Random_write                        ops =       4145 	Avg Latency:   0.000470  Min Latency:   0.000011  Max Latency:   0.016848
+	Random_read                         ops =       2337 	Avg Latency:   0.000014  Min Latency:   0.000004  Max Latency:   0.000674
+	Read_modify_write                   ops =          0 	Avg Latency:   Not collected
+	Open file                           ops =        277	Avg Latency:   Not collected
+	Close file                          ops =       1396	Avg Latency:   Not collected
+	Copyfile                            ops =          0 	Avg Latency:   Not collected
+	Rename                              ops =          0 	Avg Latency:   Not collected
+	Statfs                              ops =          0 	Avg Latency:   Not collected
+	Pathconf                            ops =          0 	Avg Latency:   Not collected
+	Trunc                               ops =          0 	Avg Latency:   Not collected
+	Custom1                             ops =          0 	Avg Latency:   Not collected
+	Custom2                             ops =          0 	Avg Latency:   Not collected
+
+	Band 1:  20us:15056    40us:5541     60us:2625     80us:1197    100us:192     
+	Band 2: 200us:193     400us:122     600us:166     800us:11        1ms:4       
+	Band 3:   2ms:880       4ms:1801      6ms:185       8ms:13       10ms:8       
+	Band 4:  12ms:4        14ms:3        16ms:3        18ms:2        20ms:1       
+	Band 5:  40ms:2        60ms:0        80ms:0       100ms:0       
+	Band 6: 200ms:0       400ms:0       600ms:0       800ms:0          1s:0       
+	Band 7:    2s:0          4s:0          6s:0          8s:0         10s:0       
+	Band 8:   20s:0         40s:0         60s:0         80s:0        120s:0       
+	Band 9: 120+s:0       
+
+
+--------------------------------------------------------------------
+Client            rmchad-redhat8-base                  ID:          4
+Workload Name:                     EDA_FRONTEND
+Run time                                299
+Ops/sec                              100.00
+Avg Latency                           0.440
+Total file ops                        29939
+Read throughput                     584.026 Kbytes/sec
+Read kbytes                      174845.507 Kbytes
+Write throughput                    242.010 Kbytes/sec
+Write Kbytes                      72452.973 Kbytes
+Native_read throughput              182.422 Kbytes/sec
+Native read kbytes                54613.507 Kbytes
+Native_write throughput             196.075 Kbytes/sec
+Native_write Kbytes               58700.973 Kbytes
+Meta_write throughput                45.993 Kbytes/sec
+Meta_write Kbytes                 13752.000 Kbytes
+Meta_read throughput                402.114 Kbytes/sec
+Meta_read Kbytes                 120232.000 Kbytes
+Initialized dirs                        270 
+Initialized files                      2700 
+Initialized files with space              0 
+Per proc file space             ~         0 Mbytes
+Min Direct I/O size =                   512
+
+Details
+	Write                               ops =          0 	Avg Latency:   Not collected
+	Write_file                          ops =       2786 	Avg Latency:   0.000633  Min Latency:   0.000038  Max Latency:   0.027536
+	Mmap_write                          ops =          0 	Avg Latency:   Not collected
+	Mmap_read                           ops =          0 	Avg Latency:   Not collected
+	Read                                ops =          0 	Avg Latency:   Not collected
+	Read_file                           ops =       2029 	Avg Latency:   0.000016  Min Latency:   0.000005  Max Latency:   0.000473
+	Mkdir                               ops =        269 	Avg Latency:   0.001689  Min Latency:   0.001143  Max Latency:   0.011539
+	Rmdir                               ops =          0 	Avg Latency:   Not collected
+	Unlink                              ops =        572 	Avg Latency:   0.001274  Min Latency:   0.001079  Max Latency:   0.022370
+	Unlink2                             ops =        285 	Avg Latency:   0.002446  Min Latency:   0.001183  Max Latency:   0.022427
+	Create                              ops =        593 	Avg Latency:   0.002088  Min Latency:   0.001000  Max Latency:   0.014984
+	Stat                                ops =      11012 	Avg Latency:   0.000081  Min Latency:   0.000004  Max Latency:   0.009825
+	Neg_stat                            ops =          0 	Avg Latency:   Not collected
+	Append                              ops =          0 	Avg Latency:   Not collected
+	Lock                                ops =          0 	Avg Latency:   Not collected
+	Access                              ops =       4017 	Avg Latency:   0.000030  Min Latency:   0.000004  Max Latency:   0.011883
+	Chmod                               ops =        269 	Avg Latency:   0.002444  Min Latency:   0.000983  Max Latency:   0.021893
+	Readdir                             ops =          0 	Avg Latency:   Not collected
+	Random_write                        ops =       4117 	Avg Latency:   0.000478  Min Latency:   0.000010  Max Latency:   0.020442
+	Random_read                         ops =       2237 	Avg Latency:   0.000014  Min Latency:   0.000004  Max Latency:   0.000120
+	Read_modify_write                   ops =          0 	Avg Latency:   Not collected
+	Open file                           ops =        287	Avg Latency:   Not collected
+	Close file                          ops =       1466	Avg Latency:   Not collected
+	Copyfile                            ops =          0 	Avg Latency:   Not collected
+	Rename                              ops =          0 	Avg Latency:   Not collected
+	Statfs                              ops =          0 	Avg Latency:   Not collected
+	Pathconf                            ops =          0 	Avg Latency:   Not collected
+	Trunc                               ops =          0 	Avg Latency:   Not collected
+	Custom1                             ops =          0 	Avg Latency:   Not collected
+	Custom2                             ops =          0 	Avg Latency:   Not collected
+
+	Band 1:  20us:14870    40us:5490     60us:2668     80us:1219    100us:175     
+	Band 2: 200us:228     400us:120     600us:157     800us:10        1ms:7       
+	Band 3:   2ms:968       4ms:1757      6ms:194       8ms:23       10ms:8       
+	Band 4:  12ms:5        14ms:7        16ms:3        18ms:2        20ms:0       
+	Band 5:  40ms:6        60ms:0        80ms:0       100ms:0       
+	Band 6: 200ms:0       400ms:0       600ms:0       800ms:0          1s:0       
+	Band 7:    2s:0          4s:0          6s:0          8s:0         10s:0       
+	Band 8:   20s:0         40s:0         60s:0         80s:0        120s:0       
+	Band 9: 120+s:0       
+
+

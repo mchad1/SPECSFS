@@ -1,0 +1,3117 @@
+#!/usr/bin/env python3
+##############################################################################
+# Copyright (c) 2014 - 2020 Standard Performance Evaluation Corporation
+#               All rights reserved.
+#
+# Authors: Vernon Miller, Nick Principe
+# This source code is provided as is, without any express or implied warranty.
+#
+#  History:
+#  Date        ID, Company               Description
+#  --------  --------------------  --------------------------------------------
+#  01/30/19  nap, iXsystems        Remove UsableGiB-related field, fix
+#                                  cropped axes titles on plots, and send
+#                                  totalCapacity field to .sub file instead
+#                                  of sum of UsableGiB
+#
+#  02/03/20  nap, iXsystems        Ported to python3
+#
+#
+##############################################################################
+
+
+# standard help screen
+def usage():
+    """Prints syntax and limits each line to 60 characters + tab."""
+    print("\tUsage: python %s [options] " % sys.argv[0])
+    print("")
+    print("\tCommand line option:")
+    print("\tRequired:")
+    print('\t{0:.<60} {1}'.format("[-i <file>] or [--submission-file=<file>]",
+          "Specify XML submission file"))
+    print("\tRequired for Initial Creation Only:")
+    print('\t{0:.<60} {1}'.format("[-r <file>] or [--rc-file=<file>]",
+          "Specify RC file"))
+    print('\t{0:.<60} {1}'.format("[-s <suffix>] or [--suffix=<suffix>]",
+          "Suffix used in log and summary files, similar to SfsManager"))
+    print("\tOptional:")
+    print('\t{0:.<60} {1}'.format("[-p <prefix>] or [--prefix=<prefix>]",
+          "Prefix common to all submission files that get created."))
+    print('\t{0:<60} {1}'.format("", ("Default during initial submission"
+          " package creation: storage2020-YYYYmmdd-HHMM")))
+    print('\t{0:<60} {1}'.format("", ("This parameter is required for renaming"
+          " existing submissions.")))
+    print('\t{0:.<60} {1}'.format("[-u] or [--update]",
+          "Update an existing submission."))
+    print('\t{0:<60} {1}'.format("", ("This option gets the prefix from the"
+          " submission file (-i <file>) filename.")))
+    print('\t{0:<60} {1}'.format("", ("The RC file, suffix, and results"
+          " directory flags will be ignored.")))
+    print('\t{0:<60} {1}'.format("", ("Use with -p <prefix> for a renamed and"
+          " updated version of a submission.")))
+    print('\t{0:.<60} {1}'.format("[-d <dir>] or [--results-dir=<dir>]",
+          "Results directory, use full path"))
+    print('\t{0:.<60} {1}'.format("[-o <file>] or [--output=<dir>]",
+          "Output ZIP archive for full disclosure"))
+    print('\t{0:.<60} {1}'.format(("[-a <file1,file2,...>] or "
+           "[--attachments=<file1,file2,...>]"), ("List of extra files to "
+           "attach to the submission (e.g. client/mountpoint file)")))
+    print('\t{0:.<60} {1}'.format("[--validate-only]",
+          "Validate the submission without creating the full disclosure pkg"))
+    print('\t{0:.<60} {1}'.format("[-h]", "Show usage info"))
+    print('\t{0:.<60} {1}'.format("[--debug]", "Detailed output"))
+
+
+#
+# Utility functions
+#
+
+
+def message(msg, pad="", exit=False, rc=1):
+    """Formats messages to stdout and exits if necessary."""
+    msg_str = pad
+    msg_str += msg
+    print(msg_str)
+    if exit:
+        sys.exit(rc)
+
+
+def simplify_capacity(gib):
+    """Convert to most convenient binary capacity units."""
+    cap = float(gib)
+    if cap / (1024 * 1024) > 1:
+        return "%.1f PiB" % (cap / (1024 * 1024))
+    elif cap / 1024 > 1:
+        return "%.1f TiB" % (cap / 1024)
+    else:
+        return "%.1f GiB" % cap
+
+
+def text_wrap(text, maxchar=80):
+    """Modifies given string to wrap at 80 characters."""
+    txt = ""
+    linelen = 0
+    for word in text.split():
+        if (linelen + len(word) > (maxchar - 1)):
+            txt += "\n%s " % word
+            linelen = len(word) + 1
+        else:
+            txt += "%s " % word
+            linelen += len(word) + 1
+    return txt
+
+
+def tag_surround(text, tag, newline=False):
+    """Surrounds given text with HTML/XML markup style tags."""
+    if newline:
+        return "<%s>%s</%s>\n" % (tag, text, tag)
+    else:
+        return "<%s>%s</%s>" % (tag, text, tag)
+
+
+def get_year_range():
+    """Returns a string for a year or range of years based on current date."""
+    today = date.today()
+    thisyear = today.year
+    if thisyear > 2016:
+        return "2016-%d" % thisyear
+    else:
+        return "2016"
+
+
+def filename_split(filename):
+    """Returns a tuple cotaining a given file's name and extension."""
+    fname = ""
+    fname_ext = ""
+    i = filename.split(".")
+    fname = ".".join(i[:-1])
+    fname_ext = i[-1]
+    return (fname, fname_ext)
+
+
+def file_update(fname1, fname2):
+    """Renames fname1 to fname2 if they are different."""
+    if fname1 != fname2:
+        try:
+            if os.path.isfile(fname1):
+                os.rename(fname1, fname2)
+            else:
+                message("%s is not a valid file, skipping rename to %s" % \
+                    (fname1, fname2))
+            # delete fname1 if for some reason it is still around
+            if os.path.exists(fname1):
+                os.remove(fname1)
+        except OSError:
+            message(("Error trying to rename %s to %s.  Please check that"
+                        " the source file exists and the destination file"
+                        " does not exist." % (fname1, fname2)), "", True)
+
+#
+# Generic HTML & ASCII formatting classes
+#
+
+
+class Heading:
+    def __init__(self, text="", size=2):
+        """Simple section heading with title and optional size (HTML only)"""
+        self.text = text
+        self.size = size
+
+    def to_html(self):
+        """Create HTML heading with a given size"""
+        return "\n<h%d>%s</h%d>\n" % (self.size, self.text, self.size)
+
+    def to_ascii(self):
+        """Center text and surround with ASCII art outline"""
+        txt = ""
+        txt += "{0:^79}".format(self.text)
+        txt += "\n"
+        if self.size < 3:
+            txt += "{0:^79}".format("=" * len(self.text))
+        else:
+            txt += "{0:^79}".format("-" * len(self.text))
+        txt += "\n"
+        return txt
+
+
+class Text:
+    def __init__(self, text="", paragraph=True, div=False, bold=False):
+        """Block of text."""
+        self.text = text
+        self.paragraph = paragraph
+        self.div = div
+        self.bold = bold
+
+    def to_html(self):
+        """Optionally formats with bold/paragraph/div tags."""
+        htmlstr = text_wrap(re.sub("\n\n", "<br><br>\n", self.text))
+        if self.bold:
+            htmlstr = tag_surround(htmlstr, "b")
+        if self.paragraph:
+            htmlstr = tag_surround(htmlstr, "p")
+        if self.div:
+            htmlstr = tag_surround(htmlstr, "div", True)
+        return htmlstr
+
+    def to_ascii(self):
+        """Wraps text at 80 characters."""
+        txt = ""
+        for i in self.text.split("\n\n"):
+            txt += text_wrap(i)
+            txt += "\n\n"
+        return txt
+
+
+class Image:
+    def __init__(self, src="", alt="", w=None, h=None):
+        """Image container for performance curve."""
+        self.src = src
+        self.alt = alt
+        self.w = w
+        self.h = h
+
+    def to_html(self):
+        """Code to embed generated PNG plot."""
+        if self.w and self.h:
+            return '<img src="%s" alt="%s" width="%d" height="%d">\n' % \
+                (self.src, self.alt, self.w, self.h)
+        else:
+            return '<img src="%s" alt="%s">\n' % (self.src, self.alt)
+
+    def to_ascii(self):
+        """Does nothing as there is no image in the text version."""
+        return "[image]"
+
+
+class Link:
+    def __init__(self, ref="", text=""):
+        """Container for link/name of configuration diagrams."""
+        self.ref = ref
+        self.text = text
+
+    def to_html(self):
+        """Embeds link to configuration diagrams."""
+        return '<a href="%s">%s</a>\n' % (self.ref, self.text)
+
+    def to_ascii(self):
+        """Lists file name and refers to webpage for picture."""
+        return "%s (see SPECstorage Solution 2020 results webpage)" % \
+            os.path.basename(self.ref)
+
+
+class Line:
+    def __init__(self, char="=", length=79):
+        """Just a visual or text line."""
+        self.char = char
+        self.length = length
+
+    def to_html(self):
+        """Generates horizontal rule."""
+        return "<p><hr></p>\n"
+
+    def to_ascii(self):
+        """Repeated characters for a given length"""
+        return "%s\n" % (self.length * self.char)
+
+
+class List:
+    def __init__(self):
+        """A bulleted list of items."""
+        self.items = []
+
+    def add_item(self, item):
+        """Add item to the list."""
+        self.items.append(item)
+
+    def to_html(self):
+        """Create HTML numbered list"""
+        htmlstr = "<ol>\n"
+        for item in self.items:
+            htmlstr += "<li>%s" % item.to_html()
+        htmlstr += "</ol>"
+        return htmlstr
+
+    def to_ascii(self):
+        """Create numbered text list"""
+        txt = ""
+        for i in range(len(self.items)):
+            txt += "%d) %s\n" % (i + 1, self.items[i].to_ascii())
+        return txt
+
+
+class TextCell:
+    def __init__(self, text="", align="left", width=0, underline=False, \
+            valign="top"):
+        """A container for used to represent cells in text based tables."""
+        self.text = text
+        self.align = align
+        self.width = width
+        self.underline = underline
+        self.valign = valign
+
+    def get_height(self):
+        """Returns height of text block in terms of number of characters."""
+        if self.width:
+            return len(textwrap.wrap(self.text, self.width))
+        else:
+            return len(self.text)
+
+    def get_width(self):
+        """Returns the specified width of the cell or length of the text."""
+        if self.width:
+            return self.width
+        else:
+            return len(self.text)
+
+    def set_width(self, width):
+        """Sets the width of the text cell."""
+        if width > 0:
+            self.width = width
+
+    def get_lines(self):
+        """Returns the text representation of the cell with borders."""
+        if self.width:
+            lines = textwrap.wrap(self.text, self.width)
+            if self.underline:
+                lines.append("-" * self.width)
+            return lines
+        else:
+            lines = [self.text]
+            if self.underline:
+                lines.append("-" * len(self.text))
+            return lines
+
+    def get_formatted_lines(self, height=1):
+        """Returns the formatted cell with alignment."""
+        lines = self.get_lines()
+        empty_lines = height - len(lines)
+        if empty_lines > 0:
+            for i in range(empty_lines):
+                if self.valign == "bottom":
+                    lines.insert(0, "")
+                else:
+                    lines.append("")
+        align = ""
+        if self.align == "left":
+            align = "<"
+        elif self.align == "right":
+            align = ">"
+        elif self.align == "center":
+            align = "^"
+        else:
+            align = "<"
+        width = self.get_width()
+        lines = ["{0:{align}{width}}".format(i, align=align, width=width) for \
+            i in lines]
+        return lines
+
+
+class TextRow:
+    def __init__(self, separator=" ", border=False):
+        """A container representing a row in text based tables."""
+        self.separator = separator
+        self.border = border
+        self.cells = []
+
+    def add_cell(self, cell):
+        """Adds a new cell to the row."""
+        self.cells.append(cell)
+
+    def set_col_width(self, col, width):
+        """Sets the maximum column width in number of characters."""
+        if len(self.cells) > col:
+            self.cells[col].set_width(width)
+
+    def join_cells(self):
+        """Combines all cells to form the row."""
+        height = 1
+        columns = [cell.get_lines() for cell in self.cells]
+        try:
+            height = max([len(column) for column in columns])
+        except:
+            message("couldn't determine height for text row")
+        lines = []
+        ncell = len(self.cells)
+        seps = [self.separator for i in range(ncell)]
+        for i in range(ncell):
+            lines.append(self.cells[i].get_formatted_lines(height))
+        return [self.separator.join(i) for i in zip(*lines)]
+
+    def print_row(self):
+        """Returns the text representation of the row with borders."""
+        lines = self.join_cells()
+        if self.border:
+            lines = ["%s%s%s" % (self.separator, i, self.separator) for \
+                i in lines]
+            w = len(lines[0])
+            borderstr = ""
+            if w > 2:
+                borderstr = "+%s+" % ("-" * (w - 2))
+            else:
+                borderstr = "-" * w
+            lines.insert(0, borderstr)
+            lines.append(borderstr)
+        txt = ""
+        for i in range(len(lines)):
+            txt += "%s\n" % lines[i]
+        return txt
+
+
+class SimpleTable:
+    def __init__(self, border=0, bold=False):
+        """A simple 2 column table containing text only."""
+        self.border = border
+        self.bold = bold
+        self.rows = []
+        self.col_align = {}
+        self.col_width = {}
+
+    def add_row(self, data):
+        """Adds a row to the table."""
+        self.rows.append(data)
+
+    def set_col_align(self, col, align):
+        """Sets the text alignment for a given column."""
+        self.col_align[col] = align
+
+    def set_col_width(self, col, width):
+        """Sets the column width."""
+        self.col_width[col] = width
+
+    def to_html(self):
+        """Returns HTML representation of the table."""
+        htmlstr = '<table border="%d">\n' % self.border
+        for row in self.rows:
+            htmlstr += "<tr>\n"
+            for i in range(len(row)):
+                txt = row[i]
+                if self.bold:
+                    txt = tag_surround(txt, "b")
+                if i in self.col_align:
+                    htmlstr += '<td align="%s">%s</td>\n' % \
+                        (self.col_align[i], txt)
+                else:
+                    htmlstr += '<td>%s</td>\n' % txt
+            htmlstr += "</tr>\n"
+        htmlstr += "</table>"
+        return htmlstr
+
+    def to_ascii(self):
+        """Returns text representation of the table."""
+        txt = ""
+        for row in self.rows:
+            txtrow = TextRow()
+            for i in range(len(row)):
+                txtcell = TextCell(row[i])
+                if i in self.col_align:
+                    txtcell.align = self.col_align[i]
+                if i in self.col_width:
+                    txtcell.set_width(self.col_width[i])
+                txtrow.add_cell(txtcell)
+            txt += txtrow.print_row()
+        return txt
+
+
+class ObjectTable(SimpleTable):
+    def __init__(self):
+        """A 2 column table suitable for embedding images and text."""
+        SimpleTable.__init__(self)
+
+    def to_html(self):
+        """Returns HTML representation of the table."""
+        htmlstr = '<table border="%d">\n' % self.border
+        for row in self.rows:
+            htmlstr += "<tr>\n"
+            for i in range(len(row)):
+                if i in self.col_align:
+                    htmlstr += '<td align="%s">\n\t%s\n</td>\n' % \
+                        (self.col_align[i], row[i].to_html())
+                else:
+                    htmlstr += '<td>\n\t%s</td>\n' % row[i].to_html()
+            htmlstr += "</tr>\n"
+        htmlstr += "</table>"
+        return htmlstr
+
+
+class Table:
+    def __init__(self, border=1, width=None, transpose=False):
+        """A generic table class with normal/transpose representation."""
+        self.border = border
+        self.width = width
+        self.transpose = transpose
+        self.title = None
+        self.headers = []
+        self.data = {}
+        self.header_align = {}
+        self.col_width = {}
+        self.data_align = {}
+
+    def add_title(self, title=""):
+        """Title will be the first row spanning all columns"""
+        self.title = title
+
+    def add_header(self, header, align="", width=0):
+        """Adds a new category of data to the table."""
+        if not header in self.headers:
+            self.headers.append(header)
+            self.header_align[header] = align
+            self.col_width[header] = width
+            if not header in self.data:
+                self.data[header] = []
+                self.data_align[header] = align
+                self.col_width[header] = width
+
+    def add_data(self, datum, header):
+        """Adds data for a specified header. Data is appended existing data"""
+        if header in self.data:
+            self.data[header].append(datum)
+        else:
+            self.data[header] = [datum]
+
+    def set_header_align(self, header, align=""):
+        """Sets the text alignment for a given category (header)."""
+        self.header_align[header] = align
+
+    def set_data_align(self, header, align=""):
+        """Sets the text alignment for a given category (data)."""
+        self.data_align[header] = align
+
+    def set_col_width(self, col, width=0):
+        """Sets the column width, irrespective of category."""
+        self.col_width[col] = width
+
+    def get_cols(self):
+        """Returns the total number of columns in the table."""
+        if self.transpose:
+            n = 0
+            for i in self.headers:
+                j = len(self.data[i])
+                if j > n:
+                    n = j
+            return n + 1
+        else:
+            return len(self.headers)
+
+    def get_html_normal(self):
+        """Generate HTML with each column having header then data"""
+        if self.width:
+            htmlstr = '<table border="%d" width="%d%%">\n' % \
+                (self.border, self.width)
+        else:
+            htmlstr = '<table border="%d">\n' % self.border
+        if self.title:
+            nspan = self.get_cols()
+            htmlstr += '<th colspan="%d" align="center">%s</th>\n' % \
+                (nspan, self.title)
+        htmlstr += "<tr>"
+        for i in self.headers:
+            htmlstr += '<th class="cellHeader"'
+            if i in self.header_align:
+                htmlstr += ' align="%s">%s</th>' % (self.header_align[i], i)
+            else:
+                htmlstr += '>%s</th>' % i
+        htmlstr += "</tr>\n"
+        maxrows = 0
+        for i in self.data:
+            if len(self.data[i]) > maxrows:
+                maxrows = len(self.data[i])
+        for i in range(maxrows):
+            htmlstr += "<tr>"
+            odd = False
+            if i % 2 == 1:
+                odd = True
+            for j in self.headers:
+                if odd:
+                    htmlstr += '<td class="cellValueOdd"'
+                else:
+                    htmlstr += '<td class="cellValueEven"'
+                if len(self.data[j]) > i:
+                    if self.data_align[j]:
+                        htmlstr += ' align="%s">%s</td>' % \
+                            (self.data_align[j], self.data[j][i])
+                    else:
+                        htmlstr += '>%s</td>' % self.data[j][i]
+                else:
+                    htmlstr += '></td>'
+            htmlstr += '</tr>\n'
+        htmlstr += '</table>\n'
+        return htmlstr
+
+    def get_html_transpose(self):
+        """Generate HTML with each row having header then data"""
+        if self.width:
+            htmlstr = '<table border="%d" width="%d%%">\n' % \
+                (self.border, self.width)
+        else:
+            htmlstr = '<table border="%d">\n' % self.border
+        if self.title:
+            nspan = self.get_cols()
+            htmlstr += ('<th class="cellHeader" colspan="%d"'
+                        ' align="center">%s</th>\n') % (nspan, self.title)
+        htmlstr += "<tr>"
+        for i in self.headers:
+            if i in self.header_align:
+                htmlstr += '<th class="cellSubHeader" align="%s">%s</th>' \
+                    % (self.header_align[i], i)
+            else:
+                htmlstr += '<th class="cellSubHeader">%s</th>' % i
+            for j in self.data[i]:
+                if self.data_align[i]:
+                    htmlstr += '<td align="%s">%s</td>' % \
+                        (self.data_align[i], j)
+                else:
+                    htmlstr += '<td>%s</td>' % j
+            htmlstr += '</tr>\n'
+        htmlstr += '</table>'
+        return htmlstr
+
+    def get_ascii_normal(self):
+        """Generate text table with each column having header then data"""
+        txt = ""
+        if self.title:
+            totalwidth = 0
+            for i in self.col_width:
+                totalwidth += self.col_width[i]
+            if totalwidth == 0:
+                for j in self.headers:
+                    totalwidth += len(j)
+            totalwidth += len(self.headers) - 3
+            titlecell = TextCell(self.title, align="center")
+            if totalwidth < len(self.title):
+                totalwidth = len(self.title)
+            titlecell.set_width(totalwidth)
+            titlerow = TextRow("|", border=True)
+            titlerow.add_cell(titlecell)
+            txt += titlerow.print_row()
+        headerrow = TextRow()
+        for i in self.headers:
+            col = self.headers.index(i)
+            headercell = TextCell(i, underline=True, valign="bottom")
+            if col in self.col_width:
+                headercell.set_width(self.col_width[col])
+            if i in self.header_align:
+                headercell.align = self.header_align[i]
+            headerrow.add_cell(headercell)
+        txt += headerrow.print_row()
+        maxrows = 0
+        for i in self.data:
+            if len(self.data[i]) > maxrows:
+                maxrows = len(self.data[i])
+        for i in range(maxrows):
+            txtrow = TextRow()
+            for j in self.headers:
+                col = self.headers.index(j)
+                width = None
+                if col in self.col_width:
+                    width = self.col_width[col]
+                if len(self.data[j]) > i:
+                    txtcell = TextCell(self.data[j][i])
+                    if self.data_align[j]:
+                        txtcell.align = self.data_align[j]
+                    if width:
+                        txtcell.set_width(width)
+                    txtrow.add_cell(txtcell)
+            txt += txtrow.print_row()
+        return txt + "\n"
+
+    def get_ascii_transpose(self):
+        """Generate text table with each row having header then data"""
+        txt = ""
+        if self.title:
+            totalwidth = 0
+            for i in self.col_width:
+                totalwidth += self.col_width[i]
+            if totalwidth == 0:
+                for j in self.headers:
+                    totalwidth += len(j)
+            totalwidth += len(self.headers) - 3
+            titlecell = TextCell(self.title, align="center")
+            if totalwidth < len(self.title):
+                totalwidth = len(self.title)
+            titlecell.set_width(totalwidth)
+            titlerow = TextRow("|", border=True)
+            titlerow.add_cell(titlecell)
+            txt += titlerow.print_row()
+        for i in self.headers:
+            txtrow = TextRow("  ")
+            width = None
+            if 0 in self.col_width:
+                width = self.col_width[0]
+            headercell = TextCell(i, align="right")
+            if width:
+                headercell.set_width(width)
+            txtrow.add_cell(headercell)
+            for j in range(len(self.data[i])):
+                col = j + 1
+                width = None
+                if col in self.col_width:
+                    width = self.col_width[col]
+                txtcell = TextCell(self.data[i][j])
+                if self.data_align[i]:
+                    txtcell.align = self.data_align[i]
+                if width:
+                    txtcell.set_width(width)
+                txtrow.add_cell(txtcell)
+            txt += txtrow.print_row()
+        return txt + "\n"
+
+    def to_html(self):
+        """Generate HTML, either normal or traspose"""
+        if self.transpose:
+            return self.get_html_transpose()
+        else:
+            return self.get_html_normal()
+
+    def to_ascii(self):
+        """Generate text, either normal or traspose"""
+        if self.transpose:
+            return self.get_ascii_transpose()
+        else:
+            return self.get_ascii_normal()
+
+
+class ItemizedTable(Table):
+    def __init__(self, border=1, width=None):
+        """Like Table with an additional first column for numbering rows."""
+        self.border = border
+        self.width = width
+        self.item_header = "Item No"
+        self.nrows = 0
+        Table.__init__(self, self.border, self.width)
+        self.add_header(self.item_header, "left")
+        self.set_data_align(self.item_header, "right")
+        self.set_col_width(0, 4)
+
+    def add_data(self, datum, header):
+        """Adds data for a specified header. Data is appended existing data"""
+        if header in self.data:
+            self.data[header].append(datum)
+            datarows = len(self.data[header])
+            if datarows > self.nrows:
+                self.nrows = datarows
+                self.data[self.item_header] = ["%d" % (i + 1) for i in \
+                    range(self.nrows)]
+        else:
+            self.data[header] = [datum]
+            self.data[self.item_header] = ["1"]
+
+
+class ComponentTable(Table):
+    def __init__(self, border=1, width=None):
+        """Table with sections labeled by spanned headings."""
+        Table.__init__(self, border, width)
+        self.components = []
+        self.data = {}
+        self.component_align = {}
+        self.header_align = {}
+        self.data_align = {}
+
+    def add_component(self, component, align="center"):
+        """Adds new component, creates structures to hold headers & data"""
+        self.components.append(component)
+        self.component_align[component] = align
+        if not component in self.data:
+            self.data[component] = {}
+            for i in self.headers:
+                self.data[component][i] = []
+
+    def add_data(self, datum, header, component):
+        """Adds data for a specified header and component."""
+        if component in self.data:
+            if header in self.data[component]:
+                self.data[component][header].append(datum)
+            else:
+                self.data[component][header] = [datum]
+        else:
+            self.components.append(component)
+            self.data[component] = {}
+            self.data[component][header] = [datum]
+
+    def to_html(self):
+        """Generates HTML table, component names span all columns"""
+        if self.width:
+            htmlstr = '<table border="%d" width="%d%%">\n' % \
+                (self.border, self.width)
+        else:
+            htmlstr = '<table border="%d">\n' % self.border
+        htmlstr += "<tr>"
+        ncol = len(self.headers)
+        for i in self.components:
+            htmlstr += '<th class="cellHeader"'
+            if i in self.component_align:
+                htmlstr += ' colspan="%d" align="%s">%s</th>' % \
+                    (ncol, self.component_align[i], i)
+            else:
+                htmlstr += ' colspan="%d">%s</th>' % (ncol, i)
+            htmlstr += "</tr>\n"
+            for j in self.headers:
+                htmlstr += '<th class="cellSubHeader"'
+                if j in self.header_align:
+                    htmlstr += ' align="%s">%s</th>' % \
+                        (self.header_align[j], j)
+                else:
+                    htmlstr += '>%s</th>' % j
+            htmlstr += "</tr>\n"
+            maxrows = 0
+            for j in self.data[i]:
+                if len(self.data[i][j]) > maxrows:
+                    maxrows = len(self.data[i][j])
+            for j in range(maxrows):
+                htmlstr += "<tr>"
+                odd = False
+                if j % 2 == 1:
+                    odd = True
+                for k in self.headers:
+                    if odd:
+                        htmlstr += '<td class="cellValueOdd"'
+                    else:
+                        htmlstr += '<td class="cellValueEven"'
+                    if len(self.data[i][k]) > j:
+                        if self.data_align[k]:
+                            htmlstr += ' align="%s">%s</td>' % \
+                                (self.data_align[k], self.data[i][k][j])
+                        else:
+                            htmlstr += '>%s</td>' % self.data[i][k][j]
+                    else:
+                        htmlstr += '></td>'
+                htmlstr += '</tr>\n'
+        htmlstr += '</table>\n'
+        return htmlstr
+
+    def to_ascii(self):
+        """Generates text table, component names span all columns"""
+        txt = ""
+        totalwidth = 0
+        for i in self.col_width:
+            totalwidth += self.col_width[i]
+        if totalwidth == 0:
+            for j in self.headers:
+                totalwidth += len(j)
+        totalwidth += len(self.headers) - 3
+        for i in self.components:
+            compcell = TextCell(i, align="center")
+            if totalwidth < len(i):
+                totalwidth = len(i)
+            compcell.set_width(totalwidth)
+            comprow = TextRow("|", border=True)
+            comprow.add_cell(compcell)
+            txt += comprow.print_row()
+            headerrow = TextRow()
+            for j in self.headers:
+                col = self.headers.index(j)
+                headercell = TextCell(j, underline=True, valign="bottom")
+                if col in self.col_width:
+                    headercell.set_width(self.col_width[col])
+                if j in self.header_align:
+                    headercell.align = self.header_align[j]
+                headerrow.add_cell(headercell)
+            txt += headerrow.print_row()
+            maxrows = 0
+            for j in self.data[i]:
+                if len(self.data[i][j]) > maxrows:
+                    maxrows = len(self.data[i][j])
+            for j in range(maxrows):
+                txtrow = TextRow()
+                for k in self.headers:
+                    col = self.headers.index(k)
+                    width = None
+                    if col in self.col_width:
+                        width = self.col_width[col]
+                    if len(self.data[i][k]) > j:
+                        txtcell = TextCell(self.data[i][k][j])
+                        if self.data_align[k]:
+                            txtcell.align = self.data_align[k]
+                        if width:
+                            txtcell.set_width(width)
+                        txtrow.add_cell(txtcell)
+                txt += txtrow.print_row()
+        return txt + "\n"
+
+
+class TotalsTable(Table):
+    def __init__(self, total_text="Total", showcap=True, subtotal_column=False,
+            intcap=False, border=1, width=None):
+        """Table with additional rows/columns for summed table data."""
+        Table.__init__(self, border, width)
+        self.total_text = total_text
+        self.showcap = showcap
+        self.intcap = intcap
+        self.subtotal_column = subtotal_column
+        self.subtotal_text = "Subtotal"
+        self.grand_total = None
+        self.capacity_col = None
+        self.multiplier_col = None
+        self.total = ""  # This gets reported in the lower right cell
+
+    def add_subtotal_column(self):
+        """Adds a column for holding intermediate calculations"""
+        self.add_header(self.subtotal_text, "center")
+        capdata = self.data[self.capacity_col]
+        capdata = [float(i) for i in capdata]
+        multidata = self.data[self.multiplier_col]
+        multidata = [float(i) for i in multidata]
+        totaldata = list(map(lambda i: i[0] * i[1], zip(capdata, multidata)))
+        self.grand_total = sum(totaldata)
+        if self.intcap:
+            self.data[self.subtotal_text] = ["%d" % i for i in totaldata]
+            self.grand_total = "%d" % self.grand_total
+        else:
+            self.data[self.subtotal_text] = ["%.1f" % i for i in totaldata]
+            self.grand_total = "%.1f" % self.grand_total
+
+    def calculate_total(self):
+        """Calculates grand total, to be displayed in lower right cell"""
+        if self.subtotal_column:
+            self.add_subtotal_column()
+        maxrows = 0
+        totalcap = 0.0
+        for i in self.data:
+            if len(self.data[i]) > maxrows:
+                maxrows = len(self.data[i])
+        for i in range(maxrows):
+            for j in self.headers:
+                col = self.headers.index(j)
+                width = None
+                if col in self.col_width:
+                    width = self.col_width[col]
+                if len(self.data[j]) > i:
+                    if j == self.capacity_col:
+                        totalcap += float(self.data[j][i])
+        #  Calculate total
+        if self.showcap:
+            capstr = simplify_capacity(totalcap)
+        else:
+            if self.intcap:
+                capstr = "%d" % totalcap
+            else:
+                capstr = "%.1f" % totalcap
+        if self.grand_total:
+            self.total = self.grand_total
+        else:
+            self.total = capstr
+        return self.total
+
+    def to_html(self):
+        """Generates HTML version of the table"""
+        if self.width:
+            htmlstr = '<table border="%d" width="%d%%">\n' % \
+                (self.border, self.width)
+        else:
+            htmlstr = '<table border="%d">\n' % self.border
+        htmlstr += "<tr>"
+        if self.subtotal_column:
+            self.add_subtotal_column()
+        for i in self.headers:
+            htmlstr += '<th class="cellHeader"'
+            if i in self.header_align:
+                htmlstr += ' align="%s">%s</th>' % (self.header_align[i], i)
+            else:
+                htmlstr += '>%s</th>' % i
+        htmlstr += "</tr>\n"
+        maxrows = 0
+        totalcap = 0.0
+        for i in self.data:
+            if len(self.data[i]) > maxrows:
+                maxrows = len(self.data[i])
+        for i in range(maxrows):
+            htmlstr += "<tr>"
+            odd = False
+            if i % 2 == 1:
+                odd = True
+            for j in self.headers:
+                if odd:
+                    htmlstr += '<td class="cellValueOdd"'
+                else:
+                    htmlstr += '<td class="cellValueEven"'
+                if len(self.data[j]) > i:
+                    if j == self.capacity_col:
+                        if self.showcap:
+                            datastr = simplify_capacity(self.data[j][i])
+                        else:
+                            datastr = self.data[j][i]
+                        totalcap += float(self.data[j][i])
+                    else:
+                        datastr = self.data[j][i]
+                    if self.data_align[j]:
+                        htmlstr += ' align="%s">%s</td>' % \
+                            (self.data_align[j], datastr)
+                    else:
+                        htmlstr += '>%s</td>' % datastr
+                else:
+                    htmlstr += '></td>'
+            htmlstr += '</tr>\n'
+        #  Calculate total and put in last row
+        if self.showcap:
+            capstr = simplify_capacity(totalcap)
+        else:
+            if self.intcap:
+                capstr = "%d" % totalcap
+            else:
+                capstr = "%.1f" % totalcap
+        ncols = len(self.headers)
+        htmlstr += '<th class="cellHeader"'
+        htmlstr += ' colspan="%d" align="right">%s</th>' % ((ncols - 1), \
+            self.total_text)
+        align = self.data_align[self.capacity_col]
+        if self.grand_total:
+            self.total = self.grand_total
+        else:
+            self.total = capstr
+        htmlstr += '<td class="cellValueTotal"'
+        if align:
+            htmlstr += ' align="%s">%s</td></tr>\n' % (align, self.total)
+        else:
+            htmlstr += ' align="right">%s</td></tr>\n' % self.total
+        htmlstr += '</table>\n'
+        return htmlstr
+
+    def to_ascii(self):
+        """Generates text version of the table"""
+        txt = ""
+        if self.subtotal_column:
+            self.add_subtotal_column()
+        headerrow = TextRow()
+        for i in self.headers:
+            col = self.headers.index(i)
+            headercell = TextCell(i, underline=True, valign="bottom")
+            if col in self.col_width:
+                headercell.set_width(self.col_width[col])
+            if i in self.header_align:
+                headercell.align = self.header_align[i]
+            headerrow.add_cell(headercell)
+        txt += headerrow.print_row()
+        maxrows = 0
+        totalcap = 0.0
+        for i in self.data:
+            if len(self.data[i]) > maxrows:
+                maxrows = len(self.data[i])
+        for i in range(maxrows):
+            txtrow = TextRow()
+            for j in self.headers:
+                col = self.headers.index(j)
+                width = None
+                if col in self.col_width:
+                    width = self.col_width[col]
+                if len(self.data[j]) > i:
+                    datastr = ""
+                    if j == self.capacity_col:
+                        if self.showcap:
+                            datastr = simplify_capacity(self.data[j][i])
+                        else:
+                            datastr = self.data[j][i]
+                        totalcap += float(self.data[j][i])
+                    else:
+                        datastr = self.data[j][i]
+                    txtcell = TextCell(datastr)
+                    if self.data_align[j]:
+                        txtcell.align = self.data_align[j]
+                    if width:
+                        txtcell.set_width(width)
+                    txtrow.add_cell(txtcell)
+            txt += txtrow.print_row()
+        #  Calculate total and put in last row
+        if self.showcap:
+            capstr = simplify_capacity(totalcap)
+        else:
+            if self.intcap:
+                capstr = "%d" % totalcap
+            else:
+                capstr = "%.1f" % totalcap
+        # find width of n-1 columns
+        totalcolwidth = 0
+        ncols = len(self.headers)
+        for i in range(ncols - 1):
+            if i in self.col_width:
+                totalcolwidth += self.col_width[i]
+        if totalcolwidth == 0:
+            for i in range(ncols - 1):
+                totalcolwidth += len(self.headers[i])
+        totalcolwidth += ncols - 2
+        totalrow = TextRow()
+        totaltext = TextCell(self.total_text, align="right")
+        totaltext.set_width(totalcolwidth)
+        totalrow.add_cell(totaltext)
+        grandtotalcell = TextCell()
+        col = len(self.headers) - 1
+        if self.headers[col] in self.data_align:
+            grandtotalcell.align = self.data_align[self.headers[col]]
+        if col in self.col_width:
+            grandtotalcell.set_width(self.col_width[col])
+        if self.grand_total:
+            grandtotalcell.text = self.grand_total
+            self.total = self.grand_total
+        else:
+            grandtotalcell.text = capstr
+            self.total = capstr
+        totalrow.add_cell(grandtotalcell)
+        txt += totalrow.print_row()
+        return txt + "\n"
+
+
+class Section:
+    def __init__(self, title="", env="", size=2):
+        """Generalized report section with title and environment type."""
+        self.titletxt = title
+        self.env = env
+        if self.env:
+            if self.env.lower() == "physical":
+                self.titletxt += " - Physical"
+            if self.env.lower() == "virtual":
+                self.titletxt += " - Virtual"
+        self.title = Heading(self.titletxt, size)
+        self.items = []
+
+    def add_item(self, item):
+        """Adds item to section, must implement HTML and TXT conversion"""
+        self.items.append(item)
+
+    def to_html(self):
+        """Sequentially convert all items to HTML"""
+        htmlstr = self.title.to_html()
+        itemstr = ""
+        for item in self.items:
+            itemstr += item.to_html()
+        htmlstr += tag_surround(itemstr, "div", True)
+        return htmlstr
+
+    def to_ascii(self):
+        """Sequentially convert all items to text"""
+        txt = "\n\n"
+        txt = self.title.to_ascii()
+        txt += "\n"
+        for item in self.items:
+            txt += item.to_ascii()
+        txt += "\n"
+        return txt
+
+
+class HTMLDocument:
+    def __init__(self, filename="", title="", valid=True):
+        """Container class for the HTML version of the submission."""
+        self.filename = filename
+        if title:
+            self.title = tag_surround(title, "title")
+        else:
+            self.title = None
+        self.summary = ""
+        self.valid = valid
+        self.bench = ""
+        #self.style = '<STYLE type="text/css">'
+        #self.style += '<!--div {margin-left: 3.0em;}--></STYLE>'
+        # CSS - to see this locally uncomment the following 2 lines
+        #self.style = ('<link rel="stylesheet" type="text/css"'
+        #                'href="storage2020result.css">\n')
+        self.style = ('<style type="text/css" id="internalScreen" '
+                      ' media="screen">\n<!--\n')
+        self.style += ('@import url(//www.spec.org/includes/css/'
+                       'storage2020result.css);-->\n</style>\n')
+        self.style += ('<style type="text/css" id="internalPrint" '
+                       'media="print">\n<!--\n')
+        self.style += ('@import url(//www.spec.org/includes/css/'
+                       'storage2020result.css);-->\n</style>\n')
+
+        self.sections = []
+
+    def add_section(self, section):
+        """Add section to list"""
+        self.sections.append(section)
+
+    def add_summary(self, vendor="", solution="", result="", ort="",):
+        """Creates the 2x2 table on the top of the results page"""
+        self.summary += '<table border="0" width="100%">\n<tr>\n'
+        self.summary += '<td width="62%" class="summaryText upperSummary">'
+        self.summary += '%s</td>\n' % vendor
+        self.summary += '<th class="summaryResult cellHeader upperSummary">'
+        self.summary += '%s</td>\n</tr>\n<tr>\n' % result
+        self.summary += '<td class="summaryText lowerSummary">%s</td>\n' % \
+            solution
+        self.summary += ('<td class="summaryResult cellValueTotal '
+                         'lowerSummary">%s</td>\n' % ort)
+        self.summary += '</tr>\n</table><p><hr></p>\n\n'
+
+    def write_file(self):
+        """Creates HTML file: preamble, summary, sections, and footer"""
+        preamble = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0'
+                    ' Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/'
+                    'xhtml1-transitional.dtd">\n<html xmlns="http://www.w3.org'
+                    '/1999/xhtml">\n<head>')
+        if self.title:
+            preamble += "%s\n" % self.title
+        if self.style:
+            preamble += "%s\n" % self.style
+        preamble += "</head>\n<body>\n"
+        preamble += '<table class="header" width="100%">\n'
+        preamble += ('\t<tr><td class="logo"><a href="http://www.spec.org">'
+                     '<img src="/images/spec-sm.gif" alt="SPEC Seal"/></a>'
+                     '</td>\n')
+        headerstr = "SPECstorage&trade; Solution 2020_%s Result" % self.bench
+        if not self.valid:
+            headerstr += " [INVALID]"
+        preamble += '\t<td class="benchmark"><h1>%s</h1>\n' % headerstr
+        preamble += ('\t<p class="copyright"><p>Copyright &copy; %s Standard'
+                     ' Performance Evaluation Corporation</p></td></tr>\n' % \
+                     get_year_range())
+        preamble += '</table>\n'
+        postamble = "<p><hr></p>\n"
+        postamble += "<p>Generated on %s by SpecReport<br>" % time.ctime()
+        postamble += ("Copyright &copy; %s Standard Performance"
+                      " Evaluation Corporation\n</p>\n</body>\n</html>" % \
+                      get_year_range())
+        f = open(self.filename, 'w')
+        f.write(preamble)
+        f.write(self.summary)
+        for section in self.sections:
+            f.write(section.to_html())
+        f.write(postamble)
+        f.close()
+
+
+class TextDocument:
+    def __init__(self, filename="", title=""):
+        """Container class for the text version of the submission."""
+        self.filename = filename
+        self.title = title
+        self.sections = []
+
+    def add_section(self, section):
+        """Add section to list"""
+        self.sections.append(section)
+
+    def write_file(self):
+        """Sequentially write all sections to file"""
+        preamble = "\n"
+        if self.title:
+            preamble += "{0:^80}".format(self.title)
+            preamble += "\n\n"
+        postamble = "Generated on %s by SpecReport\n" % time.ctime()
+        postamble += ("Copyright (C) %s Standard Performance Evaluation"
+                      " Corporation\n" % get_year_range())
+        f = open(self.filename, 'w')
+        f.write(preamble)
+        for section in self.sections:
+            txt = section.to_ascii()
+            if txt:
+                f.write("%s\n" % txt)
+        f.write(postamble)
+        f.close()
+
+#
+#  SPEC Submission Disclosure Classes
+#
+
+
+class Report:
+    def __init__(self, repfile, prefix, subdir, update_links, debug):
+        """Main class for translating the input XML to report data"""
+        self.repfile = repfile
+        self.prefix = prefix
+        self.subdir = subdir
+        self.debug = debug
+        self.reptree = None  # ElementTree representing submission XML document
+        self.vendor = None
+        self.product = None
+        self.xmltree = None
+        self.lic = None
+        self.update_links = update_links
+        self.usable_cap = ""
+        self.total_mem = ""
+        self.noncompliant = "no"  # valid are no, yes, and na
+        self.noncompliance_reason = ""
+        self.noncompliance_remedy = ""
+        self.noncompliance_notes = ""
+        self.sections = []
+        self.attachments = []  # extra files (config diagrams) to archive
+        try:
+            self.xmltree = et.parse(self.repfile)
+        except:
+            message("Error parsing report XML file")
+            print(sys.exc_info())
+            sys.exit(1)
+
+    def cfgtext(self, element, default="None"):
+        """ Replaces blank fields with None or some user specified string. """
+        txt = ""
+        if element.text:
+            txt = element.text.strip()
+        if txt == "":
+            txt = default
+            element.text = txt
+        return txt
+
+    def validate(self):
+        """ Checks for correctness of the XML structure and data. """
+        xmlfirstpass = SubmissionFormat()
+        xmlparser = et.XMLParser(target=xmlfirstpass)
+        f = open(self.repfile)
+        xmlparser.feed(f.read())
+        f.close()
+        xmlparser.close()
+        # If the file has all the right tags validation will continue
+        root = self.xmltree.getroot()
+        if root.tag != "specSPECstorage2020":
+            self.syntax_error("Unknown root tag <%s>" % root.tag)
+            section_validation = {"solutionInfo": False, "testInfo": False,
+                "otherReportNotes": False, "submissionInfo": False,
+                "results": False, "resultCompliance": False}
+        for section in root:
+            tag = section.tag
+            if tag == "solutionInfo":
+                for subsection in section:
+                    subtag = subsection.tag
+                    if subtag == "vendorAndProduct":
+                        thissection = Section("Product and Test Information")
+                        attribs = ["testedBy", "submissionTitle",
+                            "hardwareAvailable", "softwareAvailable",
+                            "dateTested", "licenseNumber", "licenseeLocation"]
+                        attrib_names = {
+                            "testedBy": "Tested by",
+                            "submissionTitle": "Submission Title",
+                            "hardwareAvailable": "Hardware Available",
+                            "softwareAvailable": "Software Available",
+                            "dateTested": "Date Tested",
+                            "licenseNumber": "License Number",
+                            "licenseeLocation": "Licensee Locations"}
+                        prodtable = Table(transpose=True)
+                        for a in attribs:
+                            if a in subsection.attrib:
+                                if a != "submissionTitle":
+                                    prodtable.add_header(attrib_names[a])
+                                    prodtable.set_header_align(attrib_names[a],
+                                        "right")
+                                else:
+                                    prodtable.add_title(subsection.attrib[a])
+                                prodtable.add_data(subsection.attrib[a], \
+                                    attrib_names[a])
+                                if a == "testedBy":
+                                    self.vendor = subsection.attrib[a]
+                                if a == "submissionTitle":
+                                    self.product = subsection.attrib[a]
+                                if a == "licenseNumber":
+                                    try:
+                                        self.lic = int(subsection.attrib[a])
+                                    except ValueError:
+                                        self.syntax_error(("License number"
+                                                           " must be an "
+                                                           " integer"))
+                            else:
+                                self.missing_data(a, subtag)
+                        prodtable.set_col_width(0, 20)
+                        prodtable.set_col_width(1, 40)
+                        #otherinfo = subsection.findtext("otherMarketingInfo")
+                        otherinfo = subsection.find("otherMarketingInfo")
+                        if otherinfo is None:
+                            self.syntax_error(("Could not find "
+                                               " otherMarketingInfo tag"))
+                        prodinfo = Text(self.cfgtext(otherinfo))
+                        thissection.add_item(prodtable)
+                        thissection.add_item(prodinfo)
+                        self.sections.append(thissection)
+                    elif subtag == "SUTBomList":
+                        thissection = Section(("Solution Under Test Bill of"
+                                               " Materials"))
+                        attribs = ["quantity", "type", "vendor", "model"]
+                        attrib_names = {
+                            "model": "Model/Name",
+                            "quantity": "Qty",
+                            "type": "Type",
+                            "vendor": "Vendor"}
+                        bomtable = ItemizedTable()
+                        for a in attribs:
+                            bomtable.add_header(attrib_names[a], "left")
+                        bomtable.add_header("Description", "left")
+                        bomtable.set_col_width(1, 4)
+                        bomtable.set_col_width(2, 10)
+                        bomtable.set_col_width(3, 10)
+                        bomtable.set_col_width(4, 10)
+                        bomtable.set_col_width(5, 35)
+                        bomtable.set_data_align("Qty", "right")
+                        for bomitem in subsection:
+                            tag = bomitem.tag
+                            if tag != "bomItem":
+                                self.unknown_tag(tag, subtag)
+                            for a in attribs:
+                                if a in bomitem.attrib:
+                                    bomtable.add_data(bomitem.attrib[a], \
+                                        attrib_names[a])
+                                else:
+                                    self.missing_data(a, subtag)
+                            #desc = get_text(bomitem.findtext("description"))
+                            desc = bomitem.find("description")
+                            if desc is None:
+                                self.syntax_error(("Could not find description"
+                                                  " tag in %s." % subtag))
+                            desctxt = self.cfgtext(desc)
+                            bomtable.add_data(desctxt, "Description")
+                        thissection.add_item(bomtable)
+                        self.sections.append(thissection)
+                    elif subtag == "configDiagramList":
+                        thissection = Section("Configuration Diagrams")
+                        diagrams = List()
+                        for s in subsection:
+                            tag = s.tag
+                            if tag == "configDiagramItem":
+                                dianame = ""
+                                diaref = ""
+                                if "name" in s.attrib:
+                                    dianame = s.attrib["name"]
+                                else:
+                                    self.missing_data("name", subtag)
+                                if "ref" in s.attrib:
+                                    diaref = s.attrib["ref"]
+                                else:
+                                    self.missing_data("ref", subtag)
+                            else:
+                                self.unknown_tag(tag, subtag)
+                            if dianame != "" and diaref != "":
+                                self.add_diagram(diaref)
+                                newref = self.attachments[-1][1]
+                                diagrams.add_item(Link(newref, dianame))
+                                # update XML with new filename
+                                s.attrib["ref"] = newref
+                            else:
+                                message(("Missing configuration diagram name"
+                                         " or link", "", True))
+                        thissection.add_item(diagrams)
+                        self.sections.append(thissection)
+                    elif subtag == "componentSoftwareList":
+                        thissection = Section("Component Software")
+                        attribs = ["componentName", "softwareType",
+                            "softwareVersion"]
+                        attrib_names = {
+                            "componentName": "Component",
+                            "softwareType": "Type",
+                            "softwareVersion": "Name and Version",
+                        }
+                        swtable = ItemizedTable()
+                        for a in attribs:
+                            swtable.add_header(attrib_names[a], "left")
+                        swtable.add_header("Description", "left")
+                        swtable.set_col_width(1, 12)
+                        swtable.set_col_width(2, 12)
+                        swtable.set_col_width(3, 12)
+                        swtable.set_col_width(4, 35)
+                        for switem in subsection:
+                            tag = switem.tag
+                            if tag != "componentSoftwareItem":
+                                self.unknown_tag(tag, subtag)
+                            for a in attribs:
+                                if a in switem.attrib:
+                                    swtable.add_data(switem.attrib[a], \
+                                        attrib_names[a])
+                                else:
+                                    self.missing_data(a, subtag)
+                            #desc = get_text(switem.findtext("description"))
+                            desc = switem.find("description")
+                            if desc is None:
+                                self.syntax_error(("Could not find description"
+                                                  " tag in %s." % subtag))
+                            desctxt = self.cfgtext(desc)
+                            swtable.add_data(desctxt, "Description")
+                        thissection.add_item(swtable)
+                        self.sections.append(thissection)
+                    elif subtag == "hardwareConfigAndTuning":
+                        envtype = self.get_env(subsection.attrib, subtag)
+                        thissection = Section(("Hardware Configuration and"
+                                               " Tuning"), envtype)
+                        hwnotes = Section(("Hardware Configuration and"
+                                                " Tuning Notes"), size=3)
+                        attribs = ["paramName", "paramValue", "paramDesc"]
+                        attrib_names = {
+                            "paramName": "Parameter Name",
+                            "paramValue": "Value",
+                            "paramDesc": "Description"}
+                        hwtable = ComponentTable()
+                        for a in attribs:
+                            hwtable.add_header(attrib_names[a], "left")
+                        hwtable.set_col_width(0, 15)
+                        hwtable.set_col_width(1, 15)
+                        hwtable.set_col_width(2, 40)
+                        for s in subsection:
+                            tag = s.tag
+                            if tag == "hardwareComponentConfig":
+                                cname = ""
+                                if "componentName" in s.attrib:
+                                    cname = s.attrib["componentName"]
+                                    hwtable.add_component(cname)
+                                else:
+                                    self.missing_data("componentName", s.tag)
+                                for i in s.findall("hardwareTuningList"):
+                                    for a in attribs:
+                                        if a in i.attrib:
+                                            hwtable.add_data(i.attrib[a], \
+                                                attrib_names[a], cname)
+                                        else:
+                                            self.missing_data(a, subtag)
+                            elif tag == "hardwareConfigAndTuningNotes":
+                                hwnotes.add_item(Text(self.cfgtext(s)))
+                            else:
+                                self.unknown_tag(tag, subtag)
+                        thissection.add_item(hwtable)
+                        thissection.add_item(hwnotes)
+                        self.sections.append(thissection)
+                    elif subtag == "softwareConfigAndTuning":
+                        envtype = self.get_env(subsection.attrib, subtag)
+                        thissection = Section(("Software Configuration and"
+                                               " Tuning"), envtype)
+                        swnotes = Section(("Software Configuration and"
+                                                " Tuning Notes"), size=3)
+                        slanotes = Section("Service SLA Notes", size=3)
+                        attribs = ["paramName", "paramValue", "paramDesc"]
+                        attrib_names = {
+                            "paramName": "Parameter Name",
+                            "paramValue": "Value",
+                            "paramDesc": "Description"}
+                        swtable = ComponentTable()
+                        for a in attribs:
+                            swtable.add_header(attrib_names[a], "left")
+                        swtable.set_col_width(0, 15)
+                        swtable.set_col_width(1, 15)
+                        swtable.set_col_width(2, 40)
+                        for s in subsection:
+                            tag = s.tag
+                            if tag == "softwareComponentConfig":
+                                cname = ""
+                                if "componentName" in s.attrib:
+                                    cname = s.attrib["componentName"]
+                                    swtable.add_component(cname)
+                                else:
+                                    self.missing_data("componentName", s.tag)
+                                for e in s:
+                                    etag = e.tag
+                                    if etag != "softwareTuningList":
+                                        self.unknown_tag(etag, subtag)
+                                    for a in attribs:
+                                        if a in e.attrib:
+                                            swtable.add_data(e.attrib[a], \
+                                                attrib_names[a], cname)
+                                        else:
+                                            self.missing_data(a, subtag)
+                            elif tag == "softwareConfigAndTuningNotes":
+                                swnotes.add_item(Text(self.cfgtext(s)))
+                            elif tag == "serviceSLA":
+                                slanotes.add_item(Text(self.cfgtext(s)))
+                            else:
+                                self.unknown_tag(tag, subtag)
+                        thissection.add_item(swtable)
+                        thissection.add_item(swnotes)
+                        thissection.add_item(slanotes)
+                        self.sections.append(thissection)
+                    elif subtag == "storageAndFilesystems":
+                        thissection = Section("Storage and Filesystems")
+                        strgtable = ItemizedTable()
+                        fstable = Table(transpose=True)
+                        fscrnotes = Section("Filesystem Creation Notes",
+                            size=3)
+                        strgfsnotes = Section("Storage and Filesystem Notes",
+                            size=3)
+                        strg_attribs = ["description", "dataProtection",
+                            "stableStorage", "quantity"]
+                        strg_attrib_names = {
+                            "description": "Description",
+                            "dataProtection": "Data Protection",
+                            "stableStorage": "Stable Storage",
+                            "quantity": "Qty"}
+                        fs_attribs = ["fsQuantity", "totalCapacity", "fsType"]
+                        fs_attrib_names = {
+                            "fsQuantity": "Number of Filesystems",
+                            "totalCapacity": "Total Capacity",
+                            "fsType": "Filesystem Type"}
+                        for a in strg_attribs:
+                            strgtable.add_header(strg_attrib_names[a], "left")
+                        strgtable.set_header_align("Qty", "right")
+                        strgtable.set_data_align("Qty", "right")
+                        strgtable.set_col_width(0, 4)
+                        strgtable.set_col_width(1, 37)
+                        strgtable.set_col_width(2, 18)
+                        strgtable.set_col_width(3, 8)
+                        strgtable.set_col_width(4, 5)
+                        for a in fs_attribs:
+                            fstable.add_header(fs_attrib_names[a], "right")
+                            fstable.set_data_align(fs_attrib_names[a], "left")
+                        fstable.set_col_width(0, 29)
+                        fstable.set_col_width(1, 46)
+                        for s in subsection:
+                            tag = s.tag
+                            if tag == "storageSetList":
+                                for e in s:
+                                    etag = e.tag
+                                    if etag != "storageSetItem":
+                                        self.unknown_tag(etag, subtag)
+                                    for a in strg_attribs:
+                                        if a in e.attrib:
+                                            strgtable.add_data(e.attrib[a], \
+                                                strg_attrib_names[a])
+                                        else:
+                                            self.missing_data(a, subtag)
+                            elif tag == "fsInfo":
+                                for a in fs_attribs:
+                                    if a in s.attrib:
+                                        fstable.add_data(s.attrib[a], \
+                                            fs_attrib_names[a])
+                                        if a == "totalCapacity":
+                                            self.usable_cap = s.attrib[a]
+                                    else:
+                                        self.missing_data(a, subtag)
+                            elif tag == "fsCreationNotes":
+                                fscrnotes.add_item(Text(self.cfgtext(s)))
+                            elif tag == "storageAndFsNotes":
+                                strgfsnotes.add_item(Text(self.cfgtext(s)))
+                            else:
+                                self.unknown_tag(tag, subtag)
+                        thissection.add_item(strgtable)
+                        thissection.add_item(fstable)
+                        thissection.add_item(fscrnotes)
+                        thissection.add_item(strgfsnotes)
+                        self.sections.append(thissection)
+                    elif subtag == "transportList":
+                        envtype = self.get_env(subsection.attrib, subtag)
+                        thissection = Section("Transport Configuration",
+                            envtype)
+                        notessec = Section("Transport Configuration Notes",
+                            size=3)
+                        transtable = ItemizedTable()
+                        attribs = ["transportType", "portsUsed",
+                            "interfaceNotes"]
+                        attrib_names = {
+                            "transportType": "Transport Type",
+                            "portsUsed": "Number of Ports Used",
+                            "interfaceNotes": "Notes"}
+                        for a in attribs:
+                            transtable.add_header(attrib_names[a], "left")
+                        transtable.set_data_align("Number of Ports Used",
+                            "center")
+                        transtable.set_col_width(1, 15)
+                        transtable.set_col_width(2, 10)
+                        transtable.set_col_width(3, 47)
+                        for s in subsection:
+                            tag = s.tag
+                            if tag == "transportInterface":
+                                for a in attribs:
+                                    if a in s.attrib:
+                                        transtable.add_data(s.attrib[a], \
+                                            attrib_names[a])
+                                    else:
+                                        self.missing_data(a, subtag)
+                            elif tag == "transportConfigurationNotes":
+                                notessec.add_item(Text(self.cfgtext(s)))
+                            else:
+                                self.unknown_tag(tag, subtag)
+                        thissection.add_item(transtable)
+                        thissection.add_item(notessec)
+                        self.sections.append(thissection)
+                    elif subtag == "switchList":
+                        envtype = self.get_env(subsection.attrib, subtag)
+                        thissection = Section("Switches", envtype)
+                        switchtable = ItemizedTable()
+                        attribs = ["switchName", "switchType",
+                            "switchPortCount", "switchPortAvail",
+                            "switchNotes"]
+                        attrib_names = {
+                            "switchName": "Switch Name",
+                            "switchType": "Switch Type",
+                            "switchPortCount": "Total Port Count",
+                            "switchPortAvail": "Used Port Count",
+                            "switchNotes": "Notes"}
+                        for a in attribs:
+                            switchtable.add_header(attrib_names[a], "left")
+                        switchtable.set_header_align("Port Count", "center")
+                        switchtable.set_data_align("Port Count", "center")
+                        switchtable.set_col_width(1, 20)
+                        switchtable.set_col_width(2, 15)
+                        switchtable.set_col_width(3, 6)
+                        switchtable.set_col_width(4, 5)
+                        switchtable.set_col_width(5, 24)
+                        for s in subsection:
+                            tag = s.tag
+                            if tag == "switchItem":
+                                for a in attribs:
+                                    if a in s.attrib:
+                                        switchtable.add_data(s.attrib[a], \
+                                            attrib_names[a])
+                                    else:
+                                        self.missing_data(a, subtag)
+                            else:
+                                self.unknown_tag(tag, subtag)
+                        thissection.add_item(switchtable)
+                        self.sections.append(thissection)
+                    elif subtag == "processingElements":
+                        envtype = self.get_env(subsection.attrib, subtag)
+                        thissection = Section("Processing Elements", envtype)
+                        notessec = Section("Processing Element Notes", size=3)
+                        proctable = ItemizedTable()
+                        attribs = ["procQuantity", "procType", "procLocation",
+                            "procDecs", "procFunction"]
+                        attrib_names = {
+                            "procQuantity": "Qty",
+                            "procType": "Type",
+                            "procLocation": "Location",
+                            "procDecs": "Description",
+                            "procFunction": "Processing Function"}
+                        for a in attribs:
+                            proctable.add_header(attrib_names[a], "left")
+                        proctable.set_header_align("Qty", "right")
+                        proctable.set_data_align("Qty", "right")
+                        proctable.set_col_width(1, 4)
+                        proctable.set_col_width(2, 8)
+                        proctable.set_col_width(3, 14)
+                        proctable.set_col_width(4, 25)
+                        proctable.set_col_width(5, 19)
+                        for s in subsection:
+                            tag = s.tag
+                            if tag == "processingElement":
+                                for a in attribs:
+                                    if a in s.attrib:
+                                        proctable.add_data(s.attrib[a], \
+                                            attrib_names[a])
+                                    else:
+                                        self.missing_data(a, subtag)
+                            elif tag == "procElementNotes":
+                                notessec.add_item(Text(self.cfgtext(s)))
+                            else:
+                                self.unknown_tag(tag, subtag)
+                        thissection.add_item(proctable)
+                        thissection.add_item(notessec)
+                        self.sections.append(thissection)
+                    elif subtag == "memory":
+                        envtype = self.get_env(subsection.attrib, subtag)
+                        thissection = Section("Memory", envtype)
+                        notessec = Section("Memory Notes", size=3)
+                        memtable = TotalsTable(
+                            total_text="Grand Total Memory Gibibytes",
+                            showcap=False,
+                            subtotal_column=True,
+                            intcap=True)
+                        attribs = ["memoryDesc", "memorySizeGiB",
+                            "memoryQuantity", "nonVolatile"]
+                        attrib_names = {
+                            "memoryDesc": "Description",
+                            "memorySizeGiB": "Size in GiB",
+                            "memoryQuantity": "Number of Instances",
+                            "nonVolatile": "Nonvolatile"}
+                        for a in attribs:
+                            memtable.add_header(attrib_names[a], "center")
+                        memtable.set_header_align("Description", "left")
+                        memtable.set_data_align("Description", "left")
+                        memtable.capacity_col = "Size in GiB"
+                        memtable.multiplier_col = "Number of Instances"
+                        memtable.subtotal_text = "Total GiB"
+                        memtable.set_col_width(0, 25)
+                        memtable.set_col_width(1, 10)
+                        memtable.set_col_width(2, 10)
+                        memtable.set_col_width(3, 12)
+                        memtable.set_col_width(4, 12)
+                        for s in subsection:
+                            tag = s.tag
+                            if tag == "memorySetItem":
+                                for a in attribs:
+                                    if a in s.attrib:
+                                        memtable.add_data(s.attrib[a], \
+                                            attrib_names[a])
+                                    else:
+                                        self.missing_data(a, subtag)
+                            elif tag == "memoryNotes":
+                                notessec.add_item(Text(self.cfgtext(s)))
+                            else:
+                                self.unknown_tag(tag, subtag)
+                        self.total_mem = memtable.calculate_total()
+                        thissection.add_item(memtable)
+                        thissection.add_item(notessec)
+                        self.sections.append(thissection)
+                    elif subtag == "stableStorage":
+                        thissection = Section("Stable Storage")
+                        thissection.add_item(Text(self.cfgtext(subsection)))
+                        self.sections.append(thissection)
+                    elif subtag == "sutConfigNotes":
+                        thissection = Section(("Solution Under Test"
+                                               " Configuration Notes"))
+                        thissection.add_item(Text(self.cfgtext(subsection)))
+                        self.sections.append(thissection)
+                    elif subtag == "otherSutNotes":
+                        thissection = Section("Other Solution Notes")
+                        thissection.add_item(Text(self.cfgtext(subsection)))
+                        self.sections.append(thissection)
+                    else:
+                        self.syntax_error(("Unknown subsection <%s> in"
+                            " section <%s>" % (subtag, tag)))
+            elif tag == "testInfo":
+                for subsection in section:
+                    subtag = subsection.tag
+                    if subtag == "dataFlow":
+                        thissection = Section("Dataflow")
+                        thissection.add_item(Text(self.cfgtext(subsection)))
+                        self.sections.append(thissection)
+                    elif subtag == "otherTestNotes":
+                        thissection = Section("Other Notes")
+                        thissection.add_item(Text(self.cfgtext(subsection)))
+                        self.sections.append(thissection)
+                    else:
+                        self.syntax_error(("Unknown subsection <%s> in"
+                            " section <%s>" % (subtag, tag)))
+            elif tag == "otherReportNotes":
+                thissection = Section("Other Report Notes")
+                thissection.add_item(Text(self.cfgtext(section)))
+                self.sections.append(thissection)
+            elif tag == "submissionInfo":
+                for subsection in section:
+                    subtag = subsection.tag
+                    if subtag == "submitterName":
+                        if not subsection.text:
+                            message("Missing submitter name", "", True)
+                    elif subtag == "submitterEmail":
+                        if not subsection.text:
+                            message("Missing submitter email", "", True)
+                    elif subtag == "reviewersComments":
+                        pass
+                    else:
+                        self.syntax_error(("Unknown subsection <%s> in"
+                            " section <%s>" % (subtag, tag)))
+            elif tag == "results":
+                pass
+            elif tag == "resultCompliance":
+                valid_values = ["no", "yes", "na"]
+                if "noncompliant" in section.attrib:
+                    noncompliance = section.attrib["noncompliant"].lower()
+                    if noncompliance in valid_values:
+                        self.noncompliant = noncompliance
+                    else:
+                        self.syntax_error(("Invalid value for noncompliant"
+                                           " attribute in %s tag." % tag))
+                else:
+                    self.syntax_error(("Missing noncompliant attribute in %s"
+                                       " tag." % tag))
+                for subsection in section:
+                    subtag = subsection.tag
+                    if subtag == "nonComplianceReason":
+                        self.noncompliance_reason = self.cfgtext(subsection, \
+                            "n/a")
+                    elif subtag == "nonComplianceRemedy":
+                        self.noncompliance_remedy = self.cfgtext(subsection, \
+                            "n/a")
+                    elif subtag == "nonComplianceNotes":
+                        self.noncompliance_notes = self.cfgtext(subsection)
+            else:
+                self.syntax_error("Unexpected top-level tag <%s>" % tag)
+
+    def add_diagram(self, ref):
+        """Add config diagram and give consistent naming for archive."""
+        picnum = len(self.attachments) + 1
+        fname, fname_ext = filename_split(os.path.basename(ref))
+        if not fname:
+            message("Invalid filename for configuration diagram %s." % \
+                ref, "", True)
+        if not fname_ext:
+            message(("Use a valid filename extension for configuration"
+                     " diagram %s." % ref), "", True)
+        picname = "%s.config%d.%s" % (self.prefix, picnum, fname_ext)
+        if self.update_links:
+            ref = picname
+        if self.subdir:
+            self.attachments.append((os.path.join(self.subdir, ref), picname))
+        else:
+            self.attachments.append((ref, picname))
+
+    def get_license(self):
+        """Returns the license key specified in the XML file"""
+        if self.lic is not None:
+            return self.lic
+        else:
+            return -1
+
+    def get_env(self, attribs, section):
+        """Handling for tags that differentiate by physical vs virtual"""
+        if "environmentType" in attribs:
+            envstr = attribs["environmentType"]
+            if envstr.lower() == "physical":
+                return "Physical"
+            elif envstr.lower() == "virtual":
+                return "Virtual"
+            else:
+                self.syntax_error(("environmentType must be physical or"
+                                   " virtual in section <%s>"), section)
+        else:
+            return ""
+
+    def missing_data(self, data, section):
+        """Error handling for missing data from XML section."""
+        self.syntax_error('Missing "%s" data in section <%s>.' % \
+            (data, section))
+
+    def unknown_tag(self, tag, section):
+        """Error handling for unexpected XML tag."""
+        self.syntax_error('Unknown tag "<%s>" in section <%s>.' % \
+            (tag, section))
+
+    def syntax_error(self, context=None):
+        """Error handling for malformed submission files"""
+        if context:
+            message(context, "[ERROR]", False)
+        message("Submission file %s does not have the correct syntax" % \
+            self.repfile, "[ERROR]", False)
+        message(("Review the run rules documentation for the correct"
+                 " submission file XML syntax."), "", True)
+
+    def merge_results(self, tree):
+        """Results XML get merged into the report XML"""
+        results_elem = self.xmltree.find('results')
+        if results_elem is not None:
+            results_elem.clear()
+            results_elem.insert(0, tree)
+            #self.xmltree.write(self.repfile)
+        else:
+            message("Error merging XML results into submission file", "", True)
+
+    def clear_results(self):
+        """Clear existing results in a report XML"""
+        results_elem = self.xmltree.find('results')
+        if results_elem is not None:
+            results_elem.clear()
+
+    def add_reasons(self, txt):
+        """Add possible reasons for noncompliance (load point dist, etc)"""
+        reasons_elem = self.xmltree.findall('.//nonComplianceNotes')
+        if len(reasons_elem):
+            reasons_elem[0].text = txt
+        else:
+            message("Could not find nonComplianceNotes tag")
+
+    def clear_reasons(self):
+        """Clear existing possible noncompliance reasons."""
+        tags = [
+            './/nonComplianceNotes',
+            './/nonComplianceReason',
+            './/nonComplianceRemedy']
+        for tag in tags:
+            elem = self.xmltree.findall(tag)
+            if len(elem):
+                elem[0].text = "n/a"
+            else:
+                message("Could not find %s tag" % tag)
+
+    def write_xml(self, filename=None):
+        """Write report XML to a file, usually a new file."""
+        if filename:
+            self.xmltree.write(filename)
+        else:
+            self.xmltree.write(self.repfile)
+
+    def get_xml(self):
+        """Get XML report in text."""
+        f = open(self.repfile)
+        xml = f.read()
+        f.close()
+        return xml
+
+    def get_results_xml(self):
+        """Get the results section as an ElementTree element"""
+        root = self.xmltree.getroot()
+        return root.find('results/summary')
+
+    def to_html(self):
+        """Sequentially generate HTML for each section"""
+        htmlstr = ""
+        for section in self.sections:
+            htmlstr += section.to_html()
+        return htmlstr
+
+    def to_ascii(self):
+        """Sequentially generate text representations of each section"""
+        txt = ""
+        for section in self.sections:
+            txt += section.to_ascii()
+        return txt
+
+
+class Results:
+    def __init__(self, suffix, prefix, results_dir, license, plots_available, \
+        noncompliance_text, txtfile=None, xmltree=None, subdir=None, \
+        debug=False, update=False, oldprefix=None):
+        """Main class for validating results and creating plot."""
+        self.suffix = suffix
+        self.prefix = prefix
+        self.oldprefix = oldprefix
+        self.results_dir = results_dir
+        self.lic = license
+        self.plots_available = plots_available
+        self.txtfile = txtfile
+        self.xmltree = xmltree
+        self.subdir = subdir
+        self.plot_name = None
+        self.fingerprint = "abb8f9fa"
+        self.noncompliance_text = noncompliance_text
+        self.debug = debug
+        self.update = update
+        if not txtfile:
+#            self.txtfile = os.path.join(results_dir, "storage2020_sum_%s.txt" % suffix)
+            self.txtfile = os.path.join(results_dir, "sfssum_%s.txt" % suffix)
+            if not os.access(self.txtfile, os.R_OK):
+                message("%s does not exist or is not readable" % self.txtfile,
+                    "", True)
+        if self.xmltree is None:
+#            self.xmlfile = os.path.join(results_dir, "storage2020_sum_%s.xml" % suffix)
+            self.xmlfile = os.path.join(results_dir, "sfssum_%s.xml" % suffix)
+            if not os.access(self.xmlfile, os.R_OK):
+                message("%s does not exist or is not readable" % self.xmlfile,
+                    "", True)
+            try:
+                self.xmltree = et.parse(self.xmlfile).getroot()
+            except:
+                message("Error parsing %s." % self.xmlfile)
+                print(sys.exc_info())
+                sys.exit(1)
+        self.valid = True
+        self.valid_benchmarks = ["SWBUILD", "VDA", "EDA_BLENDED", "AI_IMAGE", "GENOMICS"]
+        self.txtmetrics = {}
+        self.business_metrics = {
+            "SWBUILD": "Builds",
+            "VDA": "Streams",
+            "EDA_BLENDED": "Job_Sets",
+            "AI_IMAGE": "AI_Jobs",
+            "GENOMICS": "Jobs"}
+        self.resultsid = None
+        self.benchmark = None
+        self.metric_name = None
+        self.metrics = ["op rate", "achieved rate", "average latency", \
+            "overall throughput", "read throughput", "write throughput", \
+            "run time", "clients", "processes per client", "file size", \
+            "client data set size", "starting data set size", \
+            "initial file space", "maximum file space"]
+        self.xmlmetrics = {}
+        self.xmlid = None
+        for i in self.metrics:
+            self.xmlmetrics[i] = []
+            self.txtmetrics[i] = []
+        self.ort = None
+        self.wa = None
+        self.maxresult = None
+        self.maxlat = 0.0
+        self.curve = []
+        self.oprate_lat = []  # curve used in ORT calculation
+        self.iops = []
+        self.mbps = []
+        self.starttimes = []
+        self.attachments = [(self.txtfile, "%s.sum" % self.prefix)]
+        self.reasons = {
+            "invalid_run": 0,
+            "run_id mismatch": 0,
+            "fingerprint mismatch": 0,
+            "load points": 0,
+            "load point dist": 0,
+            "missing run_id": 0,
+            "missing fingerprint": 0,
+            "data value mismatch": 0,
+            "data length mismatch": 0,
+            "missing summary id": 0,
+            "summary id failure": 0,
+            "summary id mismatch": 0}
+        self.reasons_text = ""
+
+    def validate(self):
+        """Validate XML and TXT results and check against run rules."""
+        root = self.xmltree
+        if root.tag != "summary":
+            self.syntax_error("Unknown root tag <%s>" % root.tag)
+        if "id" in root.attrib:
+            self.xmlid = root.attrib["id"]
+        results_ok = True
+        for section in root:
+            tag = section.tag
+            if tag != "run":
+                self.syntax_error("Unexpected top-level tag <%s>" % tag)
+            if "fingerprint" in section.attrib:
+                fp1 = section.attrib["fingerprint"]
+                fp2 = "{0:x}".format(int(self.fingerprint, 16) ^ self.lic)
+                if fp1 != fp2:
+                    results_ok = False
+                    self.reasons["fingerprint mismatch"] += 1
+                    self.reasons_text += ("fingerprint, expected=%s, got=%s\n"
+                                          % (fp2, fp1))
+            else:
+                self.reasons["missing fingerprint"] += 1
+                results_ok = False
+            if "time" in section.attrib:
+                t = section.attrib["time"]
+                if not t in self.starttimes:
+                    self.starttimes.append(t)
+            business_metric = None
+            avg_latency = None
+            oprate = None
+            datarate = None
+            for subsection in section:
+                subtag = subsection.tag
+                if subtag == "business_metric":
+                    try:
+                        txt = subsection.text.strip()
+                        business_metric = int(txt)
+                    except ValueError:
+                        message(('Invalid value "%s" for business metric'
+                                    ' in %s' % (txt, self.xmltree)), "", True)
+                elif subtag == "benchmark":
+                    if "name" in subsection.attrib:
+                        bname = subsection.attrib["name"]
+                        if bname in self.valid_benchmarks:
+                            if self.benchmark:
+                                if bname != self.benchmark:
+                                    message(("All loadpoints for the"
+                                                " submission must be for"
+                                                " the same benchmark"), "",
+                                                True)
+                            else:
+                                self.benchmark = bname
+                    else:
+                        self.missing_data("name", "benchmark")
+                elif subtag == "metric":
+                    if "name" in subsection.attrib:
+                        aname = subsection.attrib["name"]
+                        value = subsection.text.strip()
+                        if not value:
+                            self.missing_data(aname, subtag)
+                        if aname in self.metrics:
+                            try:
+                                self.xmlmetrics[aname].append(float(value))
+                            except ValueError:
+                                self.bad_data(aname, value)
+                        if subsection.attrib["name"] == "average latency":
+                            avg_latency = float(subsection.text.strip())
+                            if avg_latency > self.maxlat:
+                                self.maxlat = avg_latency
+                        if subsection.attrib["name"] == "achieved rate":
+                            oprate = float(subsection.text.strip())
+                        if subsection.attrib["name"] == "overall throughput":
+                            datarate = float(subsection.text.strip()) / 1000.0
+                elif subtag == "valid_run":
+                    if subsection.text:
+                        self.valid = False
+                        self.reasons["invalid_run"] += 1
+                else:
+                    self.syntax_error(("Unknown subsection <%s> in"
+                                        " section <%s>" % \
+                                        (subtag, subsection)))
+            if business_metric and avg_latency:
+                self.curve.append((business_metric, avg_latency))
+            if oprate and avg_latency:
+                self.oprate_lat.append((oprate, avg_latency))
+            if oprate:
+                self.iops.append(oprate)
+            if datarate:
+                self.mbps.append(datarate)
+        f = open(self.txtfile)
+        lines = f.readlines()
+        f.close()
+        if len(lines) > 2:
+            i = re.sub("\s", "", "".join(lines[2:])).encode('utf-8', \
+                'ignore')
+            self.resultsid = "{0:x}".format(zlib.crc32(i) & 0xffffffff)
+            lines = [i.strip().split() for i in lines[2:]]
+            for i in lines:
+                s = len(i)
+                if s >= 16:
+                    for j in range(1, 15):
+                        try:
+                            m = self.metrics[j - 1]
+                            value = float(i[j])
+                            self.txtmetrics[m].append(value)
+                        except ValueError:
+                            message('Incorrect value for "%s" in %s: %s' % \
+                                (m, self.txtfile, i[j]), "", True)
+                elif s > 0 and s < 16:
+                    message("Missing data in %s" % self.txtfile, "", True)
+        else:
+            message("Insufficient data in %s" % self.txtfile, "", True)
+        if self.curve:
+            self.metric_name = self.business_metrics[self.benchmark]
+            self.maxresult = self.curve[-1][0]
+            self.calculate_ort()
+            self.check_wobble()
+            self.create_plot()
+
+    def benchmark_name(self, form="full"):
+        """Returns the long form benchmark name with trademark."""
+        benchmark = self.benchmark.lower()
+        if form == "full":
+            return "SPECstorage Solution 2020_%s" % benchmark
+        elif form == "html":
+            return "SPECstorage&trade; Solution 2020_%s" % benchmark
+        elif form == "unicode":
+            return "SPECstorage(TM) Solution 2020_%s" % benchmark
+        else:
+            return benchmark
+
+    def check_wobble(self):
+        """Checks load point distribution against run rules."""
+        curve = self.curve[:]
+        curve.insert(0, (0, 0))
+        nintervals = len(curve)
+        if nintervals < 11:
+            message(("Results are invalid because there are fewer than 10"
+                     " load points"))
+            self.reasons["load points"] += 1
+            self.valid = False
+        if nintervals:
+            nominal_interval = self.maxresult / float(nintervals - 1)
+            tolerance = .3
+            pass_wobble = True
+            for i in range(nintervals - 1):
+                xdiff = curve[i + 1][0] - curve[i][0]
+                if xdiff > (nominal_interval * (1 + tolerance)) or \
+                        xdiff < (nominal_interval * (1 - tolerance)):
+                    pass_wobble = False
+            if not pass_wobble:
+                message(("Results are invalid because at least one pair of"
+                         " load points does not comply with the required"
+                         " interval spacing described in the run rules."))
+                self.reasons["load point dist"] += 1
+                self.valid = False
+        else:
+            self.valid = False
+
+    def calculate_ort(self):
+        """Calculates the overall response time."""
+        ort = 0.0
+        sumbm = 0.0
+        accum = 0.0
+        for x, y in self.oprate_lat:
+            sumbm += x
+            accum += x * y
+        for i in range(len(self.oprate_lat) - 1):
+            x1, y1 = self.oprate_lat[i]
+            x2, y2 = self.oprate_lat[i + 1]
+            ymin = min(y1, y2)
+            ymax = max(y1, y2)
+            xdiff = abs(x2 - x1)
+            #ort += 0.5 * (x2 - x1) * (y1 + y2)
+            # same as above, but clearer to the reader
+            ort += xdiff * ymin + 0.5 * xdiff * (ymax - ymin)
+        self.compare_metrics()
+        minrate = min(self.iops)
+        maxrate = max(self.iops)
+        self.ort = ort / (maxrate - minrate)
+
+    def get_reasons(self):
+        """Get text summary of possible run rule violations."""
+        txt = ""
+        i = 0
+        if len(self.starttimes) > 1:
+            i += 1
+            txt += "(%d) Multiple start times" % i
+        if self.reasons["invalid_run"] > 0:
+            i += 1
+            txt += ("(%d) %d occurences of a load point marked with"
+                    " INVALID_RUN\n" % (i, self.reasons["invalid_run"]))
+        if self.reasons["load points"] > 0:
+            i += 1
+            txt += "(%d) Fewer than 10 load points\n" % i
+        if self.reasons["load point dist"] > 0:
+            i += 1
+            txt += "(%d) Unacceptable load point distribution\n" % i
+        if self.reasons["missing run_id"] > 0:
+            i += 1
+            txt += "(%d) %d occurrences of a missing run id\n" % \
+                (i, self.reasons["missing run_id"])
+        if self.reasons["missing fingerprint"] > 0:
+            i += 1
+            txt += "(%d) %d occurrences of a missing fingerprint\n" % \
+                (i, self.reasons["missing fingerprint"])
+        if self.reasons["fingerprint mismatch"] > 0:
+            i += 1
+            txt += "(%d) %d occurrences of a fingerprint mismatch\n" % \
+                (i, self.reasons["fingerprint mismatch"])
+        if self.reasons["data value mismatch"] > 0:
+            i += 1
+            txt += "(%d) %d occurrences of a data value mismatch\n" % \
+                (i, self.reasons["data value mismatch"])
+        if self.reasons["data length mismatch"] > 0:
+            i += 1
+            txt += "(%d) %d occurrences of a data length mismatch\n" % \
+                (i, self.reasons["data length mismatch"])
+        if self.reasons["missing summary id"] > 0:
+            i += 1
+            txt += "(%d) Missing summary id\n" % i
+        if self.reasons["summary id failure"] > 0:
+            i += 1
+            txt += "(%d) Failure getting summary id \n" % i
+        if self.reasons["summary id mismatch"] > 0:
+            i += 1
+            txt += "(%d) Summary id mismatch\n" % i
+        if i > 0:
+            txt += "\nDetails\n%s" % self.reasons_text
+        return txt
+
+    def get_lat_range(self, maxlat):
+        """Determines range for y-axis in plot."""
+        lats = [0.2, 0.5, 0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 100, 200, 500, 1000]
+        nbuckets = len(lats)
+        if maxlat == 0.0:
+            return None
+        else:
+            i = 0
+            while maxlat > lats[i]:
+                i += 1
+                if i >= nbuckets:
+                    break
+        if i >= nbuckets:
+            return None
+        else:
+            return lats[i]
+
+    def create_plot(self):
+        """Create Latency vs Business Metric plot."""
+        if self.plots_available:
+            font_parms = {'size': 16}
+            matplotlib.rc('font', **font_parms)
+            rcParams.update({'figure.autolayout': True})
+            if self.subdir:
+                self.plot_name = os.path.join(self.subdir, "%s.plot.png" % \
+                    self.prefix)
+            else:
+                self.plot_name = "%s.plot.png" % self.prefix
+            x, y = zip(*self.curve[:])
+            mname = self.business_metrics[self.benchmark]
+            figure = plt.figure()
+            axis1 = figure.add_subplot(111)
+            axis1.plot(x, y)
+            axis1.set_xlabel("Business Metric (%s)" % mname, fontsize=18)
+            ylim = self.get_lat_range(self.maxlat)
+            if ylim:
+                axis1.set_ylim([0, ylim])
+            axis1.set_xlim([0, 1.1 * self.maxresult])
+            axis1.set_ylabel("Average Latency (msec)", fontsize=18)
+            axis1.grid(True)
+            axis1.axhline(y=self.ort, color='red', linestyle='dashed')
+            plt.savefig(self.plot_name)
+            self.attachments.append((self.plot_name, \
+                os.path.basename(self.plot_name)))
+        else: # maybe this is an update and there is already an image
+            fname = None
+            if self.update:
+                plotfile = os.path.join(self.subdir, "%s.plot.png" % \
+                    self.oldprefix)
+                if os.path.isfile(plotfile):
+                    fname = plotfile
+                else:
+                    fname = os.path.join(self.subdir, "%s.plot.png" % \
+                        self.prefix)
+            if fname:
+                self.plot_name = fname
+                self.attachments.append((self.plot_name, \
+                    "%s.plot.png" % self.prefix))
+
+    def to_html(self):
+        """Generate HTML for results table and plot image"""
+        perfsection = Section("Performance", size=2)
+        hidden_table = ObjectTable()
+        mname = self.business_metrics[self.benchmark]
+        #  Create results table
+        results_table = Table()
+        bmetric = "Business<br>Metric<br>(%s)" % mname
+        alat = "Average<br>Latency<br>(msec)"
+        iops = "%s<br>Ops/Sec" % mname
+        mbps = "%s<br>MB/Sec" % mname
+        results_table.add_header(bmetric, "center")
+        results_table.add_header(alat, "center")
+        results_table.add_header(iops, "center")
+        results_table.add_header(mbps, "center")
+        results_table.set_data_align(bmetric, "center")
+        results_table.set_data_align(alat, "center")
+        results_table.set_data_align(iops, "center")
+        results_table.set_data_align(mbps, "center")
+        for x, y in self.curve:
+            if self.noncompliance_text:
+                results_table.add_data(self.noncompliance_text, bmetric)
+                results_table.add_data(self.noncompliance_text, alat)
+            else:
+                results_table.add_data("%d" % x, bmetric)
+                results_table.add_data("%.3f" % y, alat)
+        for i in self.iops:
+            if self.noncompliance_text:
+                results_table.add_data(self.noncompliance_text, iops)
+            else:
+                results_table.add_data("%d" % i, iops)
+        for i in self.mbps:
+            if self.noncompliance_text:
+                results_table.add_data(self.noncompliance_text, mbps)
+            else:
+                results_table.add_data("%d" % i, mbps)
+        #  Create plot image
+        if self.plot_name:
+            if not self.noncompliance_text:
+                plotname = "%s.plot.png" % self.prefix
+                plot_image = Image(plotname, "Performance Graph", 500, 375)
+                hidden_table.add_row((results_table, plot_image))
+            else:
+                hidden_table.add_row((results_table, Text("")))
+        else:
+            if self.noncompliance_text:
+                hidden_table.add_row((results_table, \
+                    Text(self.noncompliance_text)))
+            else:
+                hidden_table.add_row((results_table, \
+                    Text("no image available")))
+        hidden_table.set_col_align(0, "right")
+        hidden_table.set_col_align(1, "left")
+        perfsection.add_item(hidden_table)
+        return perfsection.to_html()
+
+    def compare_metrics(self):
+        data_ok = True
+        if not self.xmlid:
+            self.reasons["missing summary id"] += 1
+            self.reasons_text += "Missing id field in XML summary\n"
+            data_ok = False
+        if not self.resultsid:
+            self.reasons["summary id failure"] += 1
+            self.reasons_text += "Could not get id for TXT summary\n"
+            data_ok = False
+        if self.xmlid and self.resultsid:
+            if self.xmlid != self.resultsid:
+                self.reasons["summary id mismatch"] += 1
+                self.reasons_text += "summary, xml=%s, txt=%s\n" % \
+                    (self.xmlid, self.resultsid)
+                data_ok = False
+        for i in self.metrics:
+            xml = self.xmlmetrics[i]
+            txt = self.txtmetrics[i]
+            if len(xml) != len(txt):
+                self.reasons["data length mismatch"] += 1
+                self.reasons_text += "len mismatch, xml=%s, txt=%s\n" % \
+                    (str(xml), str(txt))
+                data_ok = False
+            elif xml != txt:
+                newxml = list(map(lambda k: float(int(k)), xml))
+                if newxml != txt:
+                    self.reasons["data value mismatch"] += 1
+                    message(('Data value mismatch between XML and TXT summary for'
+                             ' metric "%s"' % i), "", False)
+                    self.reasons_text += "value mismatch, xml=%s, txt=%s\n" % \
+                        (str(xml), str(txt))
+                    data_ok = False
+
+    def to_ascii(self):
+        """Generate text version of results table"""
+        perfsection = Section("Performance", size=2)
+        #  Create results table
+        results_table = Table()
+        mname = self.business_metrics[self.benchmark]
+        bmetric = "Business Metric (%s)" % mname
+        alat = "Average Latency (msec)"
+        iops = "%s Ops/Sec" % mname
+        mbps = "%s MB/Sec" % mname
+        results_table.add_header(bmetric, "center")
+        results_table.add_header(alat, "center")
+        results_table.add_header(iops, "center")
+        results_table.add_header(mbps, "center")
+        results_table.set_data_align(bmetric, "center")
+        results_table.set_data_align(alat, "center")
+        results_table.set_data_align(iops, "center")
+        results_table.set_data_align(mbps, "center")
+        results_table.set_col_width(0, 12)
+        results_table.set_col_width(1, 12)
+        results_table.set_col_width(2, 12)
+        results_table.set_col_width(3, 12)
+        for x, y in self.curve:
+            if self.noncompliance_text:
+                results_table.add_data(self.noncompliance_text, bmetric)
+                results_table.add_data(self.noncompliance_text, alat)
+            else:
+                results_table.add_data("%d" % x, bmetric)
+                results_table.add_data("%.1f" % y, alat)
+        for i in self.iops:
+            if self.noncompliance_text:
+                results_table.add_data(self.noncompliance_text, iops)
+            else:
+                results_table.add_data("%d" % i, iops)
+        for i in self.mbps:
+            if self.noncompliance_text:
+                results_table.add_data(self.noncompliance_text, mbps)
+            else:
+                results_table.add_data("%d" % i, mbps)
+        perfsection.add_item(results_table)
+        return perfsection.to_ascii()
+
+    def missing_data(self, data, section):
+        """Error handling for missing data from XML section."""
+        self.syntax_error('Missing "%s" data in section <%s>.' % \
+            (data, section))
+
+    def bad_data(self, metric, data):
+        """Error handling for incorrect data for a given metric."""
+        self.syntax_error('Incorrect data for metric "%s": %s' % \
+            (metric, data))
+
+    def unknown_tag(self, tag, section):
+        """Error handling for unexpected XML tag."""
+        self.syntax_error('Unknown tag "<%s>" in section <%s>.' % \
+            (tag, section))
+
+    def syntax_error(self, context=None):
+        """Error handling for XML syntax."""
+        if context:
+            message(context, "[ERROR]", False)
+        message("Results file %s does not have the correct syntax" % \
+            self.xmlfile, "[ERROR]", False)
+        message(("Review the run rules documentation for the correct"
+                 " results file XML syntax."), "", True)
+
+
+class SubmissionFormat:
+    """ Class for inspecting the format of Submission XML file. """
+    def __init__(self):
+        self.singular_tags = {  # can only appear once
+            "specSPECstorage2020": 0,
+            "solutionInfo": 0,
+            "vendorAndProduct": 0,
+            "otherMarketingInfo": 0,
+            "vendorAndProduct": 0,
+            "SUTBomList": 0,
+            "configDiagramList": 0,
+            "componentSoftwareList": 0,
+            "storageAndFilesystems": 0,
+            "storageSetList": 0,
+            "fsInfo": 0,
+            "fsCreationNotes": 0,
+            "storageAndFsNotes": 0,
+            "stableStorage": 0,
+            "sutConfigNotes": 0,
+            "otherSutNotes": 0,
+            "testInfo": 0,
+            "dataFlow": 0,
+            "otherTestNotes": 0,
+            "otherReportNotes": 0,
+            "submissionInfo": 0,
+            "submitterEmail": 0,
+            "submitterName": 0,
+            "reviewersComments": 0,
+            "results": 0,
+            "resultCompliance": 0,
+            "nonComplianceReason": 0,
+            "nonComplianceRemedy": 0,
+            "nonComplianceNotes": 0}
+        self.multi_tags = {  # must appear at least once
+            "bomItem": 0,
+            "configDiagramItem": 0,
+            "componentSoftwareItem": 0,
+            "hardwareComponentConfig": 0,
+            "hardwareTuningList": 0,
+            "softwareComponentConfig": 0,
+            "softwareTuningList": 0,
+            "storageSetItem": 0,
+            "transportInterface": 0,
+            "switchItem": 0,
+            "processingElement": 0,
+            "memorySetItem": 0}
+        self.env_tags = {  # must appear at most once for physical or virtual
+            "hardwareConfigAndTuning": [0, 0],
+            "softwareConfigAndTuning": [0, 0],
+            "transportList": [0, 0],
+            "switchList": [0, 0],
+            "processingElements": [0, 0],
+            "memory": [0, 0]}
+        self.dep_tags = {  # must appear same number of times as parents
+            "hardwareConfigAndTuningNotes": [0, "hardwareConfigAndTuning"],
+            "softwareConfigAndTuningNotes": [0, "softwareConfigAndTuning"],
+            "serviceSLA": [0, "softwareConfigAndTuning"],
+            "transportConfigurationNotes": [0, "transportList"],
+            "procElementNotes": [0, "processingElements"],
+            "memoryNotes": [0, "memory"],
+            "description": [0, ["bomItem", "componentSoftwareItem"]]}
+        self.results_tags = [
+            "summary",
+            "run",
+            "business_metric",
+            "metric",
+            "benchmark",
+            "valid_run"]
+
+    def start(self, tag, attrib):
+        """ Parse the XML file and count the tags by type. """
+        if tag in self.singular_tags:
+            self.singular_tags[tag] += 1
+        elif tag in self.multi_tags:
+            self.multi_tags[tag] += 1
+        elif tag in self.env_tags:
+            if "environmentType" in attrib:
+                envtype = attrib["environmentType"]
+                if envtype == "physical":
+                    self.env_tags[tag][0] += 1
+                elif envtype == "virtual":
+                    self.env_tags[tag][1] += 1
+                else:
+                    message("environmentType must be 'physical' or 'virtual'")
+                    self.syntax_error()
+            else:
+                message("Missing environmentType attribute in %s." % tag)
+                message(("environmentType must be present and set to 'physical"
+                         "' or 'virtual'"))
+                self.syntax_error()
+        elif tag in self.dep_tags:
+            self.dep_tags[tag][0] += 1
+        else:
+            if tag not in self.results_tags:
+                message("Invalid tag %s." % tag)
+                self.syntax_error()
+
+    def data(self, data):
+        """ not used here but required for XMLParser objects """
+        pass
+
+    def end(self, tag):
+        """ not used here but required for XMLParser objects """
+        pass
+
+    def syntax_error(self):
+        """Error handling for XML syntax."""
+        message(("\nThere was a problem with the format of the XML submission"
+                 " file. Check the Run Rules document and the example template"
+                 " for the correct format."), "", True)
+
+    def close(self):
+        """ Gives details for any problems with XML structure. """
+        missing_tags = []
+        toomany_tags = []
+        env_problems = []
+        dep_problems = []
+        found_problem = False
+        # Check for unexpected tag counts
+        for i, j in self.singular_tags.items():
+            if j > 1:  # listed more than once
+                toomany_tags.append(i)
+            elif j == 0:
+                missing_tags.append(i)
+        for i, j in self.multi_tags.items():
+            if j == 0:  # not listed at all
+                missing_tags.append(i)
+        for i, j in self.env_tags.items():
+            s = sum(j)
+            if s == 0 or s > 2:  # neither listed or one listed multiple times
+                env_problems.append(i)
+        for i, j in self.dep_tags.items():
+            if i == "description":
+                n = j[0]
+                tags = j[1]
+                s = 0
+                for tag in tags:
+                    s += self.multi_tags[tag]
+                if n != s:
+                    dep_problems.append(i)
+            else:
+                n, t = j  # count and associated tag
+                s = sum(self.env_tags[t])
+                if n != s:
+                    dep_problems.append(i)
+        # Report problems
+        if len(missing_tags):
+            missing_tags.sort()
+            tags = ""
+            for tag in missing_tags:
+                tags += "    %s\n" % tag
+            message("The following expected tags are missing: \n%s" % tags)
+            found_problem = True
+        if len(toomany_tags):
+            toomany_tags.sort()
+            tags = ""
+            for tag in toomany_tags:
+                tags += "    %s\n" % tag
+            message("The following tags are used more than once: \n%s" % tags)
+            found_problem = True
+        if len(env_problems):
+            env_problems.sort()
+            tags = ""
+            for tag in env_problems:
+                tags += "    %s\n" % tag
+            message(("Tags with the environmentType attribute can only be used"
+                     " once for each type (physical or virtual).  The"
+                     " following tags violate the rule: \n%s" % tags))
+            found_problem = True
+        if len(dep_problems):
+            dep_problems.sort()
+            tags = ""
+            for tag in dep_problems:
+                tags += "    %s\n" % tag
+            message(("There is an inconsistency between the number of"
+                     " occurrences of the following child tags and their"
+                     " corresponding parent tags: \n%s" % tags))
+            found_problem = True
+        if found_problem:
+            self.syntax_error()
+
+
+class Submission:
+    def __init__(self, subfile, workload, maxmetric, mname, mbps, ort):
+        """Class for translating XML report to SUB format."""
+        self.subfile = subfile
+        self.instart = False
+        self.prefix = "spec.storage2020"
+        self.subtext = "# ========== do not edit below this line ==========\n"
+        self.subtext += "%s.workload_name: %s\n" % (self.prefix, workload)
+        self.subtext += "%s.metric_name: %s\n" % (self.prefix, mname)
+        self.subtext += "%s.max_metric: %d\n" % (self.prefix, maxmetric)
+        self.subtext += "%s.ort: %.2f\n" % (self.prefix, ort)
+        self.subtext += "%s.max_mbps: %d\n" % (self.prefix, mbps)
+        self.nulltags = [
+            "specSPECstorage2020",
+            "solutionInfo",
+            "vendorAndProduct",
+            "SUTBomList",
+            "configDiagramList",
+            "componentSoftwareList",
+            "storageSetList",
+            "testInfo",
+            "results",
+            "submissionInfo"]
+        self.itertags = {
+            "bomItem": 0,
+            "configDiagramItem": 0,
+            "componentSoftwareItem": 0,
+            "hardwareComponentConfig": 0,
+            "softwareComponentConfig": 0,
+            "storageSetItem": 0,
+            "transportInterface": 0,
+            "switchItem": 0,
+            "processingElement": 0,
+            "memorySetItem": 0,
+            "run": 0}
+        self.transtags = {
+            "resultCompliance": "result",
+            "nonComplianceReason": "noncompliant.reason",
+            "nonComplianceRemedy": "remedy",
+            "nonComplianceNotes": "notes"}
+
+    def add_line(self, text, value):
+        """Adds a key: value pair line to submission."""
+        self.subtext += "%s.%s: %s\n" % (self.prefix, text, value)
+
+    def push_tag(self, tag):
+        """Appends a tag to the current prefix."""
+        self.prefix = "%s.%s" % (self.prefix, tag)
+
+    def pop_tag(self):
+        """Removes the last tag from the current prefix."""
+        tags = self.prefix.split(".")
+        if len(tags) > 1:
+            self.prefix = ".".join(tags[:-1])
+
+    def one_line(self, text):
+        """Converts multiline text to a single line."""
+        return " ".join([i.strip() for i in text.split("\n")]).strip()
+
+    def start(self, tag, attrib):
+        """ Parse the XML file and count the tags by type. """
+        self.instart = True
+        if tag in self.transtags:
+            tag = self.transtags[tag]
+        if tag in self.itertags:
+            self.itertags[tag] += 1
+            n = self.itertags[tag]
+            if n > 999:
+                message("More then 999 items in %s" % tag, "", True)
+            self.push_tag("%s_%03d" % (tag, n))
+        elif not tag in self.nulltags:
+            if "environmentType" in attrib:
+                self.push_tag("%s_%s" % (tag, attrib["environmentType"]))
+            else:
+                self.push_tag(tag)
+        if attrib:
+            for i, j in attrib.items():
+                if i != "environmentType":
+                    self.subtext += "%s.%s: %s\n" % (self.prefix, i, j)
+
+    def data(self, data):
+        """Adds a line of data for the current prefix."""
+        d = self.one_line(data)
+        if d:
+            self.subtext += "%s: %s\n" % (self.prefix, d)
+
+    def end(self, tag):
+        """Resets prefix to state before current tag."""
+        self.instart = False
+        if not tag in self.nulltags:
+            self.pop_tag()
+
+    def close(self):
+        """Writes submission data to file."""
+        f = open(self.subfile, 'w')
+        f.write(self.subtext)
+        f.close()
+
+
+def main(plots_available):
+    """Entry point into the program."""
+    plots_available = plots_available
+    rcfile = None
+    infile = None
+    outfile = None
+    suffix = None
+    prefix = None
+    attachments = []
+    sfssumtxt = None
+    sfssumxml = None
+    update = False
+    newprefix = False
+    oldprefix = None
+    results_dir = os.path.join(os.getcwd(), "results")
+    subdir = os.getcwd()
+    validate_only = False
+    update_links = False
+    debug = False
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'a:r:d:s:i:o:p:hu2v',
+        ['attachments=', 'suffix=', 'prefix=', 'submission-file=', 'rc-file=',
+         'results-dir=', 'output-file=', 'update', 'validate-only', 'debug',
+         'help'])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(1)
+    for opt in opts:
+        if opt[0] == '-r' or opt[0] == '--rc-file':
+            rcfile = os.path.abspath(opt[1])
+        if opt[0] == '-i' or opt[0] == '--submission-file':
+            infile = os.path.abspath(opt[1])
+        if opt[0] == '-s' or opt[0] == '--suffix':
+            suffix = opt[1]
+        if opt[0] == '-p' or opt[0] == '--prefix':
+            prefix = opt[1]
+        if opt[0] == '-d' or opt[0] == '--results-dir':
+            results_dir = os.path.abspath(opt[1])
+        if opt[0] == '-o' or opt[0] == '--output':
+            outfile = os.path.abspath(opt[1])
+        if opt[0] == '-u' or opt[0] == '--update':
+            update = True
+        if opt[0] == '-2':
+            update_links = True
+        if opt[0] == '-v' or opt[0] == '--validate-only':
+            validate_only = True
+        if opt[0] == '-a' or opt[0] == '--attachments':
+            files = opt[1]
+            for f in files.split(","):
+                path = os.path.abspath(f)
+                if os.path.isfile(path):
+                    attachments.append(path)
+                else:
+                    message("Could not find attachment %s." % path, "", True)
+        if opt[0] == '-h' or opt[0] == '--help':
+            usage()
+            sys.exit(0)
+        if opt[0] == '--debug':
+            debug = True
+    if not infile:
+        message("Missing submission file.")
+        usage()
+        sys.exit(1)
+    if not os.access(infile, os.R_OK | os.W_OK):
+        message(("The submission file must exist and have read and write"
+                    " permissions enabled."), "", True)
+    if not infile.endswith(".xml"):
+        message(("The submission file must be a valid XML file whose"
+                    " filename ends with .xml"), "", True)
+    if update:
+        # find files, prefix
+        subdir, subxml = os.path.split(infile)
+        subdir = os.path.abspath(subdir)
+        subprefix = os.path.splitext(subxml)[0]
+        if not os.path.isdir(subdir):
+            message("Could not find directory %s." % subdir, "", True)
+        if not subprefix:
+            message("Could not find prefix for existing submission.", "", True)
+        # use prefix to set rc file, summary file
+        rcfile = os.path.join(subdir, "%s.rc" % subprefix)
+        if not os.path.isfile(rcfile):
+            message("Could not find RC file %s for existing submission." % \
+                rcfile, "", True)
+        sfssumtxt = os.path.join(subdir, "%s.sum" % subprefix)
+        if not os.path.isfile(sfssumtxt):
+            message(("Could not find results summary file %s for existing"
+                     " submission." % sfssumtxt), "", True)
+        existing_attachments = glob.glob("%s.attach*" % \
+            os.path.join(subdir, subprefix))
+        existing_attachments.sort()
+        attachments = existing_attachments + attachments
+        if update_links:
+            prefix = None
+        if not prefix:
+            prefix = subprefix
+        else:
+            if prefix != subprefix:  # rename files
+                newprefix = True
+                oldprefix = subprefix
+    else:  # create mode, rc and suffix required
+        if not rcfile:
+            message("Missing RC file.")
+            usage()
+            sys.exit(1)
+        else:
+            if not os.access(rcfile, os.R_OK):
+                message("RC file is not readable.", "", True)
+        if not suffix:
+            message("Missing results suffix")
+            usage()
+            sys.exit(1)
+        if not prefix:
+            timestr = time.strftime("%Y%m%d-%H%M")
+            prefix = "storage2020-%s" % timestr
+        if os.path.exists(results_dir):
+            if not os.path.isdir(results_dir):
+                message("Invalid name for results directory", "", True)
+        else:
+            message("Results directory does not exist", "", True)
+    #  Parse submission XML file and create a Report
+    report = Report(infile, prefix, subdir, update_links, debug)
+    report.validate()
+    if not update:
+        report.clear_results()
+        report.clear_reasons()
+    license = report.get_license()
+    #  If updating an existing submission, try to get results from report
+    sfssumxml = report.get_results_xml()
+    if update and sfssumxml is None:
+        message("Could not find run results in %s." % infile, "", True)
+    #  Parse benchmark results
+    noncompliance_text = None
+    if report.noncompliant == "yes":
+        noncompliance_text = "NC"
+    elif report.noncompliant == "na":
+        noncompliance_text = "NA"
+    results = Results(suffix, prefix, results_dir, license, plots_available, \
+        noncompliance_text, sfssumtxt, sfssumxml, subdir, debug, update, \
+        oldprefix)
+    results.validate()
+    #  Merge results XML into Report
+    report.merge_results(results.xmltree)
+    #  Add reasons from results
+    report.add_reasons(results.get_reasons())
+    #  Commit all changes to XML
+    if update:
+        xmltmp = infile
+    else:
+        xmltmp = "%s.tmp" % prefix
+    report.write_xml(xmltmp)
+    benchstr_html = "%s Result" % results.benchmark_name("html")
+    benchstr_txt = "%s Result" % results.benchmark_name("unicode")
+    validstr = ""
+    if not results.valid:
+        validstr = " [INVALID]"
+    if validate_only:
+        if results.plot_name and not update:
+            os.remove(results.plot_name)
+        if os.path.exists(xmltmp) and not update:
+            os.remove(xmltmp)
+        message("\nValidation complete.")
+        sys.exit(0)
+    # Generate the HTML version of the submission
+    htmlfile = os.path.join(subdir, "%s.html" % prefix)
+    htmldoc = HTMLDocument(htmlfile, "%s: %s - %s%s" % (benchstr_html, \
+        report.vendor, report.product, validstr), results.valid)
+    htmldoc.bench = results.benchmark.lower()
+    # Summary table for use in the TXT report
+    sumtable = SimpleTable(bold=True)
+    sumtable.add_row((report.vendor, ":", report.product))
+    resultstr = ""
+    ortstr = ""
+    if not noncompliance_text:
+        sumtable.add_row(("%s" % results.benchmark_name("full"), "=", \
+            "%d %s (Overall Response Time = %.2f msec)" % \
+            (results.maxresult, results.metric_name, results.ort)))
+        resultstr = "%s = %d %s" % (results.benchmark_name("full"), \
+            results.maxresult, results.metric_name)
+        ortstr = "Overall Response Time = %.2f msec" % results.ort
+    else:
+        sumtable.add_row(("%s" % results.benchmark_name("full"), "=", \
+            "NON-COMPLIANT (NC) RESULT"))
+        resultstr = "NON-COMPLIANT (NC) RESULT"
+        ortstr = ""
+    sumtable.set_col_align(0, "right")
+    sumtable.set_col_align(1, "center")
+    sumtable.set_col_align(2, "left")
+    sumtable.set_col_width(0, 20)
+    sumtable.set_col_width(1, 1)
+    sumtable.set_col_width(2, 56)
+    htmldoc.add_summary(report.vendor, report.product, resultstr, ortstr)
+    #htmldoc.add_section(Line())
+    if noncompliance_text:
+        htmldoc.add_section(Text(report.noncompliance_reason, bold=True))
+        htmldoc.add_section(Text(report.noncompliance_remedy, bold=True))
+    htmldoc.add_section(results)
+    htmldoc.add_section(Line())
+    htmldoc.add_section(report)
+    htmldoc.write_file()
+    # Generate the TXT version of the submission
+    txtfile = os.path.join(subdir, "%s.txt" % prefix)
+    txtdoc = TextDocument(txtfile, "%s %s" % (benchstr_txt, validstr))
+    txtdoc.add_section(sumtable)
+    txtdoc.add_section(Line())
+    if noncompliance_text:
+        txtdoc.add_section(Text(report.noncompliance_reason, bold=True))
+        txtdoc.add_section(Text(report.noncompliance_remedy, bold=True))
+    txtdoc.add_section(results)
+    txtdoc.add_section(Line())
+    txtdoc.add_section(report)
+    txtdoc.add_section(Line())
+    txtdoc.write_file()
+    # Generate the SUB version of the submission
+    mname = results.business_metrics[results.benchmark]
+    maxmetric = results.curve[-1][0]
+    maxmbps = results.mbps[-1]
+    subfile = os.path.join(subdir, "%s.sub" % prefix)
+    submission = Submission(subfile, results.benchmark, maxmetric, mname, \
+        maxmbps, results.ort)
+    submission.add_line("usable_capacity", report.usable_cap)
+    submission.add_line("total_memory_gib", report.total_mem)
+    xmlparser = et.XMLParser(target=submission)
+    xmlparser.feed(report.get_xml())
+    xmlparser.close()
+    # Package all necessary files for full disclosure
+    if outfile:
+        if not outfile.endswith(".zip"):
+            outfile = "%s.zip" % outfile
+    else:
+        outfile = "%s.zip" % prefix
+    archive = zipfile.ZipFile(outfile, 'w')
+    archive.write(rcfile, "%s.rc" % prefix)
+    archive.write(xmltmp, "%s.xml" % prefix)
+    archive.write(subfile, os.path.basename(subfile))
+    for i in report.attachments:  # config diagrams
+        try:
+            archive.write(i[0], i[1])
+            if newprefix:
+                file_update(i[0], os.path.join(subdir, i[1]))
+        except OSError:
+            message(("Error trying to archive %s.  Please check that the file"
+                    " exists and is readable.\n" % i[0]), "", True)
+    for i in results.attachments:  # should just be plot
+        try:
+            archive.write(i[0], i[1])
+            if newprefix:
+                file_update(i[0], os.path.join(subdir, i[1]))
+        except OSError:
+            message(("Error trying to archive %s.  Please check that the file"
+                    " exists and is readable.\n" % i[0]), "", True)
+    archive.write(htmlfile, os.path.basename(htmlfile))
+    archive.write(txtfile, os.path.basename(txtfile))
+    if newprefix:
+        file_update(rcfile, os.path.join(subdir, "%s.rc" % prefix))
+        file_update(xmltmp, os.path.join(subdir, "%s.xml" % prefix))
+        file_update(subfile, os.path.join(subdir, "%s.sub" % prefix))
+        file_update(htmlfile, os.path.join(subdir, "%s.html" % prefix))
+        file_update(txtfile, os.path.join(subdir, "%s.txt" % prefix))
+    # Archive any attachments (e.g. external client/mountpoint file
+    for i in range(len(attachments)):
+        f = attachments[i]
+        fname = "%s.attach%03d" % (prefix, i + 1)
+        try:
+            archive.write(f, fname)
+        except OSError:
+            message(("Error trying to archive %s.  Please check that the file"
+                    " exists and is readable.\n" % i), "", True)
+        # copy new attachments into existing submission directory
+        if update:
+            filepath = os.path.join(subdir, fname)
+            if not os.path.isfile(filepath):
+                try:
+                    shutil.copyfile(f, filepath)
+                except:
+                    message("Error trying to copy %s into directory %s" % \
+                        (f, subdir))
+                    message(("Please check that the file exists and the"
+                            " destination directory is writeable."), "", True)
+    # if renaming remove any attachments with the old prefix
+    if newprefix:
+        if oldprefix:
+            for i in ["html", "sub", "txt", "plot.png"]:
+                fname = os.path.join(subdir, "%s.%s" % (oldprefix, i))
+                if os.path.exists(fname):
+                    os.remove(fname)
+        fnames = glob.glob(os.path.join(subdir, "*.attach*"))
+        for fname in fnames:
+            fname_prefix = os.path.basename(fname).split(".attach")[0]
+            if fname_prefix:
+                if fname_prefix != prefix:
+                    os.remove(fname)
+    archive.close()
+    # Delete archived files created by this program
+    if not update:
+        os.remove(subfile)
+        os.remove(htmlfile)
+        os.remove(txtfile)
+    if results.plot_name and not update:
+        os.remove(results.plot_name)
+    if os.path.exists(xmltmp) and not update:
+        os.remove(xmltmp)
+
+    if update:
+        message("\nSubmission update complete: %s" % outfile)
+    else:
+        message("\nSubmission package creation complete: %s" % outfile)
+
+if __name__ == "__main__":
+    import sys
+    if sys.version_info < (3, 5):
+        print("Must use python version 3.5.x or greater")
+        sys.exit(1)
+    plots_available = True
+    try:
+        import os
+        import os.path
+        import time
+        import getopt
+        import re
+        import glob
+        import textwrap
+        import hashlib
+        from datetime import date
+        import shutil
+        import zipfile
+        import zlib
+        from xml.dom import minidom
+        import xml.etree.ElementTree as et
+    except ImportError as error:
+        print("Import Error: %s" % str(error))
+        sys.exit(1)
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        from matplotlib import rcParams
+    except:
+        print("Could not load plotting libraries.  Plots will be left blank.")
+        print(("See the User's Guide for more information on obtaining and"
+               " installing the requisite software.\n"))
+        plots_available = False
+    main(plots_available)

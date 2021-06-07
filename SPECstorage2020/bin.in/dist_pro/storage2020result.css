@@ -1,0 +1,125 @@
+/*
+	Copyright (c) 2014 Standard Performance Evaluation Corporation (SPEC).
+	All rights reserved.
+*/
+
+body {
+	font-family: sans-serif;
+	font-size: medium;
+	color: black;
+	background: white;
+}
+
+.header {
+	text-align: center;
+	padding: 0em 0em 0em 0em;
+	margin: 0em 0em 0em 0em;
+	clear: both;
+}
+
+.logo {
+	border-style: none;
+	width: 57px;
+	height: 78px;
+}
+
+.benchmark {
+	font-size: large;
+}
+
+.copyright {
+	font-size: small;
+	margin-bottom: 2em;
+}
+
+.summaryText {
+	font-size: large;
+	font-weight: bold;
+	text-align: left;
+}
+
+.summaryResult {
+	font-size: large;
+	font-weight: bold;
+	text-align: center;
+}
+
+h2 {
+	color: black;
+	font-size: x-large;
+	font-weight: bold;
+	border-bottom: 2px solid black;
+	clear: both;
+}
+
+h3 {
+	color: black;
+	font-size: large;
+	font-weight: bold;
+	border: none;
+	text-decoration: underline;
+	clear: both;
+}
+
+div {
+	border-collapse: collapse;
+	border: none;
+	margin: 3.0em;
+}
+
+th {
+	padding-left: 0.25em;
+	padding-right: 0.25em;
+}
+
+td {
+	padding-left: 0.25em;
+	padding-right: 0.25em;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+.cellHeader {
+	font-size: larger;
+	background-color: #556699;
+	border-right: 1px solid white;
+	border-left: 1px solid white;
+	color: white;
+}
+
+.cellSubHeader {
+	font-size: medium;
+	background-color: #e8e8e8;
+	border: 1px solid #556699;
+}
+
+.cellValueOdd {
+	background-color: #e8e8e8;
+	border: 1px solid #556699;
+}
+
+.cellValueEven {
+	background-color: white;
+	border: 1px solid #556699;
+}
+
+.cellValueTotal {
+	color: #556699;
+	font-size: larger;
+	font-weight: bold;
+	border: 1px solid #556699;
+}
+
+.upperSummary {
+	border-right: 2px solid black;
+	border-top: 2px solid black;
+	border-left: 2px solid black;
+}
+
+.lowerSummary {
+	border-right: 2px solid black;
+	border-bottom: 2px solid black;
+	border-left: 2px solid black;
+}

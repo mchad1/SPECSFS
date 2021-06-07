@@ -1,0 +1,157 @@
+#  -*- mode: makefile; -*-
+# Makefile for netmist.
+#
+# As one adds new targets one needs to specify REMSH if the system
+# uses remsh instead of rsh to perform remote shell commands.
+# Also add any libraries that are needed.
+#
+#
+
+CFLAGS += -I$(TRUNK_DIR)/netmist
+
+# Variable definitions that only depend on OS.
+ifeq ($(OS),aix)
+CFLAGS += -qsuppress=1500-010 -qsuppress=1501-282 -qsuppress=1500-036 -q64
+NETMIST_LIBS += -lpthread -lyaml
+#NETMIST_LIBS += -lpthread ../../redistributable_sources/libyaml-master/src/.libs/libyaml.a
+else ifeq ($(OS),hpux)
+CC := cc
+CFLAGS += -D_REMSH_
+#NETMIST_LIBS += -lm -lyaml
+NETMIST_LIBS += -lm ../../redistributable_sources/libyaml-master/src/.libs/libyaml.a
+else ifeq ($(OS),linux)
+CC := gcc
+CFLAGS += -D_GNU_SOURCE -Wall -Wno-format-truncation -pthread -g
+LARGEFILE = -D_LARGEFILE64_SOURCE
+#NETMIST_LIBS += -lm -lrt -ldl -lyaml
+NETMIST_LIBS += -lm -lrt -ldl ../../redistributable_sources/libyaml-master/src/.libs/libyaml.a
+else ifeq ($(OS),sunos)
+CFLAGS += -Wall -D_POSIX_C_SOURCE=3 -D_XOPEN_SOURCE \
+					-D_XPG4_2 -D__EXTENSIONS__
+LARGEFILE := -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
+#NETMIST_LIBS += -lsocket -lnsl -lm -lyaml
+NETMIST_LIBS += -lsocket -lnsl -lm ../../redistributable_sources/libyaml-master/src/.libs/libyaml.a
+else ifeq ($(OS),freebsd)
+CFLAGS += -Wall -g
+#NETMIST_LIBS += -lm -lpthread -lexecinfo -lyaml
+NETMIST_LIBS += -lm -lpthread -lexecinfo ../../redistributable_sources/libyaml-master/src/.libs/libyaml.a
+else ifeq ($(OS),darwin)
+CC := gcc
+CFLAGS += -Wall -g
+#NETMIST_LIBS += -lyaml
+NETMIST_LIBS += ../../redistributable_sources/libyaml-master/src/.libs/libyaml.a
+LARGEFILE := -D_LARGEFILE64_SOURCE
+else ifeq ($(OS),VMware)
+NETMIST_OBJS += mempool.o
+endif
+
+BUILD_DIR := ../../build/$(PROD)/$(OS)/$(ARCH)
+
+BINS = $(addprefix $(BUILD_DIR)/,netmist) $(addprefix $(BUILD_DIR)/,netmist_monitor) $(addprefix $(BUILD_DIR)/,netmist_modify) $(addprefix $(BUILD_DIR)/,pump_carbon) $(addprefix $(BUILD_DIR)/,pump_csv)
+
+NETMIST_OBJS += $(addprefix $(BUILD_DIR)/,netmist.o netmist_if.o netmist_prime.o netmist_nodeManager.o netmist_client.o netmist_structures.o netmist_logger.o netmist_hashtable.o netmist_utils.o netmist_copyright.o netmist_random.o workload.o mix_table.o netmist_fdcache.o netmist_version.o netmist_fsm.o netmist_thread.o netmist_vfs_paths_abs.o)
+MONITOR_OBJS := $(addprefix $(BUILD_DIR)/,netmist_monitor.o)
+MODIFY_OBJS := $(addprefix $(BUILD_DIR)/,netmist_modify.o)
+PUMP_CARBON_OBJS := $(addprefix $(BUILD_DIR)/,pump_carbon.o)
+PUMP_CSV_OBJS := $(addprefix $(BUILD_DIR)/,pump_csv.o)
+
+OBJS := $(NETMIST_OBJS) $(MONITOR_OBJS) $(MODIFY_OBJS) $(PUMP_CARBON_OBJS)
+
+all: check-os $(BUILD_DIR) $(BINS)
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+$(BUILD_DIR)/netmist : LDFLAGS += $(NETMIST_LIBS)
+$(BUILD_DIR)/netmist: $(NETMIST_OBJS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+$(BUILD_DIR)/netmist_monitor: 
+$(BUILD_DIR)/netmist_monitor: $(MONITOR_OBJS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+$(BUILD_DIR)/netmist_modify: 
+$(BUILD_DIR)/netmist_modify: $(MODIFY_OBJS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+$(BUILD_DIR)/pump_carbon: 
+$(BUILD_DIR)/pump_carbon: $(PUMP_CARBON_OBJS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+$(BUILD_DIR)/pump_csv: 
+$(BUILD_DIR)/pump_csv: $(PUMP_CSV_OBJS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+$(BUILD_DIR)/netmist_monitor.o: CFLAGS += $(LARGEFILE)
+$(BUILD_DIR)/netmist_monitor.o: netmist_monitor.c netmist.h copyright.txt license.txt 
+
+$(BUILD_DIR)/netmist_modify.o: CFLAGS += $(LARGEFILE)
+$(BUILD_DIR)/netmist_modify.o: netmist_modify.c netmist.h copyright.txt license.txt 
+
+$(BUILD_DIR)/pump_carbon.o: CFLAGS += $(LARGEFILE)
+$(BUILD_DIR)/pump_carbon.o: pump_carbon.c netmist.h copyright.txt license.txt 
+
+$(BUILD_DIR)/pump_csv.o: CFLAGS += $(LARGEFILE)
+$(BUILD_DIR)/pump_csv.o: pump_csv.c netmist.h copyright.txt license.txt 
+
+$(BUILD_DIR)/netmist.o: CFLAGS += $(LARGEFILE)
+$(BUILD_DIR)/netmist.o: netmist.c netmist.h copyright.txt license.txt netmist_defines.h netmist_fdcache.h netmist_structures.h dist_pro/import.c dist_pro/import_yaml.c
+
+$(BUILD_DIR)/netmist_vfs_paths_abs.o: CFLAGS += $(LARGEFILE)
+$(BUILD_DIR)/netmist_vfs_paths_abs.o: netmist_vfs_paths_abs.c netmist_vfs_paths_abs.h
+
+$(BUILD_DIR)/netmist_if.o: netmist_if.c netmist_if.h netmist.h netmist_defines.h netmist_fdcache.h netmist_structures.h
+
+$(BUILD_DIR)/netmist_random.o: netmist_random.c netmist_random.h netmist.h netmist_fdcache.h
+
+$(BUILD_DIR)/netmist_copyright.o: netmist_copyright.c netmist_copyright.h netmist.h netmist_fdcache.h
+
+$(BUILD_DIR)/netmist_utils.o: netmist_utils.c netmist_utils.h netmist_defines.h netmist_fdcache.h netmist_structures.h
+
+$(BUILD_DIR)/netmist_prime.o: netmist_prime.c netmist_prime.h netmist_defines.h netmist_fdcache.h netmist_structures.h netmist_fsm.h netmist_if.h
+
+$(BUILD_DIR)/netmist_nodeManager.o: netmist_nodeManager.c netmist_nodeManager.h  netmist_defines.h netmist_fdcache.h netmist_structures.h netmist_if.h
+$(BUILD_DIR)/netmist_client.o: netmist_client.c netmist_client.h netmist_defines.h netmist_fdcache.h netmist_structures.h netmist_if.h
+
+$(BUILD_DIR)/netmist_structures.o: netmist_structures.c netmist_structures.h netmist_defines.h netmist_fdcache.h
+
+$(BUILD_DIR)/netmist_logger.o: netmist_logger.c netmist_logger.h  netmist_defines.h netmist_fdcache.h netmist_structures.h
+
+$(BUILD_DIR)/netmist_version.o: netmist_version.c netmist_version.h  netmist_defines.h netmist_fdcache.h netmist_structures.h
+
+$(BUILD_DIR)/netmist_fsm.o: netmist_fsm.c netmist_fsm.h
+
+$(BUILD_DIR)/netmist_thread.o: netmist_thread.c netmist_thread.h
+
+$(BUILD_DIR)/workload.o: CFLAGS += $(LARGEFILE)
+$(BUILD_DIR)/workload.o: workload.c netmist.h netmist_defines.h netmist_structures.h
+
+$(BUILD_DIR)/mix_table.o: CFLAGS += $(LARGEFILE)
+$(BUILD_DIR)/mix_table.o: mix_table.c netmist.h netmist_defines.h netmist_structures.h
+
+$(BUILD_DIR)/netmist_fdcache.o: CFLAGS += $(LARGEFILE)
+$(BUILD_DIR)/netmist_fdcache.o: netmist_fdcache.c netmist_fdcache.h netmist.h netmist_logger.h netmist_defines.h netmist_structures.h
+
+$(BUILD_DIR)/netmist_vfs_paths_abs.pico: CFLAGS += $(LARGEFILE)
+$(BUILD_DIR)/netmist_vfs_paths_abs.pico: netmist_vfs_paths_abs.c netmist_vfs_paths_abs.h
+	$(CC) $(CFLAGS) -c -fPIC $< $(LDFLAGS) -o $@
+
+ifneq ($(OS),sunos)
+ifneq ($(OS),aix)
+ifneq ($(OS),darwin)
+all : $(BUILD_DIR)/netmist_vfs_fs_posix.so
+$(BUILD_DIR)/netmist_vfs_fs_posix.so: netmist_vfs_fs_common.c netmist_vfs_paths_abs.h
+$(BUILD_DIR)/netmist_vfs_fs_posix.so: netmist_vfs_fs_posix.c $(BUILD_DIR)/netmist_vfs_paths_abs.pico
+	$(CC) $(CFLAGS) $(CPPFLAGS) -D NETMIST_POSIX_VFS_AS_PLUGIN \
+	 -fPIC -shared -Wl,--version-script=$(TRUNK_DIR)/netmist/netmist_vfs_plugin.exportmap \
+	 $< $(BUILD_DIR)/netmist_vfs_paths_abs.pico $(LDFLAGS) -o $@
+endif
+endif
+endif
+
+.PRECIOUS: $(OBJS)
+$(BUILD_DIR)/%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+clean:
+	rm -f *.o $(BINS) $(OBJS)

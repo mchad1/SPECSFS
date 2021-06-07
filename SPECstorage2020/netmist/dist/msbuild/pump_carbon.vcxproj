@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{53F18541-578E-4A97-8F46-6871012A2E82}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NetmistProd>dist</NetmistProd>
+    <ProdIncludePath>$(SolutionDir)\dist_pro;$(SolutionDir)\dist</ProdIncludePath>
+    <ProdPreprocessorDefinitions>SPEC_DIST</ProdPreprocessorDefinitions>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\win32lib\win32_getopt.c" />
+    <ClCompile Include="..\..\..\win32lib\win32_sub.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\win32lib\win32_getopt.h" />
+    <ClInclude Include="..\..\..\win32lib\win32_sub.h" />
+    <ClInclude Include="..\..\..\win32lib\win32_types.h" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>
+	..;..\..\dist_pro;..\..\;$(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="../../msbuild/pump_carbon.target" />
+</Project>

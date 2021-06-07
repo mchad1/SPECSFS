@@ -1,0 +1,3562 @@
+
+RCS file: import.c,v
+Working file: import.c
+head: 1.10
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 10;	selected revisions: 10
+description:
+new
+----------------------------
+revision 1.10
+date: 2012/01/26 15:07:31;  author: capps;  state: Exp;  lines: +1 -0
+Adding rand_dist_behavior attribute
+----------------------------
+revision 1.9
+date: 2012/01/13 21:35:42;  author: capps;  state: Exp;  lines: +1 -0
+Adding Sharemode attribute.
+----------------------------
+revision 1.8
+date: 2012/01/09 18:25:29;  author: capps;  state: Exp;  lines: +6 -5
+Adding "rename" op
+----------------------------
+revision 1.7
+date: 2012/01/05 20:10:31;  author: capps;  state: Exp;  lines: +1 -0
+Add Background
+----------------------------
+revision 1.6
+date: 2012/01/05 17:47:55;  author: capps;  state: Exp;  lines: +1 -0
+add compression
+----------------------------
+revision 1.5
+date: 2011/12/23 15:04:09;  author: capps;  state: Exp;  lines: +1 -0
+Adding workload attribute for percent Poisson access distribution.
+----------------------------
+revision 1.4
+date: 2011/12/10 20:55:27;  author: capps;  state: Exp;  lines: +4 -3
+Add pathconf
+----------------------------
+revision 1.3
+date: 2011/12/09 19:38:27;  author: capps;  state: Exp;  lines: +2 -2
+Change to statfs instead of statfs
+----------------------------
+revision 1.2
+date: 2011/11/24 15:07:03;  author: capps;  state: Exp;  lines: +2 -0
+Include license
+----------------------------
+revision 1.1
+date: 2011/11/24 03:05:03;  author: capps;  state: Exp;
+Initial revision
+=============================================================================
+
+RCS file: import_lite.c,v
+Working file: import_lite.c
+head: 1.2
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+new
+----------------------------
+revision 1.2
+date: 2011/11/24 15:07:38;  author: capps;  state: Exp;  lines: +2 -0
+Include license.
+----------------------------
+revision 1.1
+date: 2011/11/24 03:05:11;  author: capps;  state: Exp;
+Initial revision
+=============================================================================
+
+RCS file: mempool.c,v
+Working file: mempool.c
+head: 1.12
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 12;	selected revisions: 12
+description:
+Adding for vmware
+----------------------------
+revision 1.12
+date: 2011/11/24 15:08:19;  author: capps;  state: Exp;  lines: +1 -49
+Include license
+----------------------------
+revision 1.11
+date: 2011/08/29 03:21:46;  author: capps;  state: Exp;  lines: +27 -0
+license
+----------------------------
+revision 1.10
+date: 2011/08/28 16:26:06;  author: capps;  state: Exp;  lines: +8 -0
+license
+----------------------------
+revision 1.9
+date: 2011/08/28 05:19:17;  author: capps;  state: Exp;  lines: +14 -57
+Back to freeware license.
+----------------------------
+revision 1.8
+date: 2011/07/08 15:06:22;  author: capps;  state: Exp;  lines: +53 -711
+open-ish license.
+----------------------------
+revision 1.7
+date: 2011/06/29 22:29:19;  author: capps;  state: Exp;  lines: +2 -1
+License in comments for compile :-)
+----------------------------
+revision 1.6
+date: 2011/06/29 22:27:04;  author: capps;  state: Exp;  lines: +710 -15
+GPL v3
+----------------------------
+revision 1.5
+date: 2011/03/14 19:17:45;  author: capps;  state: Exp;  lines: +9 -0
+Add other part of license stuff.
+----------------------------
+revision 1.4
+date: 2011/02/16 19:10:39;  author: capps;  state: Exp;  lines: +1 -1
+return pointer of the beginning.
+----------------------------
+revision 1.3
+date: 2011/01/30 17:26:09;  author: capps;  state: Exp;  lines: +23 -2
+Cleanup
+----------------------------
+revision 1.2
+date: 2011/01/30 16:42:45;  author: capps;  state: Exp;  lines: +2 -2
+Prealloc memory
+----------------------------
+revision 1.1
+date: 2011/01/30 16:42:14;  author: capps;  state: Exp;
+Initial revision
+=============================================================================
+
+RCS file: netmist.c,v
+Working file: netmist.c
+head: 1.763
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 763;	selected revisions: 763
+description:
+Initial version of nfsmist
+----------------------------
+revision 1.763
+date: 2012/03/06 14:37:20;  author: capps;  state: Exp;  lines: +9 -4
+Add loggin for another path to exit in wait_master_go...
+----------------------------
+revision 1.762
+date: 2012/03/06 05:53:01;  author: capps;  state: Exp;  lines: +7 -4
+Move to try_lock SET_WRLK instead of WRLCKW  ... poll instead of wait.
+----------------------------
+revision 1.761
+date: 2012/03/05 23:07:14;  author: capps;  state: Exp;  lines: +10 -10
+More cleanup for Windows.
+----------------------------
+revision 1.760
+date: 2012/03/05 23:02:23;  author: capps;  state: Exp;  lines: +30 -10
+Ifdef the serialization code, as it is only needed in Windows.
+----------------------------
+revision 1.759
+date: 2012/03/05 20:43:00;  author: capps;  state: Exp;  lines: +9 -1
+Don't exit on socket() failures.
+----------------------------
+revision 1.758
+date: 2012/03/05 18:17:36;  author: capps;  state: Exp;  lines: +6 -12
+Simplify serialization locking
+----------------------------
+revision 1.757
+date: 2012/03/05 18:02:05;  author: capps;  state: Exp;  lines: +3 -3
+Release lock before calling sleep.
+----------------------------
+revision 1.756
+date: 2012/03/05 16:05:45;  author: capps;  state: Exp;  lines: +2 -2
+Turn off sockdebug
+----------------------------
+revision 1.755
+date: 2012/03/05 16:04:52;  author: capps;  state: Exp;  lines: +76 -24
+more serializer fix up.
+----------------------------
+revision 1.754
+date: 2012/03/05 08:00:48;  author: capps;  state: Exp;  lines: +9 -3
+Remove warnings
+----------------------------
+revision 1.753
+date: 2012/03/05 07:55:02;  author: capps;  state: Exp;  lines: +11 -2
+Remove serialization on master socket startup allocation.
+----------------------------
+revision 1.752
+date: 2012/03/05 07:30:48;  author: capps;  state: Exp;  lines: +15 -3
+Fixup unlock in serializer.
+----------------------------
+revision 1.751
+date: 2012/03/05 07:03:06;  author: capps;  state: Exp;  lines: +2 -2
+turn off sockdebug
+----------------------------
+revision 1.750
+date: 2012/03/05 07:02:08;  author: capps;  state: Exp;  lines: +28 -4
+Add more debug to serializer.
+----------------------------
+revision 1.749
+date: 2012/03/05 04:57:52;  author: capps;  state: Exp;  lines: +60 -13
+Add locking around all socket() calls.
+----------------------------
+revision 1.748
+date: 2012/03/05 03:39:43;  author: capps;  state: Exp;  lines: +50 -0
+Adding serialization support for non-reentrant functions.
+----------------------------
+revision 1.747
+date: 2012/03/04 16:07:16;  author: capps;  state: Exp;  lines: +10 -5
+Add some debug to purge_file().
+----------------------------
+revision 1.746
+date: 2012/03/04 15:45:30;  author: capps;  state: Exp;  lines: +3 -1
+Bug fix in file create, where OP_READ files are re-created, when they don't need to be.
+----------------------------
+revision 1.745
+date: 2012/03/03 14:14:31;  author: capps;  state: Exp;  lines: +4 -3
+Fixup spelling error in a comment.
+----------------------------
+revision 1.744
+date: 2012/03/03 06:19:16;  author: capps;  state: Exp;  lines: +41 -5
+Add caching of hostname... for cygwin.
+----------------------------
+revision 1.743
+date: 2012/03/02 21:24:13;  author: capps;  state: Exp;  lines: +6 -6
+Adding more debug in client_init_files, for sockdebug.
+----------------------------
+revision 1.742
+date: 2012/03/02 16:10:42;  author: capps;  state: Exp;  lines: +2 -2
+Spelling error in debug message.
+----------------------------
+revision 1.741
+date: 2012/03/02 15:10:02;  author: capps;  state: Exp;  lines: +25 -3
+Try to deal with calls to gethostname failing... oh joy !!!
+----------------------------
+revision 1.740
+date: 2012/03/02 04:24:16;  author: capps;  state: Exp;  lines: +17 -3
+More debug for socket debug problems...
+----------------------------
+revision 1.739
+date: 2012/03/01 21:46:51;  author: capps;  state: Exp;  lines: +12 -9
+cleanup of warnings on some systems.
+----------------------------
+revision 1.738
+date: 2012/03/01 16:40:09;  author: capps;  state: Exp;  lines: +7 -7
+Expanding port range so that the reuse is less likely.
+----------------------------
+revision 1.737
+date: 2012/03/01 15:55:05;  author: capps;  state: Exp;  lines: +6 -4
+More consistent use of nap(100).
+----------------------------
+revision 1.736
+date: 2012/03/01 06:38:57;  author: capps;  state: Exp;  lines: +11 -5
+Move debug printf to inside sockdebug variable.
+----------------------------
+revision 1.735
+date: 2012/02/29 23:06:01;  author: capps;  state: Exp;  lines: +8 -0
+Adding check for -d value (procs per client) exceeding the client's
+maximum number of processes per user. _SC_CHILD_MAX
+----------------------------
+revision 1.734
+date: 2012/02/29 20:22:52;  author: capps;  state: Exp;  lines: +27 -0
+Adding more debug for start_child_listen()
+----------------------------
+revision 1.733
+date: 2012/02/27 17:32:39;  author: capps;  state: Exp;  lines: +6 -2
+Slow down the retries for binds, and heartbeat speeds.
+----------------------------
+revision 1.732
+date: 2012/02/23 22:49:27;  author: capps;  state: Exp;  lines: +13 -0
+Adding shutdown for sockets... lets see if this helps with CLOSE_WAIT
+----------------------------
+revision 1.731
+date: 2012/02/22 21:58:11;  author: capps;  state: Exp;  lines: +17 -2
+Adding more debug options for when things may be hung on the filers.
+----------------------------
+revision 1.730
+date: 2012/02/22 16:31:23;  author: capps;  state: Exp;  lines: +2 -2
+Try more unique ports for the socket binding.
+----------------------------
+revision 1.729
+date: 2012/02/22 16:03:13;  author: capps;  state: Exp;  lines: +4 -4
+Take out some of the sleep calls.
+----------------------------
+revision 1.728
+date: 2012/02/22 15:29:58;  author: capps;  state: Exp;  lines: +44 -7
+Add more socket debug code
+----------------------------
+revision 1.727
+date: 2012/02/22 04:09:01;  author: capps;  state: Exp;  lines: +6 -5
+Add more variable sleep times, to avoid clusters of connects.
+----------------------------
+revision 1.726
+date: 2012/02/21 23:40:02;  author: capps;  state: Exp;  lines: +5 -1
+let master get into accept before child sends join.
+----------------------------
+revision 1.725
+date: 2012/02/21 18:07:51;  author: capps;  state: Exp;  lines: +6 -0
+Add connecton refused handing for master.
+----------------------------
+revision 1.724
+date: 2012/02/21 16:04:33;  author: capps;  state: Exp;  lines: +11 -3
+Handle connection refused...
+----------------------------
+revision 1.723
+date: 2012/02/21 04:09:00;  author: capps;  state: Exp;  lines: +2 -2
+Raise the number of retry attemps.
+----------------------------
+revision 1.722
+date: 2012/02/20 14:12:14;  author: capps;  state: Exp;  lines: +12 -3
+Add more socket debug.
+----------------------------
+revision 1.721
+date: 2012/02/20 14:05:47;  author: capps;  state: Exp;  lines: +29 -0
+add more port restart logic.
+----------------------------
+revision 1.720
+date: 2012/02/20 00:52:58;  author: capps;  state: Exp;  lines: +8 -1
+Add client port exhaustion.
+----------------------------
+revision 1.719
+date: 2012/02/19 05:34:22;  author: capps;  state: Exp;  lines: +40 -33
+Add timestamps to socket debug outputs.
+----------------------------
+revision 1.718
+date: 2012/02/18 05:42:11;  author: capps;  state: Exp;  lines: +5 -4
+More socket debug, and timers to try to get windows happy.
+----------------------------
+revision 1.717
+date: 2012/02/17 05:32:52;  author: capps;  state: Exp;  lines: +3 -2
+Add error message for child Retry of socket() call, that should NEVER have failed.
+----------------------------
+revision 1.716
+date: 2012/02/14 15:36:52;  author: capps;  state: Exp;  lines: +13 -5
+Log error to log file when unable to create files.
+----------------------------
+revision 1.715
+date: 2012/02/14 03:39:01;  author: capps;  state: Exp;  lines: +20 -20
+Let child errors get reported sooner.
+----------------------------
+revision 1.714
+date: 2012/02/13 22:30:28;  author: capps;  state: Exp;  lines: +2 -1
+Put a sleep after children join and master sends go. Children need to
+be in the accept() call...
+----------------------------
+revision 1.713
+date: 2012/02/13 20:15:31;  author: capps;  state: Exp;  lines: +9 -1
+Add some retry logic for the master's first socket() call.
+----------------------------
+revision 1.712
+date: 2012/02/13 18:48:27;  author: capps;  state: Exp;  lines: +15 -0
+Adding check for no workdir.
+----------------------------
+revision 1.711
+date: 2012/02/13 16:39:30;  author: capps;  state: Exp;  lines: +10 -6
+Add more clarity to the usage screen.
+----------------------------
+revision 1.710
+date: 2012/02/13 16:14:35;  author: capps;  state: Exp;  lines: +17 -4
+Add some retry logic to the child socket() create.
+----------------------------
+revision 1.709
+date: 2012/02/13 15:57:36;  author: capps;  state: Exp;  lines: +4 -4
+Change to debug path for sockdebug
+----------------------------
+revision 1.708
+date: 2012/02/09 16:17:36;  author: capps;  state: Exp;  lines: +2 -2
+Update splash screen, to log file, output.
+----------------------------
+revision 1.707
+date: 2012/02/09 03:06:56;  author: capps;  state: Exp;  lines: +4 -2
+Adding more debug
+----------------------------
+revision 1.706
+date: 2012/02/08 21:35:31;  author: capps;  state: Exp;  lines: +3 -1
+Back out IP address instead of master's hostname. This doesn't
+work in our labs. It comes back with 169.* range.
+----------------------------
+revision 1.705
+date: 2012/02/08 21:34:29;  author: capps;  state: Exp;  lines: +8 -2
+Revert to using hostname for Master in messages.
+----------------------------
+revision 1.704
+date: 2012/02/07 14:51:18;  author: capps;  state: Exp;  lines: +6 -3
+Cleanup the validation directory.
+----------------------------
+revision 1.703
+date: 2012/02/06 21:50:35;  author: capps;  state: Exp;  lines: +3 -3
+Remove un-needed sleep.
+----------------------------
+revision 1.702
+date: 2012/02/06 21:44:10;  author: capps;  state: Exp;  lines: +32 -20
+Adding more socket debug code.
+----------------------------
+revision 1.701
+date: 2012/02/06 20:11:38;  author: capps;  state: Exp;  lines: +4 -1
+Adding pause between runs, to prevent socket reuse issues.
+----------------------------
+revision 1.700
+date: 2012/02/03 18:57:12;  author: capps;  state: Exp;  lines: +2 -2
+Type-oh in 10195... missing a 0 in the time(0) call.
+----------------------------
+revision 1.699
+date: 2012/02/03 18:45:19;  author: capps;  state: Exp;  lines: +5 -1
+Add more child logging around child startup.
+----------------------------
+revision 1.698
+date: 2012/02/02 19:54:00;  author: capps;  state: Exp;  lines: +6 -4
+Make sockets even more robuts.
+----------------------------
+revision 1.697
+date: 2012/02/02 06:07:22;  author: capps;  state: Exp;  lines: +40 -10
+Code cleanup.. make open_cached_count accurate in all cases.
+----------------------------
+revision 1.696
+date: 2012/02/02 05:48:42;  author: capps;  state: Exp;  lines: +6 -9
+Disable file descriptor caching for the validate of ops.
+----------------------------
+revision 1.695
+date: 2012/02/01 20:05:31;  author: capps;  state: Exp;  lines: +7 -1
+Add more code to avoid Windows SO_REUSEADDR problems.
+----------------------------
+revision 1.694
+date: 2012/02/01 05:09:09;  author: capps;  state: Exp;  lines: +9 -1
+Cleanup files after validate.
+----------------------------
+revision 1.693
+date: 2012/02/01 04:39:38;  author: capps;  state: Exp;  lines: +292 -1
+Add validate all op types to the testing.
+----------------------------
+revision 1.692
+date: 2012/01/30 01:57:19;  author: capps;  state: Exp;  lines: +2 -2
+Move to 80/20 jitter in 5% chunks.
+----------------------------
+revision 1.691
+date: 2012/01/28 22:40:45;  author: capps;  state: Exp;  lines: +27 -0
+Add 5% jitter to the poisson distribution of chunks.
+----------------------------
+revision 1.690
+date: 2012/01/27 20:15:49;  author: capps;  state: Exp;  lines: +14 -10
+Update 2011 stuff to 2012 dates.
+----------------------------
+revision 1.689
+date: 2012/01/27 16:55:12;  author: capps;  state: Exp;  lines: +64 -1
+Convert master's name into IP address, so that children's resolvers
+don't get confused, if we're not in the same DNS domain, or theirs is
+not configured correctly.
+----------------------------
+revision 1.688
+date: 2012/01/26 20:02:07;  author: capps;  state: Exp;  lines: +21 -4
+Add sanity check from broken DNS.
+----------------------------
+revision 1.687
+date: 2012/01/26 16:00:36;  author: capps;  state: Exp;  lines: +3 -3
+tighten up the Poisson for random offset generation.
+----------------------------
+revision 1.686
+date: 2012/01/26 04:13:44;  author: capps;  state: Exp;  lines: +35 -11
+Make rand_dist_behavior work for reads and writes.
+(random reads, and random writes)
+----------------------------
+revision 1.685
+date: 2012/01/26 03:36:50;  author: capps;  state: Exp;  lines: +69 -219
+Make choice of random accesses to follow Uniform or Poission as an attribute.
+----------------------------
+revision 1.684
+date: 2012/01/25 20:54:24;  author: capps;  state: Exp;  lines: +5 -2
+Bug fix.
+----------------------------
+revision 1.683
+date: 2012/01/25 19:49:11;  author: capps;  state: Exp;  lines: +2 -2
+bug fix for -L option.
+----------------------------
+revision 1.682
+date: 2012/01/25 19:37:50;  author: capps;  state: Exp;  lines: +1 -1
+Move usage message for -J to modifiable parameters section.
+----------------------------
+revision 1.681
+date: 2012/01/25 19:35:48;  author: capps;  state: Exp;  lines: +16 -2
+Add -J # to limit open file descriptor caching.
+----------------------------
+revision 1.680
+date: 2012/01/25 07:02:24;  author: capps;  state: Exp;  lines: +5 -5
+For database, poisson distribution of 5% chunks, then uniform random
+inside of a chunk.
+----------------------------
+revision 1.679
+date: 2012/01/24 16:37:17;  author: capps;  state: Exp;  lines: +226 -35
+Added "spotting" to the DATABASE workload object. Affects random read
+locality of reference.
+----------------------------
+revision 1.678
+date: 2012/01/23 19:44:32;  author: capps;  state: Exp;  lines: +21 -13
+Code cleanup (printfs in the error paths)
+----------------------------
+revision 1.677
+date: 2012/01/18 20:59:15;  author: capps;  state: Exp;  lines: +156 -25
+Add open file descriptor caching for the first _SC_OPEN_MAX number
+of files.
+----------------------------
+revision 1.676
+date: 2012/01/17 20:24:45;  author: capps;  state: Exp;  lines: +2 -2
+Make re-seed more spaced out, in sharemode.
+----------------------------
+revision 1.675
+date: 2012/01/16 19:21:42;  author: capps;  state: Exp;  lines: +23 -20
+Optimize file creation in ShareMode.
+----------------------------
+revision 1.674
+date: 2012/01/16 00:46:44;  author: capps;  state: Exp;  lines: +19 -10
+More cleanup for ShareMode.
+----------------------------
+revision 1.673
+date: 2012/01/16 00:15:59;  author: capps;  state: Exp;  lines: +43 -2
+Add locking on file creates... so that the files don't get too
+large, when in ShareMode.
+----------------------------
+revision 1.672
+date: 2012/01/14 19:43:24;  author: capps;  state: Exp;  lines: +104 -18
+Simplify the namespaces.
+----------------------------
+revision 1.671
+date: 2012/01/14 15:39:23;  author: capps;  state: Exp;  lines: +14 -12
+Sharing mode... separate namespaces by workload & sharing mode.
+----------------------------
+revision 1.670
+date: 2012/01/14 04:40:09;  author: capps;  state: Exp;  lines: +4 -1
+Improve scaling when doing -X or Sharemode.
+----------------------------
+revision 1.669
+date: 2012/01/13 21:35:42;  author: capps;  state: Exp;  lines: +30 -8
+Adding Sharemode attribute.
+----------------------------
+revision 1.668
+date: 2012/01/13 05:47:40;  author: capps;  state: Exp;  lines: +4 -3
+Temporary workaround for all sharing mode, and cleanup race.
+----------------------------
+revision 1.667
+date: 2012/01/13 05:26:42;  author: capps;  state: Exp;  lines: +205 -140
+Adding prototype for ALL files sharing mode.
+----------------------------
+revision 1.666
+date: 2012/01/11 22:30:27;  author: capps;  state: Exp;  lines: +3 -17
+Remove dead code.
+----------------------------
+revision 1.665
+date: 2012/01/11 21:25:42;  author: capps;  state: Exp;  lines: +10 -9
+Improve granularity of file name distribution.
+----------------------------
+revision 1.664
+date: 2012/01/11 18:07:40;  author: capps;  state: Exp;  lines: +240 -11
+More sharing of the hot domains across meta-data op types.
+----------------------------
+revision 1.663
+date: 2012/01/11 15:16:29;  author: capps;  state: Exp;  lines: +292 -137
+Optimize make_path to use switch instead of discrete if statements.
+Expand cross sharing for meta-data type files.
+----------------------------
+revision 1.662
+date: 2012/01/11 13:47:06;  author: capps;  state: Exp;  lines: +93 -57
+Use all of the file_objects....
+----------------------------
+revision 1.661
+date: 2012/01/11 07:06:19;  author: capps;  state: Exp;  lines: +68 -2
+Add more sharing for the meta-data
+----------------------------
+revision 1.660
+date: 2012/01/11 06:52:09;  author: capps;  state: Exp;  lines: +36 -10
+Bug fix for PROT_READ in mmap read testing.
+----------------------------
+revision 1.659
+date: 2012/01/10 21:19:03;  author: capps;  state: Exp;  lines: +2 -2
+Include files in dump that were only touched once during the run.
+The touches from INIT did not get counted, so all counts are real.
+----------------------------
+revision 1.658
+date: 2012/01/10 21:00:09;  author: capps;  state: Exp;  lines: +9 -11
+Move file object dump to the Client_ log.
+----------------------------
+revision 1.657
+date: 2012/01/10 20:51:39;  author: capps;  state: Exp;  lines: +7 -1
+Fix up for OP_STAT sharing.
+----------------------------
+revision 1.656
+date: 2012/01/10 20:40:40;  author: capps;  state: Exp;  lines: +50 -2
+Add -Y dump file objects.
+----------------------------
+revision 1.655
+date: 2012/01/10 00:16:36;  author: capps;  state: Exp;  lines: +2 -2
+Format of Workload log... remove extra space in Rename output.
+----------------------------
+revision 1.654
+date: 2012/01/09 22:56:42;  author: capps;  state: Exp;  lines: +2 -2
+Bug fix for export dist.
+----------------------------
+revision 1.653
+date: 2012/01/09 21:58:55;  author: capps;  state: Exp;  lines: +1 -27
+Remove more dead comments.
+----------------------------
+revision 1.652
+date: 2012/01/09 21:52:36;  author: capps;  state: Exp;  lines: +42 -42
+Code cleanup...
+----------------------------
+revision 1.651
+date: 2012/01/09 21:40:35;  author: capps;  state: Exp;  lines: +102 -90
+Simplify the file_object structures, lookups, and sharing of op types
+in the name generaton.
+----------------------------
+revision 1.650
+date: 2012/01/09 18:25:29;  author: capps;  state: Exp;  lines: +164 -49
+Adding "rename" op
+----------------------------
+revision 1.649
+date: 2012/01/05 21:36:06;  author: capps;  state: Exp;  lines: +2 -2
+More background stuff.
+----------------------------
+revision 1.648
+date: 2012/01/05 21:02:04;  author: capps;  state: Exp;  lines: +2 -0
+More background stuff.
+----------------------------
+revision 1.647
+date: 2012/01/05 20:25:36;  author: capps;  state: Exp;  lines: +4 -0
+More background updates.
+----------------------------
+revision 1.646
+date: 2012/01/05 20:11:53;  author: capps;  state: Exp;  lines: +31 -13
+Adding background
+----------------------------
+revision 1.645
+date: 2012/01/05 17:47:46;  author: capps;  state: Exp;  lines: +53 -11
+add percent compression
+----------------------------
+revision 1.644
+date: 2012/01/04 17:40:16;  author: capps;  state: Exp;  lines: +19 -14
+Create #define for minimum alignment for O_DIRECT.
+----------------------------
+revision 1.643
+date: 2011/12/23 23:48:56;  author: capps;  state: Exp;  lines: +2 -2
+bug fix for type-oh in percent Poisson implementation.
+----------------------------
+revision 1.642
+date: 2011/12/23 15:04:09;  author: capps;  state: Exp;  lines: +20 -22
+Adding workload attribute for percent Poisson access distribution.
+----------------------------
+revision 1.641
+date: 2011/12/22 22:16:26;  author: capps;  state: Exp;  lines: +8 -2
+Adding check for empty client config file.
+----------------------------
+revision 1.640
+date: 2011/12/20 22:09:18;  author: capps;  state: Exp;  lines: +21 -19
+Add 20 % of the ops get filename distribution that follows Poisson dist.
+----------------------------
+revision 1.639
+date: 2011/12/20 05:19:08;  author: capps;  state: Exp;  lines: +22 -7
+Remove Poisson for now.. it has nodalization issues... need more work.
+----------------------------
+revision 1.638
+date: 2011/12/19 21:57:57;  author: capps;  state: Exp;  lines: +3 -2
+Tweak Poisson to have a bit less pronounced effect.
+----------------------------
+revision 1.637
+date: 2011/12/19 18:11:49;  author: capps;  state: Exp;  lines: +100 -8
+Increase sharing of files in the selection mechanism.
+----------------------------
+revision 1.636
+date: 2011/12/19 16:04:29;  author: capps;  state: Exp;  lines: +13 -17
+Code cleanup... remove dead code.
+----------------------------
+revision 1.635
+date: 2011/12/16 18:38:50;  author: capps;  state: Exp;  lines: +37 -6
+Adding Poisson distribution of file name accesses.
+----------------------------
+revision 1.634
+date: 2011/12/13 20:38:44;  author: capps;  state: Exp;  lines: +2 -2
+remove unused variable warning.
+----------------------------
+revision 1.633
+date: 2011/12/13 20:23:40;  author: capps;  state: Exp;  lines: +27 -5
+Scan xfer size of workload to find the largest size needed. Then
+allocate the xfer buffer for all use after main_buf is created.
+----------------------------
+revision 1.632
+date: 2011/12/13 18:23:45;  author: capps;  state: Exp;  lines: +29 -15
+Add another I/O slot for 512k transfer sizes and percents.
+----------------------------
+revision 1.631
+date: 2011/12/12 04:39:05;  author: capps;  state: Exp;  lines: +3 -3
+Format (spacing) in the client log file.
+----------------------------
+revision 1.630
+date: 2011/12/11 14:57:54;  author: capps;  state: Exp;  lines: +8 -8
+Setup initialization for work_object to match new variables.
+----------------------------
+revision 1.629
+date: 2011/12/11 14:46:48;  author: capps;  state: Exp;  lines: +17 -4
+Code cleanup of clear_stats
+----------------------------
+revision 1.628
+date: 2011/12/10 20:52:44;  author: capps;  state: Exp;  lines: +138 -31
+Add pathconf op.
+----------------------------
+revision 1.627
+date: 2011/12/09 20:48:24;  author: capps;  state: Exp;  lines: +2 -1
+Fix close_op_count... off by one after I_TRUN in post_op code.
+----------------------------
+revision 1.626
+date: 2011/12/09 20:42:56;  author: capps;  state: Exp;  lines: +5 -5
+Spacing of output columns in the logs.
+----------------------------
+revision 1.625
+date: 2011/12/09 20:12:54;  author: capps;  state: Exp;  lines: +3 -8
+Remove extra count of open and close on statfs op.
+----------------------------
+revision 1.624
+date: 2011/12/09 20:10:37;  author: capps;  state: Exp;  lines: +5 -5
+Fix spelling for statfs versus fstatfs
+----------------------------
+revision 1.623
+date: 2011/12/09 19:44:30;  author: capps;  state: Exp;  lines: +1 -3
+Eliminate extra open() clos() pair, in the statfs calls.
+----------------------------
+revision 1.622
+date: 2011/12/09 19:37:49;  author: capps;  state: Exp;  lines: +61 -72
+Make fstatfs calls do a direct statfs instead. Avoid extra lookup.
+----------------------------
+revision 1.621
+date: 2011/12/07 19:50:24;  author: capps;  state: Exp;  lines: +2 -2
+Fix for Macos
+----------------------------
+revision 1.620
+date: 2011/12/07 18:51:18;  author: capps;  state: Exp;  lines: +7 -3
+Move truncate() to I_TRUNCATE() so that 64 bitness is preserved.
+----------------------------
+revision 1.619
+date: 2011/12/07 18:25:39;  author: capps;  state: Exp;  lines: +16 -2
+Include output when -T or -Q is used.
+----------------------------
+revision 1.618
+date: 2011/12/07 16:59:42;  author: capps;  state: Exp;  lines: +39 -39
+Move banding data to the left, so that it all fits without any line wrap in an 80x24 terminal window.
+----------------------------
+revision 1.617
+date: 2011/12/07 16:03:43;  author: capps;  state: Exp;  lines: +99 -85
+Now supports a maximum file size of 2^73 - 1024. Very large files :-)
+----------------------------
+revision 1.616
+date: 2011/12/06 21:51:25;  author: capps;  state: Exp;  lines: +4 -4
+Update to copyfile xfer totals, to reflect new method.
+----------------------------
+revision 1.615
+date: 2011/12/06 21:43:16;  author: capps;  state: Exp;  lines: +15 -24
+Remove unused variables.
+----------------------------
+revision 1.614
+date: 2011/12/06 21:10:39;  author: capps;  state: Exp;  lines: +7 -7
+Make netmist.c non-executable.
+----------------------------
+revision 1.613
+date: 2011/12/06 21:03:06;  author: capps;  state: Exp;  lines: +7 -7
+Move to 4k boundary.
+----------------------------
+revision 1.612
+date: 2011/12/06 20:12:18;  author: capps;  state: Exp;  lines: +8 -8
+Make those random seeks so that they land on an 8k boundary.
+----------------------------
+revision 1.611
+date: 2011/12/05 22:51:57;  author: capps;  state: Exp;  lines: +4 -2
+Improve read and write throughput output calculations.
+----------------------------
+revision 1.610
+date: 2011/12/05 21:59:31;  author: capps;  state: Exp;  lines: +3 -1
+Count rand r/w towards total throughput.
+----------------------------
+revision 1.609
+date: 2011/12/05 21:18:46;  author: capps;  state: Exp;  lines: +7 -7
+Another fix for random offsets.
+----------------------------
+revision 1.608
+date: 2011/12/05 20:34:47;  author: capps;  state: Exp;  lines: +4 -4
+Bug fix for random accesses.
+----------------------------
+revision 1.607
+date: 2011/12/05 17:51:16;  author: capps;  state: Exp;  lines: +13 -5
+Don't overshoot eof on op_copyfile.
+----------------------------
+revision 1.606
+date: 2011/12/05 17:28:46;  author: capps;  state: Exp;  lines: +50 -8
+Change copyfile op to something shorter in duration.
+----------------------------
+revision 1.605
+date: 2011/12/03 05:15:13;  author: capps;  state: Exp;  lines: +45 -32
+Put error strings in the client logs, more detail the better later.
+----------------------------
+revision 1.604
+date: 2011/12/02 22:20:55;  author: capps;  state: Exp;  lines: +2 -2
+Make filebytes a size_t instead of an int.
+----------------------------
+revision 1.603
+date: 2011/12/02 21:21:32;  author: capps;  state: Exp;  lines: +2 -2
+spelling error.
+----------------------------
+revision 1.602
+date: 2011/12/02 21:19:58;  author: capps;  state: Exp;  lines: +6 -2
+Add large file support for Cygwin.
+----------------------------
+revision 1.601
+date: 2011/12/02 19:33:48;  author: capps;  state: Exp;  lines: +36 -14
+Macos large file
+----------------------------
+revision 1.600
+date: 2011/12/02 17:49:00;  author: capps;  state: Exp;  lines: +32 -32
+More LARGEFILE stuff.
+----------------------------
+revision 1.599
+date: 2011/12/02 17:36:46;  author: capps;  state: Exp;  lines: +54 -20
+Add LARGEFILE support for Linux
+----------------------------
+revision 1.598
+date: 2011/12/01 15:58:51;  author: capps;  state: Exp;  lines: +64 -10
+Add more fflush() calls, so everything shows up in some log...
+----------------------------
+revision 1.597
+date: 2011/11/30 19:10:26;  author: capps;  state: Exp;  lines: +3 -3
+bug fix for child_listen's accept() call.
+----------------------------
+revision 1.596
+date: 2011/11/29 16:24:55;  author: capps;  state: Exp;  lines: +3 -2
+fix for make_non_dedup optimization.
+----------------------------
+revision 1.595
+date: 2011/11/29 16:14:06;  author: capps;  state: Exp;  lines: +0 -1
+Remove time dependency from make_non_dedup.
+----------------------------
+revision 1.594
+date: 2011/11/29 16:08:48;  author: capps;  state: Exp;  lines: +11 -10
+Make the INIT files more unique.
+----------------------------
+revision 1.593
+date: 2011/11/29 15:46:33;  author: capps;  state: Exp;  lines: +4 -1
+Make initial file creation fill with more unique data
+----------------------------
+revision 1.592
+date: 2011/11/29 05:30:20;  author: capps;  state: Exp;  lines: +8 -1
+Fix for IPV6
+----------------------------
+revision 1.591
+date: 2011/11/29 05:24:09;  author: capps;  state: Exp;  lines: +4 -4
+Fix for size of ipv6 sockaddr_in6
+----------------------------
+revision 1.590
+date: 2011/11/28 22:00:27;  author: capps;  state: Exp;  lines: +9 -9
+Final checkin to enable IPv6.
+----------------------------
+revision 1.589
+date: 2011/11/28 21:55:11;  author: capps;  state: Exp;  lines: +12 -24
+compat with SUA
+----------------------------
+revision 1.588
+date: 2011/11/28 21:02:29;  author: capps;  state: Exp;  lines: +12 -2
+Add optiion to enable IPV6.
+----------------------------
+revision 1.587
+date: 2011/11/28 19:55:37;  author: capps;  state: Exp;  lines: +269 -50
+Move to IPv6 host IP address lookup and socket strategy.
+----------------------------
+revision 1.586
+date: 2011/11/24 15:06:34;  author: capps;  state: Exp;  lines: +3 -52
+Add dynamice license
+----------------------------
+revision 1.585
+date: 2011/11/24 03:05:48;  author: capps;  state: Exp;  lines: +5 -100
+Move lite stuff out to seperate distribution.
+----------------------------
+revision 1.584
+date: 2011/11/23 02:34:24;  author: capps;  state: Exp;  lines: +4 -4
+Solaris update for statfs versus statvfs.
+----------------------------
+revision 1.583
+date: 2011/11/22 19:25:39;  author: capps;  state: Exp;  lines: +4 -4
+Portability for Mac OS-X
+----------------------------
+revision 1.582
+date: 2011/11/22 16:05:17;  author: capps;  state: Exp;  lines: +4 -4
+BSD uses statvfs instead of statfs
+----------------------------
+revision 1.581
+date: 2011/11/19 19:15:06;  author: capps;  state: Exp;  lines: +10 -9
+Add statvfs for SUA, as it uses this instead of statfs.
+----------------------------
+revision 1.580
+date: 2011/11/19 17:52:26;  author: capps;  state: Exp;  lines: +12 -1
+Make fstatfs calls go away for SUA. That system call does not exist in SUA.
+----------------------------
+revision 1.579
+date: 2011/11/18 21:50:45;  author: capps;  state: Exp;  lines: +4 -3
+Make custom1 and custom2 not fill files.
+----------------------------
+revision 1.578
+date: 2011/11/18 21:31:51;  author: capps;  state: Exp;  lines: +190 -13
+Adding two custom op types.
+----------------------------
+revision 1.577
+date: 2011/11/18 20:43:05;  author: capps;  state: Exp;  lines: +2 -2
+17 op types only.
+----------------------------
+revision 1.576
+date: 2011/11/18 20:35:15;  author: capps;  state: Exp;  lines: +3 -3
+Unify the number of OP types & MAX_DIST_ELEMS. They must/do match.
+----------------------------
+revision 1.575
+date: 2011/11/18 17:46:24;  author: capps;  state: Exp;  lines: +2 -2
+fix total mix check.
+----------------------------
+revision 1.574
+date: 2011/11/18 17:03:34;  author: capps;  state: Exp;  lines: +1 -9
+move defines to netmist.h
+----------------------------
+revision 1.573
+date: 2011/11/18 16:05:16;  author: capps;  state: Exp;  lines: +8 -8
+formatting of logs.
+----------------------------
+revision 1.572
+date: 2011/11/18 15:41:12;  author: capps;  state: Exp;  lines: +144 -22
+Adding fstatfs to mix
+----------------------------
+revision 1.571
+date: 2011/11/17 04:33:02;  author: capps;  state: Exp;  lines: +22 -50
+Remove dead code.
+----------------------------
+revision 1.570
+date: 2011/11/16 22:31:05;  author: capps;  state: Exp;  lines: +2 -4
+close stdin and stderr
+----------------------------
+revision 1.569
+date: 2011/11/16 22:23:36;  author: capps;  state: Exp;  lines: +8 -1
+Check to make sure that the new stdout is working, if not, spray error.
+----------------------------
+revision 1.568
+date: 2011/11/16 19:37:39;  author: capps;  state: Exp;  lines: +24 -1
+cygwin fixes
+----------------------------
+revision 1.567
+date: 2011/11/16 14:44:52;  author: capps;  state: Exp;  lines: +22 -1
+Let's try send/recv instead of write/read on the sockets.
+----------------------------
+revision 1.566
+date: 2011/11/14 15:25:20;  author: capps;  state: Exp;  lines: +22 -3
+Tell user when, and which, required options are missing.
+----------------------------
+revision 1.565
+date: 2011/11/09 22:10:31;  author: capps;  state: Exp;  lines: +53 -53
+Move OFFICE to HOMEDIR
+----------------------------
+revision 1.564
+date: 2011/11/09 21:33:35;  author: capps;  state: Exp;  lines: +53 -53
+Change VIDEO to STREAM
+----------------------------
+revision 1.563
+date: 2011/11/08 22:46:59;  author: capps;  state: Exp;  lines: +7 -1
+Pass the licensed flag to the remote children, so they can make licensed decisions.
+----------------------------
+revision 1.562
+date: 2011/11/08 19:17:57;  author: capps;  state: Exp;  lines: +6 -1
+Import of object not permitted in freeware version.
+----------------------------
+revision 1.561
+date: 2011/11/02 22:06:44;  author: capps;  state: Exp;  lines: +4 -9
+Make ssh and scp default for cygwin. Let users use the -u to switch.
+----------------------------
+revision 1.560
+date: 2011/10/30 00:22:55;  author: capps;  state: Exp;  lines: +6 -1
+Disable import of workload objects in non-licensed version.
+----------------------------
+revision 1.559
+date: 2011/10/27 14:36:04;  author: capps;  state: Exp;  lines: +8 -2
+Try to make master_listen() more robust.
+----------------------------
+revision 1.558
+date: 2011/10/27 03:52:18;  author: capps;  state: Exp;  lines: +20 -4
+Add more calls to fflush() after fprintf() calls, so that
+you will get output even if there is some hang or exit.
+----------------------------
+revision 1.557
+date: 2011/10/25 03:12:28;  author: capps;  state: Exp;  lines: +7 -1
+bug fix. Forgot to transport gg_flag.
+----------------------------
+revision 1.556
+date: 2011/10/14 20:18:01;  author: capps;  state: Exp;  lines: +3 -3
+Get percent complete messages to max at 100%
+----------------------------
+revision 1.555
+date: 2011/10/12 21:23:03;  author: capps;  state: Exp;  lines: +3 -3
+Add passing of localflag so that the forked child will know to use cp instead of rcp or scp.
+----------------------------
+revision 1.554
+date: 2011/10/11 21:49:25;  author: capps;  state: Exp;  lines: +3 -1
+It's bad to use nul as a file name in Windows. It creates
+a file that can not be deleted from the Windows gui.
+----------------------------
+revision 1.553
+date: 2011/10/06 20:33:11;  author: capps;  state: Exp;  lines: +2 -2
+footprint in the code and the net.
+----------------------------
+revision 1.552
+date: 2011/09/27 22:15:39;  author: capps;  state: Exp;  lines: +3 -2
+add 10 ms nap after write over socket.
+----------------------------
+revision 1.551
+date: 2011/09/27 21:04:55;  author: capps;  state: Exp;  lines: +3 -3
+Increase listen() queue depth... see if this makes the resets go away.
+----------------------------
+revision 1.550
+date: 2011/09/27 20:01:02;  author: capps;  state: Exp;  lines: +16 -3
+Add debug around malloc
+----------------------------
+revision 1.549
+date: 2011/09/27 14:44:42;  author: capps;  state: Exp;  lines: +2 -2
+Improve format of debug output.
+----------------------------
+revision 1.548
+date: 2011/09/27 14:32:55;  author: capps;  state: Exp;  lines: +2 -1
+Add debug
+----------------------------
+revision 1.547
+date: 2011/09/27 03:04:28;  author: capps;  state: Exp;  lines: +9 -5
+Fix for throughput in pdsm stats
+----------------------------
+revision 1.546
+date: 2011/09/26 05:57:18;  author: capps;  state: Exp;  lines: +5 -5
+Throughput stats clean up.
+----------------------------
+revision 1.545
+date: 2011/09/26 04:27:02;  author: capps;  state: Exp;  lines: +5 -1
+Add throughput stats
+----------------------------
+revision 1.544
+date: 2011/09/23 23:37:01;  author: capps;  state: Exp;  lines: +31 -1
+Adding license check. Without license there is a max of 50 procs.
+----------------------------
+revision 1.543
+date: 2011/09/23 23:24:56;  author: capps;  state: Exp;  lines: +29 -1
+Add function to check for license.
+----------------------------
+revision 1.542
+date: 2011/09/22 21:18:03;  author: capps;  state: Exp;  lines: +3 -2
+Remove child_send_socket, change to child_socket_val.
+----------------------------
+revision 1.541
+date: 2011/09/22 21:16:34;  author: capps;  state: Exp;  lines: +3 -4
+Remove unused child_send_socket, and use child_socket_val.
+----------------------------
+revision 1.540
+date: 2011/09/21 16:46:11;  author: capps;  state: Exp;  lines: +3 -2
+Improve nap() calabration test, prime caches.
+----------------------------
+revision 1.539
+date: 2011/09/21 03:19:45;  author: capps;  state: Exp;  lines: +25 -6
+Replace calls to strcasestr() witn a private version. This function
+is not available as part of libc in SUA.
+----------------------------
+revision 1.538
+date: 2011/09/20 16:43:22;  author: capps;  state: Exp;  lines: +14 -46
+Solaris fixes.
+----------------------------
+revision 1.537
+date: 2011/09/20 16:33:28;  author: capps;  state: Exp;  lines: +5 -1
+solaris fix
+----------------------------
+revision 1.536
+date: 2011/09/20 15:47:24;  author: capps;  state: Exp;  lines: +9 -1
+Fixes for Solaris
+----------------------------
+revision 1.535
+date: 2011/09/20 15:01:27;  author: capps;  state: Exp;  lines: +5 -5
+Work around bug in BSD
+----------------------------
+revision 1.534
+date: 2011/09/15 02:37:12;  author: capps;  state: Exp;  lines: +75 -5
+Add -a option to permit add-offset to xfers.
+----------------------------
+revision 1.533
+date: 2011/09/14 22:06:39;  author: capps;  state: Exp;  lines: +3 -1
+Deal with negative timers... VM stuff.
+----------------------------
+revision 1.532
+date: 2011/09/14 21:59:03;  author: capps;  state: Exp;  lines: +5 -2
+Prevent time from going negative.
+----------------------------
+revision 1.531
+date: 2011/09/14 14:28:37;  author: capps;  state: Exp;  lines: +37 -4
+Add -z to run locally.
+----------------------------
+revision 1.530
+date: 2011/09/13 16:47:56;  author: capps;  state: Exp;  lines: +5 -6
+fix for TRUE.
+----------------------------
+revision 1.529
+date: 2011/09/13 16:45:50;  author: capps;  state: Exp;  lines: +79 -25
+Fixes for Microsoft's broken implementation of SO_REUSEADDR.
+----------------------------
+revision 1.528
+date: 2011/09/13 05:27:20;  author: capps;  state: Exp;  lines: +15 -1
+Disable pct and heartbeats for cygwin and sua for now...
+----------------------------
+revision 1.527
+date: 2011/09/13 04:13:00;  author: capps;  state: Exp;  lines: +2 -1
+Zero out inBytes
+----------------------------
+revision 1.526
+date: 2011/09/12 22:15:42;  author: capps;  state: Exp;  lines: +15 -11
+PIT fixups
+----------------------------
+revision 1.525
+date: 2011/09/12 19:36:00;  author: capps;  state: Exp;  lines: +7 -2
+Add error message for PIT read error.
+----------------------------
+revision 1.524
+date: 2011/09/11 21:42:36;  author: capps;  state: Exp;  lines: +17 -2
+Improve initial resolution measurment.
+----------------------------
+revision 1.523
+date: 2011/09/08 16:13:29;  author: capps;  state: Exp;  lines: +40 -13
+SUA cleanup
+----------------------------
+revision 1.522
+date: 2011/09/07 15:55:30;  author: capps;  state: Exp;  lines: +3 -3
+add more precision, all 10.0 become 10.2 or 12.2.
+----------------------------
+revision 1.521
+date: 2011/09/07 15:52:10;  author: capps;  state: Exp;  lines: +2 -2
+fix for totaling up ops/sec.
+----------------------------
+revision 1.520
+date: 2011/09/07 15:34:47;  author: capps;  state: Exp;  lines: +40 -41
+Make op_rate always a float/double.
+----------------------------
+revision 1.519
+date: 2011/09/06 14:38:39;  author: capps;  state: Exp;  lines: +81 -219
+Adding Jerry's changes for flow control
+----------------------------
+revision 1.518
+date: 2011/09/05 03:39:01;  author: capps;  state: Exp;  lines: +12 -2
+Improve error path for readdir calls.
+----------------------------
+revision 1.517
+date: 2011/09/03 14:58:02;  author: capps;  state: Exp;  lines: +3 -2
+Add timer resolution output to the child logs.
+----------------------------
+revision 1.516
+date: 2011/09/03 14:24:04;  author: capps;  state: Exp;  lines: +3 -2
+Jerry noticed my_time_res not initialized correctly.
+----------------------------
+revision 1.515
+date: 2011/09/02 14:37:15;  author: capps;  state: Exp;  lines: +10 -7
+Add more error logging.
+----------------------------
+revision 1.514
+date: 2011/09/01 13:26:47;  author: capps;  state: Exp;  lines: +2 -1
+add sleep before exit.
+----------------------------
+revision 1.513
+date: 2011/08/31 17:11:09;  author: capps;  state: Exp;  lines: +13 -4
+add debug
+----------------------------
+revision 1.512
+date: 2011/08/31 15:48:56;  author: capps;  state: Exp;  lines: +2 -2
+Add error message.
+----------------------------
+revision 1.511
+date: 2011/08/31 03:25:29;  author: capps;  state: Exp;  lines: +10 -1
+chuck old messages arriving to this instance of init.
+----------------------------
+revision 1.510
+date: 2011/08/30 18:47:17;  author: capps;  state: Exp;  lines: +5 -4
+flow tweak
+----------------------------
+revision 1.509
+date: 2011/08/30 15:40:36;  author: capps;  state: Exp;  lines: +21 -3
+Adding averaging to flow control.
+----------------------------
+revision 1.508
+date: 2011/08/30 06:16:40;  author: capps;  state: Exp;  lines: +2 -2
+tweak run flow
+----------------------------
+revision 1.507
+date: 2011/08/30 05:07:26;  author: capps;  state: Exp;  lines: +2 -2
+tweak flow
+----------------------------
+revision 1.506
+date: 2011/08/30 04:59:36;  author: capps;  state: Exp;  lines: +3 -3
+tweak to flow control
+----------------------------
+revision 1.505
+date: 2011/08/30 03:44:24;  author: capps;  state: Exp;  lines: +2 -2
+ISCALE from 10 down to 5
+----------------------------
+revision 1.504
+date: 2011/08/30 03:01:31;  author: capps;  state: Exp;  lines: +10 -1
+add command into master_wait_barrier.
+----------------------------
+revision 1.503
+date: 2011/08/29 15:23:15;  author: capps;  state: Exp;  lines: +48 -57
+code cleanup
+----------------------------
+revision 1.502
+date: 2011/08/29 03:21:06;  author: capps;  state: Exp;  lines: +28 -1
+Adding more to license.
+----------------------------
+revision 1.501
+date: 2011/08/28 16:25:34;  author: capps;  state: Exp;  lines: +9 -1
+license for universities and researchers
+----------------------------
+revision 1.500
+date: 2011/08/28 05:16:16;  author: capps;  state: Exp;  lines: +30 -83
+Back to free-ware license.
+----------------------------
+revision 1.499
+date: 2011/08/26 19:57:02;  author: capps;  state: Exp;  lines: +2 -2
+add more error path info.
+----------------------------
+revision 1.498
+date: 2011/08/26 14:58:02;  author: capps;  state: Exp;  lines: +11 -2
+Add another error path.
+----------------------------
+revision 1.497
+date: 2011/08/23 13:38:40;  author: capps;  state: Exp;  lines: +5 -3
+Add more strerror output for errors returned by children.
+----------------------------
+revision 1.496
+date: 2011/08/22 17:14:06;  author: capps;  state: Exp;  lines: +3 -3
+remove scaling.
+----------------------------
+revision 1.495
+date: 2011/08/22 17:09:21;  author: capps;  state: Exp;  lines: +3 -3
+turn off debug
+----------------------------
+revision 1.494
+date: 2011/08/22 16:06:03;  author: capps;  state: Exp;  lines: +21 -84
+Tighten up the flow control.
+----------------------------
+revision 1.493
+date: 2011/08/22 02:20:59;  author: capps;  state: Exp;  lines: +6 -2
+no change.
+----------------------------
+revision 1.492
+date: 2011/08/22 02:16:52;  author: capps;  state: Exp;  lines: +3 -3
+Add credits
+----------------------------
+revision 1.491
+date: 2011/08/16 05:15:28;  author: capps;  state: Exp;  lines: +5 -0
+accounting.
+----------------------------
+revision 1.490
+date: 2011/08/16 05:06:40;  author: capps;  state: Exp;  lines: +1 -1
+accounting.
+----------------------------
+revision 1.489
+date: 2011/08/16 04:50:55;  author: capps;  state: Exp;  lines: +9 -1
+Fix counts due to prefix operations.
+----------------------------
+revision 1.488
+date: 2011/08/16 04:10:17;  author: capps;  state: Exp;  lines: +106 -114
+Reduce complexity of the accounting of ops counts and totals.
+----------------------------
+revision 1.487
+date: 2011/08/15 17:17:45;  author: capps;  state: Exp;  lines: +16 -42
+Remove un needed code.
+----------------------------
+revision 1.486
+date: 2011/08/15 03:16:16;  author: capps;  state: Exp;  lines: +50 -110
+removelseek
+----------------------------
+revision 1.485
+date: 2011/08/14 21:16:12;  author: capps;  state: Exp;  lines: +66 -9
+lseek add
+----------------------------
+revision 1.484
+date: 2011/08/14 02:51:32;  author: capps;  state: Exp;  lines: +3 -1
+Remove un-needed Flushed message.
+----------------------------
+revision 1.483
+date: 2011/08/14 02:43:41;  author: capps;  state: Exp;  lines: +34 -9
+fix up open/close counts.
+----------------------------
+revision 1.482
+date: 2011/08/14 02:03:48;  author: capps;  state: Exp;  lines: +77 -11
+accounting for open() and close().
+----------------------------
+revision 1.481
+date: 2011/08/14 01:20:46;  author: capps;  state: Exp;  lines: +30 -1
+Add cleanup heartbeats and PDSM types.
+----------------------------
+revision 1.480
+date: 2011/08/13 14:08:10;  author: capps;  state: Exp;  lines: +1 -12
+Remove useless message
+----------------------------
+revision 1.479
+date: 2011/08/12 22:50:10;  author: capps;  state: Exp;  lines: +12 -1
+Add message about cleanup .
+----------------------------
+revision 1.478
+date: 2011/08/12 22:26:19;  author: capps;  state: Exp;  lines: +1 -2
+Remove double count of write ops.
+----------------------------
+revision 1.477
+date: 2011/08/12 19:30:45;  author: capps;  state: Exp;  lines: +7 -7
+Setup initializer fully.
+----------------------------
+revision 1.476
+date: 2011/08/12 18:48:42;  author: capps;  state: Exp;  lines: +63 -2
+Added USERDEF workload object.
+----------------------------
+revision 1.475
+date: 2011/08/12 17:48:27;  author: capps;  state: Exp;  lines: +10 -2
+Adding more to usage screen, and a bell character to inform user when
+the test is finished.
+----------------------------
+revision 1.474
+date: 2011/08/11 19:40:18;  author: capps;  state: Exp;  lines: +49 -4
+Add new token ... Instances=
+----------------------------
+revision 1.473
+date: 2011/08/11 15:45:19;  author: capps;  state: Exp;  lines: +2 -2
+fix type-oh
+----------------------------
+revision 1.472
+date: 2011/08/11 02:05:26;  author: capps;  state: Exp;  lines: +4 -3
+Add comment.
+----------------------------
+revision 1.471
+date: 2011/08/10 21:17:44;  author: capps;  state: Exp;  lines: +295 -295
+Move to netmist.h for the table defaults.
+----------------------------
+revision 1.470
+date: 2011/08/10 19:12:56;  author: capps;  state: Exp;  lines: +20 -20
+move copyfile back to zero percent.
+----------------------------
+revision 1.469
+date: 2011/08/10 16:54:56;  author: capps;  state: Exp;  lines: +2 -1
+Round up PDSM seg size.
+----------------------------
+revision 1.468
+date: 2011/08/10 16:40:57;  author: capps;  state: Exp;  lines: +3 -3
+Add copyfile to the calculation for total space.
+----------------------------
+revision 1.467
+date: 2011/08/10 05:32:26;  author: capps;  state: Exp;  lines: +24 -24
+Add use of copyfile in some of the workload objects.
+----------------------------
+revision 1.466
+date: 2011/08/10 05:07:52;  author: capps;  state: Exp;  lines: +26 -2
+license update
+----------------------------
+revision 1.465
+date: 2011/08/09 22:06:44;  author: capps;  state: Exp;  lines: +33 -33
+Format fixing.
+----------------------------
+revision 1.464
+date: 2011/08/09 21:45:55;  author: capps;  state: Exp;  lines: +1 -1
+more formating fixes.
+----------------------------
+revision 1.463
+date: 2011/08/09 21:44:10;  author: capps;  state: Exp;  lines: +35 -35
+Fix up some formatting in the logs.
+----------------------------
+revision 1.462
+date: 2011/08/09 20:46:53;  author: capps;  state: Exp;  lines: +223 -41
+Add hooks for copy file op.
+----------------------------
+revision 1.461
+date: 2011/08/09 20:05:46;  author: capps;  state: Exp;  lines: +6 -6
+Fixes for mac
+----------------------------
+revision 1.460
+date: 2011/08/09 20:04:33;  author: capps;  state: Exp;  lines: +6 -6
+Fixes for solaris
+----------------------------
+revision 1.459
+date: 2011/08/08 14:08:39;  author: capps;  state: Exp;  lines: +15 -1
+Add warm-up percent complete messages.
+----------------------------
+revision 1.458
+date: 2011/08/08 13:54:15;  author: capps;  state: Exp;  lines: +86 -21
+Fix race in master listen and child's first message.
+----------------------------
+revision 1.457
+date: 2011/08/08 06:04:13;  author: capps;  state: Exp;  lines: +8 -2
+too fast heartbeats
+----------------------------
+revision 1.456
+date: 2011/08/08 05:54:22;  author: capps;  state: Exp;  lines: +2 -1
+Check for heartbeat flag
+----------------------------
+revision 1.455
+date: 2011/08/08 05:52:07;  author: capps;  state: Exp;  lines: +3 -11
+Fixes
+----------------------------
+revision 1.454
+date: 2011/08/08 05:41:04;  author: capps;  state: Exp;  lines: +15 -3
+Fix client early termination.
+----------------------------
+revision 1.453
+date: 2011/08/08 04:59:59;  author: capps;  state: Exp;  lines: +1 -3
+Remove message that can not print from the child.
+----------------------------
+revision 1.452
+date: 2011/08/08 03:19:11;  author: capps;  state: Exp;  lines: +39 -2
+Flush files if they need to shrink.
+----------------------------
+revision 1.451
+date: 2011/08/08 03:10:10;  author: capps;  state: Exp;  lines: +1 -1
+Fix for init percentage
+----------------------------
+revision 1.450
+date: 2011/08/08 03:04:14;  author: capps;  state: Exp;  lines: +10 -1
+Add percent complete message for INIT
+----------------------------
+revision 1.449
+date: 2011/08/08 02:54:20;  author: capps;  state: Exp;  lines: +29 -3
+Add percent init complete
+----------------------------
+revision 1.448
+date: 2011/08/08 02:39:13;  author: capps;  state: Exp;  lines: +5 -3
+Add one run heartbeat for startup.
+----------------------------
+revision 1.447
+date: 2011/08/08 00:49:51;  author: capps;  state: Exp;  lines: +120 -3
+Fix O_DIRECT to F_NOCACHE for Macos
+----------------------------
+revision 1.446
+date: 2011/08/06 20:06:51;  author: capps;  state: Exp;  lines: +2 -2
+Make token parsing case-insensitive.
+----------------------------
+revision 1.445
+date: 2011/08/06 13:45:39;  author: capps;  state: Exp;  lines: +2 -2
+add a space to the contributors list.
+----------------------------
+revision 1.444
+date: 2011/08/06 13:43:00;  author: capps;  state: Exp;  lines: +17 -3
+Adding Splash
+----------------------------
+revision 1.443
+date: 2011/08/05 15:24:59;  author: capps;  state: Exp;  lines: +3 -2
+Remove pre-warm-up log message.
+----------------------------
+revision 1.442
+date: 2011/08/05 15:22:29;  author: capps;  state: Exp;  lines: +59 -7
+flush caches in write_file during the INIT phase, and eliminate the pre-warm-up.
+----------------------------
+revision 1.441
+date: 2011/08/05 14:12:27;  author: capps;  state: Exp;  lines: +21 -6
+Permit MM reads and MM writes to cross share files.
+----------------------------
+revision 1.440
+date: 2011/08/05 07:20:22;  author: capps;  state: Exp;  lines: +5 -8
+remove double count of read_count being incremented by rand_read()
+----------------------------
+revision 1.439
+date: 2011/08/05 06:36:26;  author: capps;  state: Exp;  lines: +4 -3
+Add mmap stuff into data set size calculations.
+----------------------------
+revision 1.438
+date: 2011/08/05 06:20:22;  author: capps;  state: Exp;  lines: +11 -4
+slow down messages for percent warmup complete.
+----------------------------
+revision 1.437
+date: 2011/08/05 06:10:50;  author: capps;  state: Exp;  lines: +31 -7
+Add some percent warmup output.
+----------------------------
+revision 1.436
+date: 2011/08/05 05:54:00;  author: capps;  state: Exp;  lines: +5 -5
+Add strerror() for errors.
+----------------------------
+revision 1.435
+date: 2011/08/05 04:05:40;  author: capps;  state: Exp;  lines: +2 -2
+cleanup
+----------------------------
+revision 1.434
+date: 2011/08/05 03:59:03;  author: capps;  state: Exp;  lines: +13 -1
+Add INIT for PDSM.
+----------------------------
+revision 1.433
+date: 2011/08/04 22:42:33;  author: capps;  state: Exp;  lines: +2 -2
+*** empty log message ***
+----------------------------
+revision 1.432
+date: 2011/08/04 22:39:27;  author: capps;  state: Exp;  lines: +2 -2
+Add achieved ops to PDSM for pre-warm up.
+----------------------------
+revision 1.431
+date: 2011/08/04 20:52:11;  author: capps;  state: Exp;  lines: +81 -27
+Adding pre-warmp-up stuff
+----------------------------
+revision 1.430
+date: 2011/08/04 17:57:00;  author: capps;  state: Exp;  lines: +6 -6
+consistency in the exported tables.
+----------------------------
+revision 1.429
+date: 2011/08/04 17:52:12;  author: capps;  state: Exp;  lines: +438 -40
+Adding pre-warm-up and mmap
+----------------------------
+revision 1.428
+date: 2011/08/02 17:32:24;  author: capps;  state: Exp;  lines: +3 -3
+Change clients to processes
+----------------------------
+revision 1.427
+date: 2011/08/02 15:19:36;  author: capps;  state: Exp;  lines: +21 -9
+Return proper client number in the heartbeat messages.
+----------------------------
+revision 1.426
+date: 2011/08/02 14:50:40;  author: capps;  state: Exp;  lines: +3 -3
+minor tweak to heartbeat notifications > changed to >=
+----------------------------
+revision 1.425
+date: 2011/08/02 13:56:47;  author: capps;  state: Exp;  lines: +6 -5
+finish heartbeat work to deliver any child heartbeat
+----------------------------
+revision 1.424
+date: 2011/08/02 13:52:22;  author: capps;  state: Exp;  lines: +9 -1
+Deliver heartbeats from any child.
+----------------------------
+revision 1.423
+date: 2011/07/29 17:00:15;  author: capps;  state: Exp;  lines: +2 -1
+Re-create dist tables after workload update.
+----------------------------
+revision 1.422
+date: 2011/07/28 02:09:25;  author: capps;  state: Exp;  lines: +2 -2
+bsd fix
+----------------------------
+revision 1.421
+date: 2011/07/27 03:49:01;  author: capps;  state: Exp;  lines: +10 -1
+Add modified_run update from any client back to the master in the results.
+----------------------------
+revision 1.420
+date: 2011/07/26 19:38:28;  author: capps;  state: Exp;  lines: +3 -2
+Only shoot finger print if actual change was made.
+----------------------------
+revision 1.419
+date: 2011/07/26 19:31:03;  author: capps;  state: Exp;  lines: +5 -1
+Disable fingerprint if modified via pdsm.
+----------------------------
+revision 1.418
+date: 2011/07/26 13:51:56;  author: capps;  state: Exp;  lines: +2 -2
+typeoh
+----------------------------
+revision 1.417
+date: 2011/07/26 13:50:37;  author: capps;  state: Exp;  lines: +14 -14
+boundary enforcement on create_tests
+----------------------------
+revision 1.416
+date: 2011/07/26 03:16:20;  author: capps;  state: Exp;  lines: +6 -2
+Once update is done, reset the local copy of the "set" bit.
+The PDSM code will update this again, if another change
+is made.
+----------------------------
+revision 1.415
+date: 2011/07/25 23:23:51;  author: capps;  state: Exp;  lines: +9 -9
+Cleanup PDSM_REGISTRY naming.
+----------------------------
+revision 1.414
+date: 2011/07/25 21:37:08;  author: capps;  state: Exp;  lines: +9 -20
+Adding PDSM min seg size output.
+----------------------------
+revision 1.413
+date: 2011/07/25 19:59:50;  author: capps;  state: Exp;  lines: +17 -50
+Moving to external header
+----------------------------
+revision 1.412
+date: 2011/07/25 17:29:41;  author: capps;  state: Exp;  lines: +9 -93
+Import entire set of workloads.
+----------------------------
+revision 1.411
+date: 2011/07/23 04:26:29;  author: capps;  state: Exp;  lines: +30 -1
+reset dist_table after pdsm update.
+----------------------------
+revision 1.410
+date: 2011/07/22 19:42:37;  author: capps;  state: Exp;  lines: +85 -5
+Adding more malable attributes.
+----------------------------
+revision 1.409
+date: 2011/07/20 18:05:34;  author: capps;  state: Exp;  lines: +4 -3
+Add set flag to each imported value that is to be set.
+----------------------------
+revision 1.408
+date: 2011/07/15 03:30:13;  author: capps;  state: Exp;  lines: +5 -1
+add license key printf to log_file too
+----------------------------
+revision 1.407
+date: 2011/07/15 03:05:16;  author: capps;  state: Exp;  lines: +1 -2
+warning
+----------------------------
+revision 1.406
+date: 2011/07/15 03:04:36;  author: capps;  state: Exp;  lines: +12 -5
+bug fix for finger print.
+----------------------------
+revision 1.405
+date: 2011/07/15 02:14:20;  author: capps;  state: Exp;  lines: +9 -2
+Add license tag to the finger print output.
+----------------------------
+revision 1.404
+date: 2011/07/14 21:44:04;  author: capps;  state: Exp;  lines: +48 -2
+Add license fingerprint stuff.
+----------------------------
+revision 1.403
+date: 2011/07/12 15:35:26;  author: capps;  state: Exp;  lines: +5 -0
+Adding remote control to permit setting op_rate on the fly.
+----------------------------
+revision 1.402
+date: 2011/07/12 15:09:36;  author: capps;  state: Exp;  lines: +15 -1
+Adding op_rate control.
+----------------------------
+revision 1.401
+date: 2011/07/12 12:38:30;  author: capps;  state: Exp;  lines: +10 -1
+Add cur_state to pdsm stats
+----------------------------
+revision 1.400
+date: 2011/07/11 15:05:17;  author: capps;  state: Exp;  lines: +2 -2
+bug fix for pdsm run time.
+----------------------------
+revision 1.399
+date: 2011/07/11 14:48:48;  author: capps;  state: Exp;  lines: +4 -1
+Add run time to pdsm stats
+----------------------------
+revision 1.398
+date: 2011/07/08 15:04:33;  author: capps;  state: Exp;  lines: +56 -716
+Update license to open-ish
+----------------------------
+revision 1.397
+date: 2011/07/06 21:22:07;  author: capps;  state: Exp;  lines: +2 -1
+No O_DIRECT in vmware
+----------------------------
+revision 1.396
+date: 2011/07/06 21:20:36;  author: capps;  state: Exp;  lines: +18 -2
+More PDSM stuff
+----------------------------
+revision 1.395
+date: 2011/07/06 18:05:36;  author: capps;  state: Exp;  lines: +3 -3
+Format of heartbeat messages.
+----------------------------
+revision 1.394
+date: 2011/07/06 17:49:59;  author: capps;  state: Exp;  lines: +9 -0
+More PDSM stuff
+----------------------------
+revision 1.393
+date: 2011/07/06 17:45:03;  author: capps;  state: Exp;  lines: +4 -4
+more WARM reporting for op rate.
+----------------------------
+revision 1.392
+date: 2011/07/06 17:42:09;  author: capps;  state: Exp;  lines: +1 -1
+Add achieved reporting to the WARMup reporting.
+----------------------------
+revision 1.391
+date: 2011/07/06 17:38:54;  author: capps;  state: Exp;  lines: +23 -9
+Adding first hook for PDSM stats.
+----------------------------
+revision 1.390
+date: 2011/07/05 19:00:44;  author: capps;  state: Exp;  lines: +28 -24
+Add op_rate reporting through heartbeats.
+----------------------------
+revision 1.389
+date: 2011/07/01 18:49:52;  author: capps;  state: Exp;  lines: +11 -2
+adding more log messages for log_flag output.
+----------------------------
+revision 1.388
+date: 2011/07/01 16:14:44;  author: capps;  state: Exp;  lines: +10 -1
+Adding more osync support
+----------------------------
+revision 1.387
+date: 2011/07/01 16:09:52;  author: capps;  state: Exp;  lines: +24 -7
+Adding O_sync percentage support.
+----------------------------
+revision 1.386
+date: 2011/07/01 15:53:12;  author: capps;  state: Exp;  lines: +9 -1
+cleanup
+----------------------------
+revision 1.385
+date: 2011/07/01 15:49:10;  author: capps;  state: Exp;  lines: +2 -2
+Remove period.
+----------------------------
+revision 1.384
+date: 2011/07/01 15:46:55;  author: capps;  state: Exp;  lines: +6 -2
+List the use of custom workloads in the output.
+----------------------------
+revision 1.383
+date: 2011/07/01 15:29:22;  author: capps;  state: Exp;  lines: +3 -1
+Strip off newline at end of line in the token_file.
+----------------------------
+revision 1.382
+date: 2011/06/30 20:45:42;  author: capps;  state: Exp;  lines: +9 -2
+Add notification of token based Op_rate control, to the client logs.
+----------------------------
+revision 1.381
+date: 2011/06/30 20:40:23;  author: capps;  state: Exp;  lines: +14 -34
+Add op_rate control from the parser file.
+----------------------------
+revision 1.380
+date: 2011/06/30 20:23:15;  author: capps;  state: Exp;  lines: +237 -8
+Added -g filename for token based configurations.
+----------------------------
+revision 1.379
+date: 2011/06/30 19:05:20;  author: capps;  state: Exp;  lines: +12 -12
+code cleanup
+----------------------------
+revision 1.378
+date: 2011/06/29 22:28:19;  author: capps;  state: Exp;  lines: +4 -2
+Make license a comment.
+----------------------------
+revision 1.377
+date: 2011/06/29 22:25:17;  author: capps;  state: Exp;  lines: +3 -13
+license update.
+----------------------------
+revision 1.376
+date: 2011/06/29 21:55:32;  author: capps;  state: Exp;  lines: +725 -18
+Adding GPL v3 license
+----------------------------
+revision 1.375
+date: 2011/06/29 18:42:49;  author: capps;  state: Exp;  lines: +7 -5
+Do not include heartbeat in op times.
+----------------------------
+revision 1.374
+date: 2011/06/29 15:37:31;  author: capps;  state: Exp;  lines: +139 -113
+Moving more stuff into the client_object... preparation for
+token parsing.
+----------------------------
+revision 1.373
+date: 2011/06/28 16:07:56;  author: capps;  state: Exp;  lines: +4 -2
+Add error path to shutdown the master if the test dir is not writable.
+----------------------------
+revision 1.372
+date: 2011/06/27 15:52:25;  author: capps;  state: Exp;  lines: +1 -2
+Remove unused variables.
+----------------------------
+revision 1.371
+date: 2011/06/27 14:38:19;  author: capps;  state: Exp;  lines: +4 -47
+code cleanup (unused variables)
+----------------------------
+revision 1.370
+date: 2011/06/25 21:15:18;  author: capps;  state: Exp;  lines: +3 -3
+make the op-flow rate control more aggressive on overshoots.
+----------------------------
+revision 1.369
+date: 2011/06/24 18:34:25;  author: capps;  state: Exp;  lines: +1 -4
+remove junk.
+----------------------------
+revision 1.368
+date: 2011/06/24 05:46:55;  author: capps;  state: Exp;  lines: +76 -1
+Add file tracking for DIRECT_IO for solaris.
+----------------------------
+revision 1.367
+date: 2011/06/23 21:52:14;  author: capps;  state: Exp;  lines: +45 -49
+Add directio() calls for Solaris to use DIRECT_IO.
+----------------------------
+revision 1.366
+date: 2011/06/20 19:57:03;  author: capps;  state: Exp;  lines: +6 -1
+Fix optimization for write init.
+----------------------------
+revision 1.365
+date: 2011/06/20 19:09:01;  author: capps;  state: Exp;  lines: +3 -3
+Now 6 populated dirs. (rmw)
+----------------------------
+revision 1.364
+date: 2011/06/20 18:32:53;  author: capps;  state: Exp;  lines: +6 -1
+fix missing close
+----------------------------
+revision 1.363
+date: 2011/06/20 16:59:23;  author: capps;  state: Exp;  lines: +100 -13
+Back port to Solaris, again !
+----------------------------
+revision 1.362
+date: 2011/06/17 15:09:43;  author: capps;  state: Exp;  lines: +1 -7
+Move to _GNU_SOURCE in the makefile.
+----------------------------
+revision 1.361
+date: 2011/06/17 05:30:58;  author: capps;  state: Exp;  lines: +21 -2
+Add make_non_dedup
+----------------------------
+revision 1.360
+date: 2011/06/16 21:35:02;  author: capps;  state: Exp;  lines: +2 -2
+Make O_DIRECT 10 percent of DATABASE
+----------------------------
+revision 1.359
+date: 2011/06/16 21:24:40;  author: capps;  state: Exp;  lines: +14 -1
+Align xfer for O_DIRECT.
+----------------------------
+revision 1.358
+date: 2011/06/16 21:12:10;  author: capps;  state: Exp;  lines: +40 -1
+make transfer size compatible with O_DIRECT
+----------------------------
+revision 1.357
+date: 2011/06/16 20:55:05;  author: capps;  state: Exp;  lines: +6 -6
+align buffers
+----------------------------
+revision 1.356
+date: 2011/06/16 20:40:22;  author: capps;  state: Exp;  lines: +5 -2
+align buffers
+----------------------------
+revision 1.355
+date: 2011/06/16 20:05:24;  author: capps;  state: Exp;  lines: +39 -2
+Align for O_DIRECT
+----------------------------
+revision 1.354
+date: 2011/06/16 19:41:02;  author: capps;  state: Exp;  lines: +46 -12
+Make default zero percent O_DIRECT in workload objects. As some
+boxes don't have O_DIRECT and fail in silly/stupid ways.
+----------------------------
+revision 1.353
+date: 2011/06/16 17:35:50;  author: capps;  state: Exp;  lines: +64 -14
+Adding percent_direct to the mix table.
+----------------------------
+revision 1.352
+date: 2011/06/15 04:32:35;  author: capps;  state: Exp;  lines: +4 -1
+Add commit ratio enforcement to rmw code.
+----------------------------
+revision 1.351
+date: 2011/06/14 22:10:44;  author: capps;  state: Exp;  lines: +2 -2
+spacing on Rmw file ops =
+----------------------------
+revision 1.350
+date: 2011/06/14 21:21:47;  author: capps;  state: Exp;  lines: +283 -67
+Add Read_modify_write op... Kesari suggestion for Databases.
+----------------------------
+revision 1.349
+date: 2011/06/09 04:29:32;  author: capps;  state: Exp;  lines: +7 -1
+Check for zero proc count.
+----------------------------
+revision 1.348
+date: 2011/05/31 14:48:28;  author: capps;  state: Exp;  lines: +1 -3
+Don't include "rand" read or write in the sanity check.
+----------------------------
+revision 1.347
+date: 2011/05/31 13:53:45;  author: capps;  state: Exp;  lines: +12 -5
+Permit pure reader or writer and skip the sanity check for missing functions.
+----------------------------
+revision 1.346
+date: 2011/05/31 13:15:28;  author: capps;  state: Exp;  lines: +9 -9
+More error logging.
+----------------------------
+revision 1.345
+date: 2011/05/10 18:29:25;  author: capps;  state: Exp;  lines: +483 -15
+Adding the Sawyer Banding support.
+----------------------------
+revision 1.344
+date: 2011/05/10 05:24:57;  author: capps;  state: Exp;  lines: +50 -26
+cleanup
+----------------------------
+revision 1.343
+date: 2011/05/10 04:24:49;  author: capps;  state: Exp;  lines: +2 -2
+make Op_lat_flag default off...
+----------------------------
+revision 1.342
+date: 2011/05/10 03:23:42;  author: capps;  state: Exp;  lines: +310 -34
+Adding -N op latency reporting.
+----------------------------
+revision 1.341
+date: 2011/05/05 17:46:55;  author: capps;  state: Exp;  lines: +43 -12
+add -U client_log_dir to let user place client logs.
+----------------------------
+revision 1.340
+date: 2011/05/05 17:08:11;  author: capps;  state: Exp;  lines: +21 -19
+make heartbeat more consistant
+----------------------------
+revision 1.339
+date: 2011/05/05 16:25:58;  author: capps;  state: Exp;  lines: +131 -3
+Adding -G for heartbeats
+----------------------------
+revision 1.338
+date: 2011/04/29 21:24:27;  author: capps;  state: Exp;  lines: +21 -1
+Add .bat support for netmist_pretest.bat ... cygwin shell is dos.
+----------------------------
+revision 1.337
+date: 2011/04/29 14:57:10;  author: capps;  state: Exp;  lines: +6 -1
+Make -u work for sua and Unixes
+----------------------------
+revision 1.336
+date: 2011/04/29 14:18:16;  author: capps;  state: Exp;  lines: +13 -26
+Move to 5 token format.
+----------------------------
+revision 1.335
+date: 2011/04/28 17:33:00;  author: capps;  state: Exp;  lines: +9 -4
+cleanup.
+----------------------------
+revision 1.334
+date: 2011/04/28 17:15:35;  author: capps;  state: Exp;  lines: +30 -4
+Introduce domain/user into client file format, for sua and cygwin.
+----------------------------
+revision 1.333
+date: 2011/04/27 20:28:53;  author: capps;  state: Exp;  lines: +18 -42
+Back to rsh, until ssh can be fully debugged.
+----------------------------
+revision 1.332
+date: 2011/04/27 17:05:04;  author: capps;  state: Exp;  lines: +6 -3
+Move to ssh and scp for sua.
+----------------------------
+revision 1.331
+date: 2011/04/26 22:41:38;  author: capps;  state: Exp;  lines: +7 -11
+Fixup pretest
+----------------------------
+revision 1.330
+date: 2011/04/26 20:33:15;  author: capps;  state: Exp;  lines: +45 -1
+Add netmist_pretest.sh for client side actions before testing.
+----------------------------
+revision 1.329
+date: 2011/04/22 04:30:44;  author: capps;  state: Exp;  lines: +6 -6
+More uniques
+----------------------------
+revision 1.328
+date: 2011/04/22 04:14:26;  author: capps;  state: Exp;  lines: +2 -1
+Add ctype.h
+----------------------------
+revision 1.327
+date: 2011/04/22 04:12:17;  author: capps;  state: Exp;  lines: +7 -6
+Make reserved names impossible to generate.
+----------------------------
+revision 1.326
+date: 2011/04/22 02:20:52;  author: capps;  state: Exp;  lines: +9 -3
+Avoid more magic names
+----------------------------
+revision 1.325
+date: 2011/04/21 23:34:53;  author: capps;  state: Exp;  lines: +11 -3
+Better checking for PRN and CON
+----------------------------
+revision 1.324
+date: 2011/04/21 23:21:44;  author: capps;  state: Exp;  lines: +9 -1
+Fix for Windows namespace corruption. "con" and "Prn" can never be files.
+----------------------------
+revision 1.323
+date: 2011/04/21 15:08:25;  author: capps;  state: Exp;  lines: +25 -1
+Use nap(10) for faster startups, for Unix. Continue with sleep(1) for Winblows.
+----------------------------
+revision 1.322
+date: 2011/04/15 20:55:18;  author: capps;  state: Exp;  lines: +2 -1
+Missing line
+----------------------------
+revision 1.321
+date: 2011/04/12 19:48:34;  author: capps;  state: Exp;  lines: +8 -8
+cleanup SO_REUSEADDR to always use optval=1
+----------------------------
+revision 1.320
+date: 2011/04/06 18:11:14;  author: capps;  state: Exp;  lines: +50 -50
+Reduce wasted message space. (use hex for xmit/receive)
+----------------------------
+revision 1.319
+date: 2011/04/05 19:40:26;  author: capps;  state: Exp;  lines: +3 -1
+Fill in "me" with the initial size to transfer.
+----------------------------
+revision 1.318
+date: 2011/03/30 19:49:39;  author: capps;  state: Exp;  lines: +14 -6
+Add -u to switch remote shells.
+----------------------------
+revision 1.317
+date: 2011/03/28 15:59:30;  author: capps;  state: Exp;  lines: +7 -7
+Set minimums for client_memsize and aggr_memsize to 1 GB
+----------------------------
+revision 1.316
+date: 2011/03/28 15:47:02;  author: capps;  state: Exp;  lines: +83 -127
+Remove the -o (fixed number of ops)
+----------------------------
+revision 1.315
+date: 2011/03/18 03:02:54;  author: capps;  state: Exp;  lines: +5 -5
+Add -T
+----------------------------
+revision 1.314
+date: 2011/03/18 02:56:38;  author: capps;  state: Exp;  lines: +11 -2
+Add -T for number of dirs per proc.
+----------------------------
+revision 1.313
+date: 2011/03/17 20:50:46;  author: capps;  state: Exp;  lines: +4 -4
+bug fix
+----------------------------
+revision 1.312
+date: 2011/03/17 20:31:34;  author: capps;  state: Exp;  lines: +33 -6
+Make the grow/shrink smarter.
+----------------------------
+revision 1.311
+date: 2011/03/17 20:11:11;  author: capps;  state: Exp;  lines: +15 -8
+Use stat to see if the file is the right size.
+----------------------------
+revision 1.310
+date: 2011/03/17 19:09:46;  author: capps;  state: Exp;  lines: +27 -7
+Need to re-init vars if the number of files/dir changes.
+----------------------------
+revision 1.309
+date: 2011/03/17 15:25:00;  author: capps;  state: Exp;  lines: +126 -70
+Add -Q option. Sets number of files per directory.
+----------------------------
+revision 1.308
+date: 2011/03/08 04:06:44;  author: capps;  state: Exp;  lines: +2 -2
+spelling
+----------------------------
+revision 1.307
+date: 2011/03/08 04:04:02;  author: capps;  state: Exp;  lines: +7 -1
+update license
+----------------------------
+revision 1.306
+date: 2011/02/17 15:21:39;  author: capps;  state: Exp;  lines: +24 -24
+Move to GiBytes and MiBytes for clarity.
+----------------------------
+revision 1.305
+date: 2011/02/16 20:05:32;  author: capps;  state: Exp;  lines: +4 -4
+Memory is printed out in the logs in Mbytes, not Gbytes.
+----------------------------
+revision 1.304
+date: 2011/02/16 04:25:42;  author: capps;  state: Exp;  lines: +7 -7
+Change throuhput results to approx ~ as they are estimates.
+----------------------------
+revision 1.303
+date: 2011/02/15 22:43:12;  author: capps;  state: Exp;  lines: +4 -3
+Max run time for a 10 point run is 24 hours.
+----------------------------
+revision 1.302
+date: 2011/02/15 22:08:50;  author: capps;  state: Exp;  lines: +1 -18
+Newer cygwin kits contain truncate.
+----------------------------
+revision 1.301
+date: 2011/02/11 21:06:09;  author: capps;  state: Exp;  lines: +16 -15
+sua fix
+----------------------------
+revision 1.300
+date: 2011/02/11 03:52:47;  author: capps;  state: Exp;  lines: +2 -2
+usage update
+----------------------------
+revision 1.299
+date: 2011/02/11 03:52:05;  author: capps;  state: Exp;  lines: +5 -8
+Simplify the adjustable aggregate setting name
+----------------------------
+revision 1.298
+date: 2011/02/10 22:52:25;  author: capps;  state: Exp;  lines: +8 -8
+wording changes
+----------------------------
+revision 1.297
+date: 2011/02/10 22:43:25;  author: capps;  state: Exp;  lines: +3 -3
+change wording for clarity
+----------------------------
+revision 1.296
+date: 2011/02/10 22:18:45;  author: capps;  state: Exp;  lines: +6 -1
+Added active versus total agg size.
+----------------------------
+revision 1.295
+date: 2011/02/10 22:08:09;  author: capps;  state: Exp;  lines: +6 -9
+Fix truncation due to division of int types.
+----------------------------
+revision 1.294
+date: 2011/02/10 05:34:19;  author: capps;  state: Exp;  lines: +3 -3
+Raise max runtime to 1 hour per load point.
+----------------------------
+revision 1.293
+date: 2011/02/09 21:15:20;  author: capps;  state: Exp;  lines: +12 -17
+Make MVFDN more unique.
+----------------------------
+revision 1.292
+date: 2011/02/09 20:04:49;  author: capps;  state: Exp;  lines: +84 -74
+bug fix.. rand() contamination from mvfdn
+----------------------------
+revision 1.291
+date: 2011/02/09 17:43:54;  author: capps;  state: Exp;  lines: +286 -4
+Adding MVFDN to file names.
+----------------------------
+revision 1.290
+date: 2011/02/08 20:08:33;  author: capps;  state: Exp;  lines: +10 -10
+Make fill_buf part of the method table.
+----------------------------
+revision 1.289
+date: 2011/02/08 18:24:54;  author: capps;  state: Exp;  lines: +2 -2
+make default rsize = 32k
+----------------------------
+revision 1.288
+date: 2011/02/08 16:54:53;  author: capps;  state: Exp;  lines: +10 -3
+make cygwin truncate more specific.
+----------------------------
+revision 1.287
+date: 2011/02/08 16:35:41;  author: capps;  state: Exp;  lines: +3 -3
+finish make_path changes.
+----------------------------
+revision 1.286
+date: 2011/02/08 16:32:20;  author: capps;  state: Exp;  lines: +46 -30
+Add aggregate data set changes, and share rand read/write
+and share seq read/write, in make_path
+----------------------------
+revision 1.285
+date: 2011/02/07 22:35:43;  author: capps;  state: Exp;  lines: +12 -12
+Change "Server memory to aggregate data set size .
+----------------------------
+revision 1.284
+date: 2011/02/07 19:51:55;  author: capps;  state: Exp;  lines: +2 -3
+make data less compressible. Was 98% compressible. Now 56% compressible.
+----------------------------
+revision 1.283
+date: 2011/02/04 22:29:21;  author: capps;  state: Exp;  lines: +9 -1
+Add percent complete, based on max run time.
+----------------------------
+revision 1.282
+date: 2011/02/04 00:38:24;  author: capps;  state: Exp;  lines: +3 -3
+Max runtime to 30 minutes
+----------------------------
+revision 1.281
+date: 2011/02/03 22:50:53;  author: capps;  state: Exp;  lines: +3 -1
+Turn off INSURANCE, so that MAX_RUN_TIME will work.
+----------------------------
+revision 1.280
+date: 2011/02/03 21:28:23;  author: capps;  state: Exp;  lines: +8 -4
+Set max run time to 15 minutes per load point.
+----------------------------
+revision 1.279
+date: 2011/02/03 14:42:19;  author: capps;  state: Exp;  lines: +3 -2
+Transport cleanup flag
+----------------------------
+revision 1.278
+date: 2011/02/03 03:27:02;  author: capps;  state: Exp;  lines: +13 -1
+Add truncate optimization for quicker subsequent data points.
+----------------------------
+revision 1.277
+date: 2011/02/01 20:42:50;  author: capps;  state: Exp;  lines: +16 -4
+Adding -K to disable cleanup between runs.
+----------------------------
+revision 1.276
+date: 2011/02/01 15:18:44;  author: capps;  state: Exp;  lines: +3 -16
+bug fix for type-oh
+----------------------------
+revision 1.275
+date: 2011/02/01 04:33:50;  author: capps;  state: Exp;  lines: +3 -2
+Have Workload_ files have Ops/sec from totalOps/run_time.
+----------------------------
+revision 1.274
+date: 2011/01/30 17:28:37;  author: capps;  state: Exp;  lines: +10 -6
+Fixs for VMware
+----------------------------
+revision 1.273
+date: 2011/01/29 21:34:52;  author: capps;  state: Exp;  lines: +215 -297
+Wall cleanup
+----------------------------
+revision 1.272
+date: 2011/01/29 20:52:52;  author: capps;  state: Exp;  lines: +250 -161
+Adding virtual switch layer, so that future workload specific
+lower level drivers will be easy to implement. (e.g. block devices)
+----------------------------
+revision 1.271
+date: 2011/01/28 20:35:30;  author: capps;  state: Exp;  lines: +9 -1
+Add VMware build
+----------------------------
+revision 1.270
+date: 2011/01/28 15:13:06;  author: capps;  state: Exp;  lines: +78 -1
+Adding support for external stat collection script.
+----------------------------
+revision 1.269
+date: 2011/01/24 03:00:32;  author: capps;  state: Exp;  lines: +11 -11
+fix
+----------------------------
+revision 1.268
+date: 2011/01/22 06:17:43;  author: capps;  state: Exp;  lines: +54 -3
+Adding VIRTUAL workload
+----------------------------
+revision 1.267
+date: 2011/01/21 23:28:41;  author: capps;  state: Exp;  lines: +6 -1
+Add log message for startup of clients.
+----------------------------
+revision 1.266
+date: 2011/01/21 19:19:42;  author: capps;  state: Exp;  lines: +3 -2
+Remove printing out the Client_id = x... Not needed by anyone.
+----------------------------
+revision 1.265
+date: 2011/01/21 17:56:30;  author: capps;  state: Exp;  lines: +5 -5
+minor edit to add --- signs to make pretty output.
+----------------------------
+revision 1.264
+date: 2011/01/21 17:47:47;  author: capps;  state: Exp;  lines: +2 -2
+code fix
+----------------------------
+revision 1.263
+date: 2011/01/21 17:33:10;  author: capps;  state: Exp;  lines: +2 -2
+Add output of workload name during startup of each proc.
+----------------------------
+revision 1.262
+date: 2011/01/21 16:50:13;  author: capps;  state: Exp;  lines: +11 -4
+fix server scaling of fsize and total_space
+.,
+----------------------------
+revision 1.261
+date: 2011/01/21 16:40:13;  author: capps;  state: Exp;  lines: +7 -4
+Recalculate space after server mem size adjustment.
+----------------------------
+revision 1.260
+date: 2011/01/20 22:07:56;  author: capps;  state: Exp;  lines: +21 -2
+Add more parameter checking for imported distributions.
+----------------------------
+revision 1.259
+date: 2011/01/20 21:45:58;  author: capps;  state: Exp;  lines: +4 -4
+Fixes for warnings in sua
+----------------------------
+revision 1.258
+date: 2011/01/20 21:32:25;  author: capps;  state: Exp;  lines: +13 -12
+Bug fix for Import of dist tables.
+----------------------------
+revision 1.257
+date: 2011/01/20 21:24:03;  author: capps;  state: Exp;  lines: +28 -7
+fixes for _sua_
+----------------------------
+revision 1.256
+date: 2011/01/20 17:01:10;  author: capps;  state: Exp;  lines: +26 -23
+code cleanup
+----------------------------
+revision 1.255
+date: 2011/01/20 15:18:54;  author: capps;  state: Exp;  lines: +2 -2
+Call exit(0), or evil will happen on Cygwin.
+----------------------------
+revision 1.254
+date: 2011/01/19 20:07:43;  author: capps;  state: Exp;  lines: +39 -6
+Adding high resolution timers for Cygwin.
+----------------------------
+revision 1.253
+date: 2011/01/18 19:58:45;  author: capps;  state: Exp;  lines: +186 -1
+Add power monitor support, and external script monitor support.
+----------------------------
+revision 1.252
+date: 2011/01/17 17:00:16;  author: capps;  state: Exp;  lines: +10 -10
+Move VIDEO to more reads and writes and less meta-data. (disney traces)
+----------------------------
+revision 1.251
+date: 2011/01/17 00:52:50;  author: capps;  state: Exp;  lines: +138 -15
+Add -l (log file)
+----------------------------
+revision 1.250
+date: 2011/01/13 05:23:13;  author: capps;  state: Exp;  lines: +6 -1
+Check for workload_name in configuration file.
+----------------------------
+revision 1.249
+date: 2011/01/13 04:34:47;  author: capps;  state: Exp;  lines: +3 -2
+Fix distribute... use bin_testname and the same
+case as the executable really is...
+----------------------------
+revision 1.248
+date: 2011/01/11 18:29:37;  author: capps;  state: Exp;  lines: +33 -2
+Add generation numbers so that zombies can not rise
+from the dead and send results to future runs.
+----------------------------
+revision 1.247
+date: 2011/01/10 17:38:49;  author: capps;  state: Exp;  lines: +2 -2
+Increase META_K...
+----------------------------
+revision 1.246
+date: 2011/01/10 08:07:07;  author: capps;  state: Exp;  lines: +76 -211
+Better accounting for throughput calculations.
+----------------------------
+revision 1.245
+date: 2011/01/09 20:01:53;  author: capps;  state: Exp;  lines: +6 -6
+Add metric name to output.
+----------------------------
+revision 1.244
+date: 2011/01/09 19:02:28;  author: capps;  state: Exp;  lines: +2 -2
+Spacing on output.
+----------------------------
+revision 1.243
+date: 2011/01/09 05:45:48;  author: capps;  state: Exp;  lines: +6 -1
+move to run_time for ops/sec
+----------------------------
+revision 1.242
+date: 2011/01/08 22:46:53;  author: capps;  state: Exp;  lines: +3 -1
+Fix divide by zero
+----------------------------
+revision 1.241
+date: 2011/01/08 20:18:53;  author: capps;  state: Exp;  lines: +505 -52
+Adding children sending results to the parent, and parent
+can now calculate and report the aggregate results.
+The log files are still created, but not needed.
+----------------------------
+revision 1.240
+date: 2011/01/08 20:15:47;  author: capps;  state: Exp;  lines: +8 -8
+License update
+----------------------------
+revision 1.239
+date: 2011/01/08 18:01:14;  author: capps;  state: Exp;  lines: +7 -4
+License addition
+----------------------------
+revision 1.238
+date: 2011/01/07 03:43:00;  author: capps;  state: Exp;  lines: +43 -5
+Add master screen updates for percent complete messages from children.
+----------------------------
+revision 1.237
+date: 2011/01/06 20:09:09;  author: capps;  state: Exp;  lines: +2 -2
+fix readdir_count in clear_stats
+----------------------------
+revision 1.236
+date: 2011/01/06 05:17:00;  author: capps;  state: Exp;  lines: +3 -3
+Change spash screen
+----------------------------
+revision 1.235
+date: 2011/01/05 22:23:42;  author: capps;  state: Exp;  lines: +2 -2
+clear chmod_count and mkdir_count
+----------------------------
+revision 1.234
+date: 2011/01/05 22:20:09;  author: capps;  state: Exp;  lines: +2 -1
+misss clearing the lock stats in the object
+----------------------------
+revision 1.233
+date: 2011/01/05 21:03:46;  author: capps;  state: Exp;  lines: +18 -1
+clear stats between warmup and run
+----------------------------
+revision 1.232
+date: 2011/01/05 19:00:00;  author: capps;  state: Exp;  lines: +3 -3
+Bug fix for flush percentage
+----------------------------
+revision 1.231
+date: 2011/01/05 18:54:10;  author: capps;  state: Exp;  lines: +3 -9
+Make all op_count and read_count and write_count... unique
+----------------------------
+revision 1.230
+date: 2011/01/05 18:42:33;  author: capps;  state: Exp;  lines: +4 -1
+Count all writes as write_count
+Count all reads in read_count
+----------------------------
+revision 1.229
+date: 2011/01/05 15:51:25;  author: capps;  state: Exp;  lines: +6 -5
+reduce calls to gettime (use tmp variable)
+----------------------------
+revision 1.228
+date: 2011/01/04 15:22:56;  author: capps;  state: Exp;  lines: +3 -3
+sua bug fix
+----------------------------
+revision 1.227
+date: 2010/12/31 18:48:09;  author: capps;  state: Exp;  lines: +8 -8
+Disney traces
+----------------------------
+revision 1.226
+date: 2010/12/31 18:35:17;  author: capps;  state: Exp;  lines: +36 -36
+Change Video workload to include Disney traces from Renderman
+----------------------------
+revision 1.225
+date: 2010/12/24 14:22:43;  author: capps;  state: Exp;  lines: +3 -1
+Add Workload ops/sec output
+----------------------------
+revision 1.224
+date: 2010/12/24 07:04:26;  author: capps;  state: Exp;  lines: +2 -2
+format change
+----------------------------
+revision 1.223
+date: 2010/12/24 06:54:56;  author: capps;  state: Exp;  lines: +1 -2
+Remove un-needed stat
+----------------------------
+revision 1.222
+date: 2010/12/24 06:51:07;  author: capps;  state: Exp;  lines: +59 -22
+More Workload unique stats
+----------------------------
+revision 1.221
+date: 2010/12/24 03:35:13;  author: capps;  state: Exp;  lines: +2 -1
+Add Workload name output to the Workload output files.
+----------------------------
+revision 1.220
+date: 2010/12/23 23:56:58;  author: capps;  state: Exp;  lines: +50 -24
+Fix for socket nightmares.
+----------------------------
+revision 1.219
+date: 2010/12/23 21:05:22;  author: capps;  state: Exp;  lines: +79 -12
+Add workload reports for each workload from each client.
+----------------------------
+revision 1.218
+date: 2010/12/23 20:43:22;  author: capps;  state: Exp;  lines: +47 -7
+Add counters for each workload type.
+----------------------------
+revision 1.217
+date: 2010/12/23 20:13:43;  author: capps;  state: Exp;  lines: +524 -271
+Multi-workload support.
+----------------------------
+revision 1.216
+date: 2010/12/23 05:35:09;  author: capps;  state: Exp;  lines: +4 -4
+Fixup for percent write commits
+----------------------------
+revision 1.215
+date: 2010/12/23 04:28:41;  author: capps;  state: Exp;  lines: +46 -19
+Add percent commit option to the import/export attributes.
+----------------------------
+revision 1.214
+date: 2010/12/21 20:20:00;  author: capps;  state: Exp;  lines: +144 -13
+Add xfer mix to the import/export table
+----------------------------
+revision 1.213
+date: 2010/12/21 18:58:42;  author: capps;  state: Exp;  lines: +27 -1
+Add REUSEADDR to all sockets.
+----------------------------
+revision 1.212
+date: 2010/12/17 18:57:26;  author: capps;  state: Exp;  lines: +279 -82
+Adding in transfer size distributions.
+----------------------------
+revision 1.211
+date: 2010/12/16 17:02:31;  author: capps;  state: Exp;  lines: +2 -2
+Missed a call to fsync in do_append
+----------------------------
+revision 1.210
+date: 2010/12/09 22:08:42;  author: capps;  state: Exp;  lines: +21 -7
+Add -F to disable all fsync calls
+----------------------------
+revision 1.209
+date: 2010/12/09 17:48:41;  author: capps;  state: Exp;  lines: +3 -1
+Add random offset to readdir
+----------------------------
+revision 1.208
+date: 2010/12/09 00:24:22;  author: capps;  state: Exp;  lines: +9 -9
+Reduce MIN reads and writes.
+----------------------------
+revision 1.207
+date: 2010/12/08 23:27:47;  author: capps;  state: Exp;  lines: +7 -1
+Touch more data
+----------------------------
+revision 1.206
+date: 2010/12/08 22:46:39;  author: capps;  state: Exp;  lines: +13 -13
+Change mix
+----------------------------
+revision 1.205
+date: 2010/12/08 21:58:14;  author: capps;  state: Exp;  lines: +10 -16
+change the mix
+----------------------------
+revision 1.204
+date: 2010/12/08 18:15:22;  author: capps;  state: Exp;  lines: +6 -2
+add more logic for percent complete
+----------------------------
+revision 1.203
+date: 2010/12/08 18:05:36;  author: capps;  state: Exp;  lines: +2 -2
+fix up
+----------------------------
+revision 1.202
+date: 2010/12/08 17:50:44;  author: capps;  state: Exp;  lines: +10 -5
+Fix up math for percent complete
+----------------------------
+revision 1.201
+date: 2010/12/08 17:36:03;  author: capps;  state: Exp;  lines: +10 -2
+Add percent complete log
+----------------------------
+revision 1.200
+date: 2010/12/07 22:46:39;  author: capps;  state: Exp;  lines: +2 -1
+bug fix
+----------------------------
+revision 1.199
+date: 2010/12/07 18:09:44;  author: capps;  state: Exp;  lines: +4 -4
+offset is in bytes...
+----------------------------
+revision 1.198
+date: 2010/12/06 23:18:50;  author: capps;  state: Exp;  lines: +2 -2
+bug fix
+----------------------------
+revision 1.197
+date: 2010/12/06 23:11:32;  author: capps;  state: Exp;  lines: +3 -3
+math bug
+----------------------------
+revision 1.196
+date: 2010/12/06 20:51:05;  author: capps;  state: Exp;  lines: +11 -4
+Try to handle rsh and ssh failures.
+----------------------------
+revision 1.195
+date: 2010/12/06 19:46:26;  author: capps;  state: Exp;  lines: +3 -3
+Improve performance when socket is EISCONN error-ing
+----------------------------
+revision 1.194
+date: 2010/12/06 19:40:57;  author: capps;  state: Exp;  lines: +5 -1
+better error handling
+----------------------------
+revision 1.193
+date: 2010/12/06 19:17:20;  author: capps;  state: Exp;  lines: +211 -179
+*** CHANGE TO TCP ONLY ***
+----------------------------
+revision 1.192
+date: 2010/12/03 23:20:19;  author: capps;  state: Exp;  lines: +9 -9
+move most important data to beginning of packets
+----------------------------
+revision 1.191
+date: 2010/12/03 21:54:33;  author: capps;  state: Exp;  lines: +5 -5
+move command up higher, and cross fingers that the DGRAM
+corruption happens later in the packet.
+----------------------------
+revision 1.190
+date: 2010/12/03 19:44:05;  author: capps;  state: Exp;  lines: +2 -1
+more bzero
+----------------------------
+revision 1.189
+date: 2010/12/03 19:30:34;  author: capps;  state: Exp;  lines: +3 -1
+bzero more
+----------------------------
+revision 1.188
+date: 2010/12/03 04:07:15;  author: capps;  state: Exp;  lines: +12 -12
+More doubles...
+----------------------------
+revision 1.187
+date: 2010/12/02 22:14:58;  author: capps;  state: Exp;  lines: +7 -2
+bug fix
+----------------------------
+revision 1.186
+date: 2010/12/02 20:22:55;  author: capps;  state: Exp;  lines: +2 -1
+missing fflush
+----------------------------
+revision 1.185
+date: 2010/12/02 15:36:42;  author: capps;  state: Exp;  lines: +11 -10
+bug fix
+----------------------------
+revision 1.184
+date: 2010/12/02 00:11:27;  author: capps;  state: Exp;  lines: +8 -20
+Go back to fixed iscale
+----------------------------
+revision 1.183
+date: 2010/12/01 21:32:34;  author: capps;  state: Exp;  lines: +81 -69
+Move to time based rate control.
+----------------------------
+revision 1.182
+date: 2010/11/26 23:57:01;  author: capps;  state: Exp;  lines: +8 -8
+Increase time to stablize flow
+----------------------------
+revision 1.181
+date: 2010/11/26 21:29:21;  author: capps;  state: Exp;  lines: +5 -5
+enhance flow control.. how fast it traps the rate.
+----------------------------
+revision 1.180
+date: 2010/11/25 01:44:38;  author: capps;  state: Exp;  lines: +2 -2
+Increase OPS
+----------------------------
+revision 1.179
+date: 2010/11/24 22:20:56;  author: capps;  state: Exp;  lines: +3 -3
+min read & write count logging.
+----------------------------
+revision 1.178
+date: 2010/11/24 22:16:54;  author: capps;  state: Exp;  lines: +5 -5
+Do more reads and writes in run phase. Need more time to
+stabilize the time and rate flow.
+----------------------------
+revision 1.177
+date: 2010/11/24 19:01:42;  author: capps;  state: Exp;  lines: +3 -3
+Correct min reads and writes calculation.
+----------------------------
+revision 1.176
+date: 2010/11/24 18:50:06;  author: capps;  state: Exp;  lines: +3 -3
+bug
+----------------------------
+revision 1.175
+date: 2010/11/24 18:42:44;  author: capps;  state: Exp;  lines: +4 -4
+Mbytes ...
+----------------------------
+revision 1.174
+date: 2010/11/24 18:38:47;  author: capps;  state: Exp;  lines: +8 -8
+Change to GBytes
+----------------------------
+revision 1.173
+date: 2010/11/24 18:28:51;  author: capps;  state: Exp;  lines: +7 -5
+Change to GB for -b and -B
+----------------------------
+revision 1.172
+date: 2010/11/24 17:03:43;  author: capps;  state: Exp;  lines: +4 -3
+Add printf to see min reads and writes.
+----------------------------
+revision 1.171
+date: 2010/11/24 16:43:28;  author: capps;  state: Exp;  lines: +2 -2
+OPS to 3000...
+----------------------------
+revision 1.170
+date: 2010/11/24 03:50:40;  author: capps;  state: Exp;  lines: +50 -4
+Move to coarse steps for now
+----------------------------
+revision 1.169
+date: 2010/11/22 21:46:40;  author: capps;  state: Exp;  lines: +2 -2
+Increase OPS to 1500
+----------------------------
+revision 1.168
+date: 2010/11/22 20:50:04;  author: capps;  state: Exp;  lines: +21 -1
+Enforce min run and warmup times.
+----------------------------
+revision 1.167
+date: 2010/11/17 17:15:49;  author: capps;  state: Exp;  lines: +4 -1
+Fix for SUSE
+----------------------------
+revision 1.166
+date: 2010/11/16 18:30:20;  author: capps;  state: Exp;  lines: +15 -15
+Move back to simpler way to collect time.
+----------------------------
+revision 1.165
+date: 2010/11/16 16:31:31;  author: capps;  state: Exp;  lines: +5 -2
+Improve nap time measurement...
+----------------------------
+revision 1.164
+date: 2010/11/15 23:38:36;  author: capps;  state: Exp;  lines: +5 -5
+make smaller adjustments
+----------------------------
+revision 1.163
+date: 2010/11/15 23:33:34;  author: capps;  state: Exp;  lines: +3 -3
+Casting ? for gettimestamp
+----------------------------
+revision 1.162
+date: 2010/11/15 22:45:35;  author: capps;  state: Exp;  lines: +4 -2
+Add code to help build on broken time() implementations.
+----------------------------
+revision 1.161
+date: 2010/11/15 18:11:50;  author: capps;  state: Exp;  lines: +2 -2
+Change splash
+----------------------------
+revision 1.160
+date: 2010/11/15 16:43:37;  author: capps;  state: Exp;  lines: +2 -2
+Add "logical" to output.
+----------------------------
+revision 1.159
+date: 2010/11/11 22:23:26;  author: capps;  state: Exp;  lines: +3 -3
+add first, then divide at the end, to avoid truncation.
+----------------------------
+revision 1.158
+date: 2010/11/09 21:25:51;  author: capps;  state: Exp;  lines: +7 -9
+improve format
+----------------------------
+revision 1.157
+date: 2010/11/09 21:22:36;  author: capps;  state: Exp;  lines: +9 -6
+Add timestamps to main view
+----------------------------
+revision 1.156
+date: 2010/11/09 20:13:20;  author: capps;  state: Exp;  lines: +11 -10
+fix mkdir when exists
+----------------------------
+revision 1.155
+date: 2010/11/09 19:27:42;  author: capps;  state: Exp;  lines: +51 -9
+add more error handling.
+----------------------------
+revision 1.154
+date: 2010/11/09 19:09:49;  author: capps;  state: Exp;  lines: +84 -27
+Improve error paths.
+----------------------------
+revision 1.153
+date: 2010/11/08 19:59:18;  author: capps;  state: Exp;  lines: +96 -27
+calculate throughput
+----------------------------
+revision 1.152
+date: 2010/11/08 15:37:08;  author: capps;  state: Exp;  lines: +112 -117
+Timestamps
+----------------------------
+revision 1.151
+date: 2010/11/05 16:56:21;  author: capps;  state: Exp;  lines: +2 -2
+get total nap time in seconds.
+----------------------------
+revision 1.150
+date: 2010/11/05 16:02:47;  author: capps;  state: Exp;  lines: +1 -2
+only this nap time to remove.
+----------------------------
+revision 1.149
+date: 2010/11/05 15:18:17;  author: capps;  state: Exp;  lines: +13 -14
+tuneing flow
+----------------------------
+revision 1.148
+date: 2010/11/04 22:38:00;  author: capps;  state: Exp;  lines: +3 -3
+1000 not 1024
+----------------------------
+revision 1.147
+date: 2010/11/04 22:21:58;  author: capps;  state: Exp;  lines: +2 -1
+reset prev_file_ops before run state
+----------------------------
+revision 1.146
+date: 2010/11/04 21:27:23;  author: capps;  state: Exp;  lines: +25 -10
+count real ops per TICk
+----------------------------
+revision 1.145
+date: 2010/11/04 20:32:57;  author: capps;  state: Exp;  lines: +2 -2
+zero sleep_val
+----------------------------
+revision 1.144
+date: 2010/11/04 20:29:22;  author: capps;  state: Exp;  lines: +5 -5
+printf
+----------------------------
+revision 1.143
+date: 2010/11/04 20:23:03;  author: capps;  state: Exp;  lines: +55 -24
+tune
+----------------------------
+revision 1.142
+date: 2010/11/04 18:09:46;  author: capps;  state: Exp;  lines: +72 -67
+fine tune
+----------------------------
+revision 1.141
+date: 2010/11/04 16:21:36;  author: capps;  state: Exp;  lines: +2 -2
+refine flow
+----------------------------
+revision 1.140
+date: 2010/11/04 16:13:13;  author: capps;  state: Exp;  lines: +7 -15
+rate control refinement.
+----------------------------
+revision 1.139
+date: 2010/11/04 05:17:04;  author: capps;  state: Exp;  lines: +2 -2
+move time calculation outside of loop
+----------------------------
+revision 1.138
+date: 2010/11/04 04:16:14;  author: capps;  state: Exp;  lines: +67 -68
+restructure time measurements...
+----------------------------
+revision 1.137
+date: 2010/11/03 20:32:34;  author: capps;  state: Exp;  lines: +5 -1
+*** empty log message ***
+----------------------------
+revision 1.136
+date: 2010/11/03 17:36:01;  author: capps;  state: Exp;  lines: +4 -1
+Setup default for PIT service name.
+----------------------------
+revision 1.135
+date: 2010/11/03 16:55:58;  author: capps;  state: Exp;  lines: +2 -2
+unsigned long long
+----------------------------
+revision 1.134
+date: 2010/11/03 16:41:22;  author: capps;  state: Exp;  lines: +11 -3
+Add error path for bad PIT connection.
+----------------------------
+revision 1.133
+date: 2010/11/03 05:04:38;  author: capps;  state: Exp;  lines: +36 -53
+Reduce number of calls to gettimeofday. It's drilling the
+pit server, and really doesn't need to be that granular, as
+the total file ops are getting divided by the total time, so
+it's not really needed to track it all that closely.
+----------------------------
+revision 1.132
+date: 2010/10/30 22:11:14;  author: capps;  state: Exp;  lines: +75 -70
+Cache getaddrinfo
+co netmist.c
+make linux
+----------------------------
+revision 1.131
+date: 2010/10/29 22:21:05;  author: capps;  state: Exp;  lines: +5 -1
+bug fix
+----------------------------
+revision 1.130
+date: 2010/10/29 22:10:06;  author: capps;  state: Exp;  lines: +5 -8
+remove bad optimization
+----------------------------
+revision 1.129
+date: 2010/10/29 19:47:32;  author: capps;  state: Exp;  lines: +11 -8
+cache getaddrinfo
+----------------------------
+revision 1.128
+date: 2010/10/29 18:31:41;  author: capps;  state: Exp;  lines: +3 -1
+cleanup
+----------------------------
+revision 1.127
+date: 2010/10/29 16:08:23;  author: capps;  state: Exp;  lines: +2 -2
+bug fix
+----------------------------
+revision 1.126
+date: 2010/10/29 14:15:39;  author: capps;  state: Exp;  lines: +3 -3
+optimize write file
+----------------------------
+revision 1.125
+date: 2010/10/29 03:51:41;  author: capps;  state: Exp;  lines: +42 -5
+add more fixes for sua
+----------------------------
+revision 1.124
+date: 2010/10/28 21:42:37;  author: capps;  state: Exp;  lines: +4 -2
+cleanup
+----------------------------
+revision 1.123
+date: 2010/10/28 21:16:56;  author: capps;  state: Exp;  lines: +240 -6
+Added -H pit_hostname and -S Pit service (in /etc/services  as 2010)
+----------------------------
+revision 1.122
+date: 2010/10/27 20:44:17;  author: capps;  state: Exp;  lines: +9 -2
+Add Solaris
+----------------------------
+revision 1.121
+date: 2010/10/27 05:51:35;  author: capps;  state: Exp;  lines: +6 -4
+clean up
+----------------------------
+revision 1.120
+date: 2010/10/27 05:00:51;  author: capps;  state: Exp;  lines: +5 -4
+add -4 for rsh and rcp in sua
+----------------------------
+revision 1.119
+date: 2010/10/27 04:58:54;  author: capps;  state: Exp;  lines: +5 -1
+Add -4 for rsh in sua
+----------------------------
+revision 1.118
+date: 2010/10/26 21:15:40;  author: capps;  state: Exp;  lines: +4 -2
+results in cwd
+----------------------------
+revision 1.117
+date: 2010/10/26 21:05:57;  author: capps;  state: Exp;  lines: +15 -1
+add usage for -O and error path for create problems in result files.
+----------------------------
+revision 1.116
+date: 2010/10/19 14:41:39;  author: capps;  state: Exp;  lines: +96 -42
+shrink size of file arrays.
+----------------------------
+revision 1.115
+date: 2010/10/19 05:37:06;  author: capps;  state: Exp;  lines: +2 -2
+put back for now
+----------------------------
+revision 1.114
+date: 2010/10/19 05:05:11;  author: capps;  state: Exp;  lines: +3 -3
+shrink size
+----------------------------
+revision 1.113
+date: 2010/10/18 18:02:57;  author: capps;  state: Exp;  lines: +1 -5
+remove debug
+----------------------------
+revision 1.112
+date: 2010/10/18 17:41:31;  author: capps;  state: Exp;  lines: +39 -12
+fill buffers
+----------------------------
+revision 1.111
+date: 2010/10/18 04:49:03;  author: capps;  state: Exp;  lines: +3 -3
+typeoh
+----------------------------
+revision 1.110
+date: 2010/10/18 04:47:13;  author: capps;  state: Exp;  lines: +3 -3
+Touch all data
+----------------------------
+revision 1.109
+date: 2010/10/17 22:21:20;  author: capps;  state: Exp;  lines: +2 -2
+More files per client.
+----------------------------
+revision 1.108
+date: 2010/10/08 18:55:09;  author: capps;  state: Exp;  lines: +83 -83
+indentation
+----------------------------
+revision 1.107
+date: 2010/10/08 18:48:49;  author: capps;  state: Exp;  lines: +5 -3
+minor edit
+----------------------------
+revision 1.106
+date: 2010/10/08 18:22:50;  author: capps;  state: Exp;  lines: +10 -3
+remove comments, and throttle warmup.
+----------------------------
+revision 1.105
+date: 2010/10/08 18:06:43;  author: capps;  state: Exp;  lines: +4 -1
+Add splash for request rate
+----------------------------
+revision 1.104
+date: 2010/10/08 17:25:43;  author: capps;  state: Exp;  lines: +7 -1
+windows
+----------------------------
+revision 1.103
+date: 2010/10/08 17:03:59;  author: capps;  state: Exp;  lines: +10 -7
+fix
+----------------------------
+revision 1.102
+date: 2010/10/08 16:55:15;  author: capps;  state: Exp;  lines: +2 -2
+nap only when op_rate was requested.
+----------------------------
+revision 1.101
+date: 2010/10/08 04:41:23;  author: capps;  state: Exp;  lines: +2 -2
+tune
+----------------------------
+revision 1.100
+date: 2010/10/08 04:31:35;  author: capps;  state: Exp;  lines: +2 -5
+tune
+----------------------------
+revision 1.99
+date: 2010/10/08 03:52:51;  author: capps;  state: Exp;  lines: +53 -8
+turn off some prints
+----------------------------
+revision 1.98
+date: 2010/10/08 03:26:04;  author: capps;  state: Exp;  lines: +3 -3
+tune initial sleep_val
+----------------------------
+revision 1.97
+date: 2010/10/08 03:12:46;  author: capps;  state: Exp;  lines: +2 -2
+initial sleep_val in ms
+----------------------------
+revision 1.96
+date: 2010/10/08 03:09:12;  author: capps;  state: Exp;  lines: +15 -4
+rate control in ms steps
+----------------------------
+revision 1.95
+date: 2010/10/07 23:01:11;  author: capps;  state: Exp;  lines: +12 -10
+seconds must move
+----------------------------
+revision 1.94
+date: 2010/10/07 21:55:40;  author: capps;  state: Exp;  lines: +44 -30
+fixes
+----------------------------
+revision 1.93
+date: 2010/10/07 20:00:25;  author: capps;  state: Exp;  lines: +40 -5
+*** empty log message ***
+----------------------------
+revision 1.92
+date: 2010/10/07 17:19:24;  author: capps;  state: Exp;  lines: +37 -55
+fix rand functions to only do one op at a time.
+----------------------------
+revision 1.91
+date: 2010/10/07 16:51:27;  author: capps;  state: Exp;  lines: +20 -25
+change do_read
+----------------------------
+revision 1.90
+date: 2010/10/07 16:47:25;  author: capps;  state: Exp;  lines: +26 -27
+add op_count
+----------------------------
+revision 1.89
+date: 2010/10/07 16:16:13;  author: capps;  state: Exp;  lines: +154 -126
+fixes
+----------------------------
+revision 1.88
+date: 2010/09/24 17:26:25;  author: capps;  state: Exp;  lines: +6 -3
+fix up run_time if it was extended.
+----------------------------
+revision 1.87
+date: 2010/09/24 16:38:08;  author: capps;  state: Exp;  lines: +4 -2
+Enforce minimum number of ops, so that the test will succeed, even
+if the user specified a run time that was too short to get the
+minimum work accomplished.
+----------------------------
+revision 1.86
+date: 2010/09/24 14:06:20;  author: capps;  state: Exp;  lines: +5 -1
+CD to workdir when child starts
+----------------------------
+revision 1.85
+date: 2010/08/14 09:18:37;  author: capps;  state: Exp;  lines: +9 -3
+fix up short detection.
+----------------------------
+revision 1.84
+date: 2010/08/14 09:06:42;  author: capps;  state: Exp;  lines: +11 -7
+deeper directory layout.
+----------------------------
+revision 1.83
+date: 2010/08/14 08:59:07;  author: capps;  state: Exp;  lines: +9 -9
+Change Client names to CL instead of "id"
+----------------------------
+revision 1.82
+date: 2010/08/14 08:54:06;  author: capps;  state: Exp;  lines: +14 -8
+deeper directory structure
+----------------------------
+revision 1.81
+date: 2010/08/12 21:40:19;  author: capps;  state: Exp;  lines: +3 -3
+bug vix
+----------------------------
+revision 1.80
+date: 2010/08/12 21:24:08;  author: capps;  state: Exp;  lines: +35 -8
+better error handling
+----------------------------
+revision 1.79
+date: 2010/08/12 21:00:18;  author: capps;  state: Exp;  lines: +25 -21
+add more logging
+----------------------------
+revision 1.78
+date: 2010/08/12 20:09:15;  author: capps;  state: Exp;  lines: +6 -1
+Check fopen for errors.
+----------------------------
+revision 1.77
+date: 2010/08/12 19:57:22;  author: capps;  state: Exp;  lines: +13 -1
+Add sanity check.
+----------------------------
+revision 1.76
+date: 2010/08/12 18:49:24;  author: capps;  state: Exp;  lines: +80 -12
+add custom distribution table support.
+----------------------------
+revision 1.75
+date: 2010/08/12 16:37:46;  author: capps;  state: Exp;  lines: +72 -2
+adding import and export for op mix distribution.
+----------------------------
+revision 1.74
+date: 2010/08/11 03:35:40;  author: capps;  state: Exp;  lines: +2 -2
+turn off debug
+----------------------------
+revision 1.73
+date: 2010/08/11 03:35:08;  author: capps;  state: Exp;  lines: +16 -10
+back out the memory load
+----------------------------
+revision 1.72
+date: 2010/08/10 22:17:29;  author: capps;  state: Exp;  lines: +7 -5
+reduce memory purge size
+----------------------------
+revision 1.71
+date: 2010/08/10 22:12:16;  author: capps;  state: Exp;  lines: +9 -9
+bug fix
+----------------------------
+revision 1.70
+date: 2010/08/10 22:00:07;  author: capps;  state: Exp;  lines: +18 -8
+Adding purge with memory.
+----------------------------
+revision 1.69
+date: 2010/08/10 19:54:27;  author: capps;  state: Exp;  lines: +19 -1
+add purge
+----------------------------
+revision 1.68
+date: 2010/08/10 17:23:40;  author: capps;  state: Exp;  lines: +7 -7
+reformat child output
+----------------------------
+revision 1.67
+date: 2010/08/10 16:16:06;  author: capps;  state: Exp;  lines: +6 -6
+Fixing printf
+----------------------------
+revision 1.66
+date: 2010/08/10 16:00:48;  author: capps;  state: Exp;  lines: +85 -29
+make rand stuff more unique.
+----------------------------
+revision 1.65
+date: 2010/08/10 15:43:29;  author: capps;  state: Exp;  lines: +3 -3
+population now at 5
+----------------------------
+revision 1.64
+date: 2010/08/10 15:39:12;  author: capps;  state: Exp;  lines: +10 -10
+table
+----------------------------
+revision 1.63
+date: 2010/08/10 15:21:37;  author: capps;  state: Exp;  lines: +270 -25
+adding rand r/w
+----------------------------
+revision 1.62
+date: 2010/08/04 15:02:22;  author: capps;  state: Exp;  lines: +3 -2
+Update the date info
+----------------------------
+revision 1.61
+date: 2010/07/28 15:37:02;  author: capps;  state: Exp;  lines: +1 -3
+Remove debug info
+----------------------------
+revision 1.60
+date: 2010/07/28 15:09:50;  author: capps;  state: Exp;  lines: +5 -1
+Force read/write to touch all of the file, regardless of time constraints.
+----------------------------
+revision 1.59
+date: 2010/07/28 04:44:54;  author: capps;  state: Exp;  lines: +2 -2
+disable cdebug
+----------------------------
+revision 1.58
+date: 2010/07/28 04:43:52;  author: capps;  state: Exp;  lines: +16 -8
+Change min read and min write to be fsize/rsize based.
+----------------------------
+revision 1.57
+date: 2010/07/27 15:08:52;  author: capps;  state: Exp;  lines: +2 -2
+server ram scaling fix
+----------------------------
+revision 1.56
+date: 2010/07/27 14:57:38;  author: capps;  state: Exp;  lines: +3 -3
+Add words to client output files.
+----------------------------
+revision 1.55
+date: 2010/07/27 06:32:08;  author: capps;  state: Exp;  lines: +2 -2
+disable debug
+----------------------------
+revision 1.54
+date: 2010/07/27 06:31:14;  author: capps;  state: Exp;  lines: +11 -7
+bug fix in readdir
+----------------------------
+revision 1.53
+date: 2010/07/27 05:54:42;  author: capps;  state: Exp;  lines: +2 -2
+Don't build real files for readdir op types.
+----------------------------
+revision 1.52
+date: 2010/07/27 05:43:14;  author: capps;  state: Exp;  lines: +11 -5
+Calculate max space.
+----------------------------
+revision 1.51
+date: 2010/07/27 05:11:45;  author: capps;  state: Exp;  lines: +9 -3
+Add flush for 30 % of the writes.
+----------------------------
+revision 1.50
+date: 2010/07/27 04:53:36;  author: capps;  state: Exp;  lines: +3 -2
+correct populated count.
+----------------------------
+revision 1.49
+date: 2010/07/27 04:51:56;  author: capps;  state: Exp;  lines: +6 -3
+write, append, read.
+----------------------------
+revision 1.48
+date: 2010/07/27 04:41:18;  author: capps;  state: Exp;  lines: +5 -5
+change mix
+----------------------------
+revision 1.47
+date: 2010/07/27 04:39:24;  author: capps;  state: Exp;  lines: +3 -3
+fix up line feeds
+----------------------------
+revision 1.46
+date: 2010/07/26 21:58:02;  author: capps;  state: Exp;  lines: +5 -1
+Bail on do_read/write if time exceeds specified amount.
+----------------------------
+revision 1.45
+date: 2010/07/26 04:58:46;  author: capps;  state: Exp;  lines: +67 -56
+cleanup
+----------------------------
+revision 1.44
+date: 2010/07/22 16:19:15;  author: capps;  state: Exp;  lines: +2 -2
+bug fix in read_clientfile
+----------------------------
+revision 1.43
+date: 2010/07/22 16:04:42;  author: capps;  state: Exp;  lines: +135 -135
+more newstderr output
+----------------------------
+revision 1.42
+date: 2010/07/22 14:53:47;  author: capps;  state: Exp;  lines: +2 -2
+turn off cdebug
+----------------------------
+revision 1.41
+date: 2010/07/22 14:48:58;  author: capps;  state: Exp;  lines: +2 -3
+bug fix
+----------------------------
+revision 1.40
+date: 2010/07/22 14:36:33;  author: capps;  state: Exp;  lines: +11 -12
+bug fixes
+----------------------------
+revision 1.39
+date: 2010/07/22 14:21:55;  author: capps;  state: Exp;  lines: +84 -5
+Add readdir
+----------------------------
+revision 1.38
+date: 2010/07/22 13:33:29;  author: capps;  state: Exp;  lines: +2 -2
+turn off cdebug
+----------------------------
+revision 1.37
+date: 2010/07/22 13:16:15;  author: capps;  state: Exp;  lines: +69 -4
+add chmod op
+----------------------------
+revision 1.36
+date: 2010/07/22 04:41:55;  author: capps;  state: Exp;  lines: +30 -27
+Make files a bit bigger, to break the caches.
+----------------------------
+revision 1.35
+date: 2010/07/20 05:44:02;  author: capps;  state: Exp;  lines: +45 -23
+Add code to make op types more flexible.
+----------------------------
+revision 1.34
+date: 2010/06/04 14:54:30;  author: capps;  state: Exp;  lines: +4 -1
+linux support
+----------------------------
+revision 1.33
+date: 2008/12/05 19:33:22;  author: capps;  state: Exp;  lines: +3473 -3355
+new version
+----------------------------
+revision 1.32
+date: 2008/12/04 22:35:36;  author: capps;  state: Exp;  lines: +2 -2
+name change
+----------------------------
+revision 1.31
+date: 2008/12/04 22:26:38;  author: capps;  state: Exp;  lines: +4 -4
+Change name
+----------------------------
+revision 1.30
+date: 2002/03/08 13:07:42;  author: capps;  state: Exp;  lines: +6 -1
+Check for too many clients.
+----------------------------
+revision 1.29
+date: 2002/03/08 09:48:21;  author: capps;  state: Exp;  lines: +17 -1
+Validate the clients are all running the same version of the software.
+----------------------------
+revision 1.28
+date: 2002/03/08 09:17:18;  author: capps;  state: Exp;  lines: +17 -12
+Cleanup remote shell
+----------------------------
+revision 1.27
+date: 2002/03/08 08:59:54;  author: capps;  state: Exp;  lines: +87 -6
+Added "access()" op testing.
+----------------------------
+revision 1.26
+date: 2002/03/07 11:50:00;  author: capps;  state: Exp;  lines: +2 -1
+Add version to normal output.
+----------------------------
+revision 1.25
+date: 2002/03/07 11:41:20;  author: capps;  state: Exp;  lines: +7 -2
+Validate file descriptor before closing it blindly. Linux 
+hates it when you close an invalid file descriptor. On some
+versions of Linux it will cause a core dump. Oops Not very
+POSIX is it.
+----------------------------
+revision 1.24
+date: 2002/03/07 11:08:19;  author: capps;  state: Exp;  lines: +6 -7
+Unify the maximum number of clients definitions.
+----------------------------
+revision 1.23
+date: 2002/03/07 10:39:41;  author: capps;  state: Exp;  lines: +2 -2
+Increase the min file touched.
+----------------------------
+revision 1.22
+date: 2002/03/07 09:44:09;  author: capps;  state: Exp;  lines: +36 -17
+Improve minimum runtime calculation.
+----------------------------
+revision 1.21
+date: 2002/03/06 17:26:41;  author: capps;  state: Exp;  lines: +42 -7
+Add minimum work check.
+----------------------------
+revision 1.20
+date: 2002/03/06 16:38:35;  author: capps;  state: Exp;  lines: +3 -3
+Improve master's listing of what is going to be tested.
+----------------------------
+revision 1.19
+date: 2002/03/06 15:41:35;  author: capps;  state: Exp;  lines: +7 -6
+Make -D easier to use. Now only needs -D and -f filename.
+----------------------------
+revision 1.18
+date: 2002/03/06 15:38:23;  author: capps;  state: Exp;  lines: +35 -3
+Add distribution capability.
+----------------------------
+revision 1.17
+date: 2002/03/06 15:05:15;  author: capps;  state: Exp;  lines: +1 -3
+Put locking back.
+----------------------------
+revision 1.16
+date: 2002/03/06 14:28:00;  author: capps;  state: Exp;  lines: +288 -71
+Turn off locking for now... Until it works with two real nfs clients.
+----------------------------
+revision 1.15
+date: 2002/03/06 11:33:18;  author: capps;  state: Exp;  lines: +456 -50
+Add prototypes for all functions
+Add HAVE_ANSI_C support.
+----------------------------
+revision 1.14
+date: 2002/03/06 10:05:30;  author: capps;  state: Exp;  lines: +4 -1
+close all files before cleanup.
+----------------------------
+revision 1.13
+date: 2002/03/06 09:58:42;  author: capps;  state: Exp;  lines: +127 -27
+Add error handling when children get errors.
+----------------------------
+revision 1.12
+date: 2002/03/05 12:20:56;  author: capps;  state: Exp;  lines: +9 -1
+Windows support
+----------------------------
+revision 1.11
+date: 2002/03/05 10:55:44;  author: capps;  state: Exp;  lines: +27 -13
+Separate active and init file space.
+----------------------------
+revision 1.10
+date: 2002/03/04 15:01:19;  author: capps;  state: Exp;  lines: +61 -11
+Latency stuff
+----------------------------
+revision 1.9
+date: 2002/03/04 12:20:48;  author: capps;  state: Exp;  lines: +12 -12
+Reorder output to match distribution in client_result files.
+----------------------------
+revision 1.8
+date: 2002/03/04 12:08:29;  author: capps;  state: Exp;  lines: +102 -7
+Add locking and version 
+----------------------------
+revision 1.7
+date: 2002/03/04 11:39:34;  author: capps;  state: Exp;  lines: +13 -0
+Add version and copyright
+----------------------------
+revision 1.6
+date: 2002/03/01 10:19:20;  author: capps;  state: Exp;  lines: +5 -1
+Add remote shell ifdefs
+----------------------------
+revision 1.5
+date: 2002/03/01 09:55:31;  author: capps;  state: Exp;  lines: +56 -24
+After master has scaled fsize prevent client from scaling again.
+----------------------------
+revision 1.4
+date: 2002/02/28 22:51:28;  author: capps;  state: Exp;  lines: +6 -1
+Add more sync code. for start_comm.
+----------------------------
+revision 1.3
+date: 2002/02/28 16:43:27;  author: capps;  state: Exp;  lines: +4 -0
+Add messages for user to see it is moving.
+----------------------------
+revision 1.2
+date: 2002/02/28 16:31:41;  author: capps;  state: Exp;  lines: +732 -6
+Add sync code.
+----------------------------
+revision 1.1
+date: 2002/02/28 11:02:25;  author: capps;  state: Exp;
+Initial revision
+=============================================================================
+
+RCS file: netmist_modify.c,v
+Working file: netmist_modify.c
+head: 1.39
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 39;	selected revisions: 39
+description:
+Initial version
+----------------------------
+revision 1.39
+date: 2012/03/01 21:48:01;  author: capps;  state: Exp;  lines: +2 -2
+Cleanup of warnings on some systems.
+----------------------------
+revision 1.38
+date: 2012/01/26 03:37:58;  author: capps;  state: Exp;  lines: +15 -8
+add RDBU stuff
+----------------------------
+revision 1.37
+date: 2012/01/13 21:35:42;  author: capps;  state: Exp;  lines: +8 -8
+Adding Sharemode attribute.
+----------------------------
+revision 1.36
+date: 2012/01/09 18:25:29;  author: capps;  state: Exp;  lines: +9 -1
+Adding "rename" op
+----------------------------
+revision 1.35
+date: 2012/01/05 20:12:14;  author: capps;  state: Exp;  lines: +8 -8
+Add background
+----------------------------
+revision 1.34
+date: 2012/01/05 17:48:09;  author: capps;  state: Exp;  lines: +15 -8
+Add compression
+----------------------------
+revision 1.33
+date: 2011/12/23 15:04:09;  author: capps;  state: Exp;  lines: +9 -8
+Adding workload attribute for percent Poisson access distribution.
+----------------------------
+revision 1.32
+date: 2011/12/10 20:52:44;  author: capps;  state: Exp;  lines: +8 -1
+Add pathconf op.
+----------------------------
+revision 1.31
+date: 2011/12/09 19:37:49;  author: capps;  state: Exp;  lines: +8 -8
+Make fstatfs calls do a direct statfs instead. Avoid extra lookup.
+----------------------------
+revision 1.30
+date: 2011/11/24 15:09:03;  author: capps;  state: Exp;  lines: +3 -1
+Include license.txt
+----------------------------
+revision 1.29
+date: 2011/11/24 06:05:56;  author: capps;  state: Exp;  lines: +3 -93
+Move import_table to external file for free-ware version mechanism.
+----------------------------
+revision 1.28
+date: 2011/11/18 21:31:51;  author: capps;  state: Exp;  lines: +15 -1
+Adding two custom op types.
+----------------------------
+revision 1.27
+date: 2011/11/18 17:03:34;  author: capps;  state: Exp;  lines: +2 -2
+move defines to netmist.h
+----------------------------
+revision 1.26
+date: 2011/11/18 15:41:12;  author: capps;  state: Exp;  lines: +8 -1
+Adding fstatfs to mix
+----------------------------
+revision 1.25
+date: 2011/11/09 22:10:31;  author: capps;  state: Exp;  lines: +49 -49
+Move OFFICE to HOMEDIR
+----------------------------
+revision 1.24
+date: 2011/11/09 21:33:52;  author: capps;  state: Exp;  lines: +49 -49
+Change VIDEO to STREAM
+----------------------------
+revision 1.23
+date: 2011/09/08 16:14:50;  author: capps;  state: Exp;  lines: +3 -1
+SUA fixes
+----------------------------
+revision 1.22
+date: 2011/09/07 15:34:47;  author: capps;  state: Exp;  lines: +7 -12
+Make op_rate always a float/double.
+----------------------------
+revision 1.21
+date: 2011/08/12 19:11:19;  author: capps;  state: Exp;  lines: +51 -2
+Add USERDEF object.
+----------------------------
+revision 1.20
+date: 2011/08/11 02:04:17;  author: capps;  state: Exp;  lines: +4 -3
+Add comment.
+----------------------------
+revision 1.19
+date: 2011/08/10 21:18:12;  author: capps;  state: Exp;  lines: +295 -295
+move to defaults from the netmist.h file.
+----------------------------
+revision 1.18
+date: 2011/08/10 19:15:38;  author: capps;  state: Exp;  lines: +20 -20
+remove copyfile for now.
+----------------------------
+revision 1.17
+date: 2011/08/10 15:32:56;  author: capps;  state: Exp;  lines: +24 -24
+Update default workload objects to match Netmist.
+----------------------------
+revision 1.16
+date: 2011/08/10 04:26:02;  author: capps;  state: Exp;  lines: +10 -2
+Adding support for copyfile.
+----------------------------
+revision 1.15
+date: 2011/08/04 17:58:03;  author: capps;  state: Exp;  lines: +17 -1
+Add mmap stuff
+----------------------------
+revision 1.14
+date: 2011/07/25 21:16:50;  author: capps;  state: Exp;  lines: +2 -2
+Wording change.
+----------------------------
+revision 1.13
+date: 2011/07/25 20:11:40;  author: capps;  state: Exp;  lines: +1 -59
+code cleanup
+----------------------------
+revision 1.12
+date: 2011/07/25 20:09:55;  author: capps;  state: Exp;  lines: +15 -6
+Moving to external header
+----------------------------
+revision 1.11
+date: 2011/07/25 17:49:47;  author: capps;  state: Exp;  lines: +2 -1
+Add a printf
+----------------------------
+revision 1.10
+date: 2011/07/25 17:35:53;  author: capps;  state: Exp;  lines: +2 -2
+usage update
+----------------------------
+revision 1.9
+date: 2011/07/25 17:34:00;  author: capps;  state: Exp;  lines: +2 -1
+exit clean when dumping table only.
+----------------------------
+revision 1.8
+date: 2011/07/25 17:31:55;  author: capps;  state: Exp;  lines: +5 -5
+Add -E
+----------------------------
+revision 1.7
+date: 2011/07/25 17:29:55;  author: capps;  state: Exp;  lines: +475 -227
+Add export of entire workload tables
+----------------------------
+revision 1.6
+date: 2011/07/22 20:30:37;  author: capps;  state: Exp;  lines: +208 -13
+more params
+----------------------------
+revision 1.5
+date: 2011/07/22 19:43:52;  author: capps;  state: Exp;  lines: +33 -1
+adding more malable parameters.
+----------------------------
+revision 1.4
+date: 2011/07/21 16:44:08;  author: capps;  state: Exp;  lines: +3 -3
+warning removal
+----------------------------
+revision 1.3
+date: 2011/07/20 18:04:36;  author: capps;  state: Exp;  lines: +3 -1
+Add set flag to each variable that is to be set.
+----------------------------
+revision 1.2
+date: 2011/07/12 16:12:27;  author: capps;  state: Exp;  lines: +2 -2
+*** empty log message ***
+----------------------------
+revision 1.1
+date: 2011/07/12 15:41:39;  author: capps;  state: Exp;
+Initial revision
+=============================================================================
+
+RCS file: netmist_monitor.c,v
+Working file: netmist_monitor.c
+head: 1.23
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 23;	selected revisions: 23
+description:
+Initial version
+----------------------------
+revision 1.23
+date: 2012/03/01 21:48:01;  author: capps;  state: Exp;  lines: +2 -2
+Cleanup of warnings on some systems.
+----------------------------
+revision 1.22
+date: 2011/11/24 15:09:41;  author: capps;  state: Exp;  lines: +3 -1
+Include license.
+----------------------------
+revision 1.21
+date: 2011/09/27 13:28:51;  author: capps;  state: Exp;  lines: +3 -3
+Throughput display with only 2 digits after decimal point.
+----------------------------
+revision 1.20
+date: 2011/09/26 04:34:41;  author: capps;  state: Exp;  lines: +16 -6
+Add throughput stats.
+----------------------------
+revision 1.19
+date: 2011/09/08 16:14:20;  author: capps;  state: Exp;  lines: +2 -1
+SUA fixes.
+----------------------------
+revision 1.18
+date: 2011/09/07 15:34:47;  author: capps;  state: Exp;  lines: +3 -3
+Make op_rate always a float/double.
+----------------------------
+revision 1.17
+date: 2011/08/26 20:06:58;  author: capps;  state: Exp;  lines: +3 -3
+Update every second.
+----------------------------
+revision 1.16
+date: 2011/08/14 01:20:31;  author: capps;  state: Exp;  lines: +5 -1
+Add clean up messages
+----------------------------
+revision 1.15
+date: 2011/08/05 05:13:03;  author: capps;  state: Exp;  lines: +6 -2
+Add runtime stuff for INIT
+----------------------------
+revision 1.14
+date: 2011/08/04 20:50:38;  author: capps;  state: Exp;  lines: +5 -1
+Pre-warmup
+----------------------------
+revision 1.13
+date: 2011/07/25 20:04:11;  author: capps;  state: Exp;  lines: +6 -11
+Moving to external header
+----------------------------
+revision 1.12
+date: 2011/07/21 16:43:29;  author: capps;  state: Exp;  lines: +3 -3
+warning removal.
+----------------------------
+revision 1.11
+date: 2011/07/12 16:03:26;  author: capps;  state: Exp;  lines: +2 -1
+add fclose()
+----------------------------
+revision 1.10
+date: 2011/07/12 12:45:25;  author: capps;  state: Exp;  lines: +3 -1
+fix
+----------------------------
+revision 1.9
+date: 2011/07/12 12:43:57;  author: capps;  state: Exp;  lines: +20 -3
+add current state
+----------------------------
+revision 1.8
+date: 2011/07/11 15:14:42;  author: capps;  state: Exp;  lines: +3 -3
+Format change
+----------------------------
+revision 1.7
+date: 2011/07/11 15:09:05;  author: capps;  state: Exp;  lines: +3 -3
+Make seconds integers .
+----------------------------
+revision 1.6
+date: 2011/07/11 14:53:37;  author: capps;  state: Exp;  lines: +14 -6
+Add run time output
+----------------------------
+revision 1.5
+date: 2011/07/08 20:52:20;  author: capps;  state: Exp;  lines: +19 -5
+Add timestamp to output
+----------------------------
+revision 1.4
+date: 2011/07/07 18:55:26;  author: capps;  state: Exp;  lines: +8 -5
+remove warnings.
+----------------------------
+revision 1.3
+date: 2011/07/07 17:49:05;  author: capps;  state: Exp;  lines: +10 -3
+Add lf only if there was output.
+----------------------------
+revision 1.2
+date: 2011/07/07 17:46:56;  author: capps;  state: Exp;  lines: +1 -0
+Add line feed.
+----------------------------
+revision 1.1
+date: 2011/07/07 17:42:46;  author: capps;  state: Exp;
+Initial revision
+=============================================================================
+
+RCS file: pdsmlib.c,v
+Working file: pdsmlib.c
+head: 1.8
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 8;	selected revisions: 8
+description:
+Initial version.
+----------------------------
+revision 1.8
+date: 2011/11/24 15:10:18;  author: capps;  state: Exp;  lines: +2 -0
+Include license.
+----------------------------
+revision 1.7
+date: 2011/07/25 23:21:44;  author: capps;  state: Exp;  lines: +3 -3
+cleanup of PSDM_REGISTRY define.
+----------------------------
+revision 1.6
+date: 2011/07/21 16:44:39;  author: capps;  state: Exp;  lines: +2 -2
+warning removal
+----------------------------
+revision 1.5
+date: 2011/07/12 15:01:41;  author: capps;  state: Exp;  lines: +54 -0
+Add get_my_master_zone()
+----------------------------
+revision 1.4
+date: 2011/07/06 21:02:26;  author: capps;  state: Exp;  lines: +12 -1
+Make it all go away for vmware.
+----------------------------
+revision 1.3
+date: 2011/07/06 20:55:52;  author: capps;  state: Exp;  lines: +18 -3
+Add more comments and sanity checking.
+----------------------------
+revision 1.2
+date: 2011/07/06 20:45:56;  author: capps;  state: Exp;  lines: +11 -14
+fixes.
+----------------------------
+revision 1.1
+date: 2011/07/06 20:30:24;  author: capps;  state: Exp;
+Initial revision
+=============================================================================

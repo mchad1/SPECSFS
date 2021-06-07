@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<summary id="1c3a6b37">
+  <run time="1619636573.3781645" fingerprint="abb8f9f9" version="2512">
+    <business_metric>1</business_metric>
+    <metric name="op rate" units="ops/s">450.00</metric>
+    <metric name="achieved rate" units="ops/s">450.029</metric>
+    <metric name="average latency" units="milliseconds">0.606</metric>
+    <metric name="overall throughput" units="KB/s">7271.040</metric>
+    <metric name="read throughput" units="KB/s">3805.238</metric>
+    <metric name="write throughput" units="KB/s">3465.802</metric>
+    <metric name="run time" units="seconds">300</metric>
+    <metric name="clients">1</metric>
+    <metric name="processes per client">5.0</metric>
+    <metric name="file size" units="KB">3424.0</metric>
+    <metric name="client data set size" units="MiB">11051.5625</metric>
+    <metric name="starting data set size" units="MiB">11051.5625</metric>
+    <metric name="initial file space" units="MiB">11051.5625</metric>
+    <metric name="maximum file space" units="MiB">12056.25</metric>
+    <benchmark name="EDA_BLENDED"/>
+    <valid_run/>
+  </run>
+</summary>

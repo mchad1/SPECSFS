@@ -1,0 +1,654 @@
+<<< Wed Apr 28 18:44:18 2021: Starting EDA_BLENDED run 1 of 1: JOBS=1 >>
+[ERROR][Wed Apr 28 18:44:18 2021]NETMIST_LICENSE_KEY is missing in rc file
+<<< Wed Apr 28 18:45:05 2021: Starting EDA_BLENDED run 1 of 1: JOBS=1 >>
+[ERROR][Wed Apr 28 18:45:05 2021]Validation failed: command will not run successfully.
+[Wed Apr 28 18:45:05 2021]/bin/sh: /usr/local/bin/SPECstorage2020/netmist: Is a directory
+
+<<< Wed Apr 28 18:46:18 2021: Starting EDA_BLENDED run 1 of 1: JOBS=1 >>
+[ERROR][Wed Apr 28 18:46:18 2021]Validation failed: command will not run successfully.
+[Wed Apr 28 18:46:18 2021]/bin/sh: /usr/local/bin/SPECstorage2020/: Is a directory
+
+<<< Wed Apr 28 18:48:06 2021: Starting EDA_BLENDED run 1 of 1: JOBS=1 >>
+[ERROR][Wed Apr 28 18:48:06 2021]Validation failed: command will not run successfully.
+[Wed Apr 28 18:48:06 2021]/bin/sh: /usr/local/bin/SPECstorage2020/binaries/linux/x86_64: Is a directory
+
+<<< Wed Apr 28 18:48:23 2021: Starting EDA_BLENDED run 1 of 1: JOBS=1 >>
+[ERROR][Wed Apr 28 18:48:23 2021]Validation failed: command will not run successfully.
+[Wed Apr 28 18:48:23 2021]/bin/sh: /usr/local/bin/SPECstorage2020/binaries/linux/x86_64/netmist: Permission denied
+
+<<< Wed Apr 28 18:48:41 2021: Starting EDA_BLENDED run 1 of 1: JOBS=1 >>
+
+     SPECstorage(TM) Solution 2020 Release        $Revision: 2512 $
+
+     This product contains benchmarks acquired from several sources who
+     understand and agree with SPEC's goal of creating fair and objective
+     benchmarks to measure computer performance.
+
+     This copyright notice is placed here only to protect SPEC in the
+     event the source is misused in any manner that is contrary to the
+     spirit, the goals and the intent of SPEC.
+
+     The source code is provided to the user or company under the license
+     agreement for the SPEC Benchmark Suite for this product.
+
+     -----------------------------------------------------------------------
+     This program contains contributions from Iozone.org.
+
+     Copyright (C) 2002-2020, Don Capps
+     All rights reserved.
+
+     This program contains a 64-bit version of Mersenne Twister pseudorandom 
+     number generator.
+
+     Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura
+     All rights reserved.
+
+     Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions 
+     are met:
+
+     1. Redistributions of source code must retain the above copyright
+        notices, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notices, this list of conditions and the following disclaimer in 
+        the documentation and/or other materials provided with the 
+        distribution.
+     3. The names of its contributors may not be used to endorse or 
+        promote products derived from this software without specific prior 
+        written permission.
+
+     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+     A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT 
+     OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+     SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+     LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+     DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    -----------------------------------------------------------------------
+
+     Test run time = 300 seconds, Warmup = 300 seconds.
+     Results directory: /usr/local/bin/SPECstorage2020/results
+     Op latency reporting activated
+     Importing workloads from storage2020.yml
+[INFO][Wed Apr 28 18:48:41 2021]Exec validation successful
+
+     SPECstorage(TM) Solution 2020 Release        $Revision: 2512 $
+
+     This product contains benchmarks acquired from several sources who
+     understand and agree with SPEC's goal of creating fair and objective
+     benchmarks to measure computer performance.
+
+     This copyright notice is placed here only to protect SPEC in the
+     event the source is misused in any manner that is contrary to the
+     spirit, the goals and the intent of SPEC.
+
+     The source code is provided to the user or company under the license
+     agreement for the SPEC Benchmark Suite for this product.
+
+     -----------------------------------------------------------------------
+     This program contains contributions from Iozone.org.
+
+     Copyright (C) 2002-2020, Don Capps
+     All rights reserved.
+
+     This program contains a 64-bit version of Mersenne Twister pseudorandom 
+     number generator.
+
+     Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura
+     All rights reserved.
+
+     Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions 
+     are met:
+
+     1. Redistributions of source code must retain the above copyright
+        notices, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notices, this list of conditions and the following disclaimer in 
+        the documentation and/or other materials provided with the 
+        distribution.
+     3. The names of its contributors may not be used to endorse or 
+        promote products derived from this software without specific prior 
+        written permission.
+
+     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+     A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT 
+     OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+     SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+     LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+     DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    -----------------------------------------------------------------------
+
+     Test run time = 300 seconds, Warmup = 300 seconds.
+     Results directory: /usr/local/bin/SPECstorage2020/results
+     Op latency reporting activated
+     Importing workloads from storage2020.yml
+2021-04-28 18:48:41.214: Prime          : Starting tests...
+2021-04-28 18:48:41.215: Prime          : 	Launching 1 nodeManager processes.
+2021-04-28 18:48:41.216: Prime          : 	Starting test nodeManager:   0 Host: 10.0.40.11
+Detected keyboard interrupt event. Waiting for netmist to terminate child processes...
+2021-04-28 18:48:52.227: Prime          : Remote command startup failed.. cleanup and exit. 2
+Netmist finished child process termination and cleanup. Netmist error code 99
+<<< Wed Apr 28 18:49:38 2021: Starting EDA_BLENDED run 1 of 1: JOBS=1 >>
+
+     SPECstorage(TM) Solution 2020 Release        $Revision: 2512 $
+
+     This product contains benchmarks acquired from several sources who
+     understand and agree with SPEC's goal of creating fair and objective
+     benchmarks to measure computer performance.
+
+     This copyright notice is placed here only to protect SPEC in the
+     event the source is misused in any manner that is contrary to the
+     spirit, the goals and the intent of SPEC.
+
+     The source code is provided to the user or company under the license
+     agreement for the SPEC Benchmark Suite for this product.
+
+     -----------------------------------------------------------------------
+     This program contains contributions from Iozone.org.
+
+     Copyright (C) 2002-2020, Don Capps
+     All rights reserved.
+
+     This program contains a 64-bit version of Mersenne Twister pseudorandom 
+     number generator.
+
+     Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura
+     All rights reserved.
+
+     Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions 
+     are met:
+
+     1. Redistributions of source code must retain the above copyright
+        notices, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notices, this list of conditions and the following disclaimer in 
+        the documentation and/or other materials provided with the 
+        distribution.
+     3. The names of its contributors may not be used to endorse or 
+        promote products derived from this software without specific prior 
+        written permission.
+
+     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+     A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT 
+     OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+     SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+     LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+     DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    -----------------------------------------------------------------------
+
+     Test run time = 300 seconds, Warmup = 300 seconds.
+     Results directory: /usr/local/bin/SPECstorage2020/results
+     Op latency reporting activated
+     Importing workloads from storage2020.yml
+[INFO][Wed Apr 28 18:49:38 2021]Exec validation successful
+
+     SPECstorage(TM) Solution 2020 Release        $Revision: 2512 $
+
+     This product contains benchmarks acquired from several sources who
+     understand and agree with SPEC's goal of creating fair and objective
+     benchmarks to measure computer performance.
+
+     This copyright notice is placed here only to protect SPEC in the
+     event the source is misused in any manner that is contrary to the
+     spirit, the goals and the intent of SPEC.
+
+     The source code is provided to the user or company under the license
+     agreement for the SPEC Benchmark Suite for this product.
+
+     -----------------------------------------------------------------------
+     This program contains contributions from Iozone.org.
+
+     Copyright (C) 2002-2020, Don Capps
+     All rights reserved.
+
+     This program contains a 64-bit version of Mersenne Twister pseudorandom 
+     number generator.
+
+     Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura
+     All rights reserved.
+
+     Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions 
+     are met:
+
+     1. Redistributions of source code must retain the above copyright
+        notices, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notices, this list of conditions and the following disclaimer in 
+        the documentation and/or other materials provided with the 
+        distribution.
+     3. The names of its contributors may not be used to endorse or 
+        promote products derived from this software without specific prior 
+        written permission.
+
+     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+     A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT 
+     OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+     SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+     LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+     DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    -----------------------------------------------------------------------
+
+     Test run time = 300 seconds, Warmup = 300 seconds.
+     Results directory: /usr/local/bin/SPECstorage2020/results
+     Op latency reporting activated
+     Importing workloads from storage2020.yml
+2021-04-28 18:49:38.820: Prime          : Starting tests...
+2021-04-28 18:49:38.820: Prime          : 	Launching 1 nodeManager processes.
+2021-04-28 18:49:38.820: Prime          : 	Starting test nodeManager:   0 Host: 10.0.40.11
+2021-04-28 18:49:44.154: Prime          : Version check successful: $Revision: 2512 $
+2021-04-28 18:49:44.157: Prime          : Waiting for each NodeManager to spawn client processes
+2021-04-28 18:49:46.293: Prime          : Starting INIT phase
+2021-04-28 18:49:46.295: Prime          : Sending Init to NodeManager 0
+2021-04-28 18:49:46.295: Prime          : Waiting to finish initialization.
+2021-04-28 18:50:04.801: Prime          : Init 30 percent complete from client 4
+2021-04-28 18:50:09.046: Prime          : Init 40 percent complete from client 2
+2021-04-28 18:50:12.481: Prime          : Init 50 percent complete from client 2
+2021-04-28 18:50:22.381: Prime          : Init 70 percent complete from client 2
+2021-04-28 18:50:27.104: Prime          : Init 80 percent complete from client 4
+2021-04-28 18:50:33.171: Prime          : Init 100 percent complete from client 2
+2021-04-28 18:51:42.663: Prime          : Initialization finished
+2021-04-28 18:51:42.664: Prime          : Sending INIT results to NodeManager 0
+2021-04-28 18:51:42.758: Prime          : Starting WARM phase
+2021-04-28 18:51:42.759: Prime          : Sending warmup to NodeManager 0
+2021-04-28 18:51:42.759: Prime          : Waiting for WARMUP phase to finish
+2021-04-28 18:52:10.874: Prime          : Warm-up 10 percent complete from client 1
+2021-04-28 18:53:42.874: Prime          : Warm heartbeat client 3: 100.005 Ops/sec
+2021-04-28 18:54:10.838: Prime          : Warm-up 50 percent complete from client 3
+2021-04-28 18:54:40.836: Prime          : Warm-up 60 percent complete from client 1
+2021-04-28 18:55:40.834: Prime          : Warm-up 80 percent complete from client 1
+2021-04-28 18:55:42.893: Prime          : Warm heartbeat client 2: 100.248 Ops/sec
+2021-04-28 18:56:10.847: Prime          : Warm-up 90 percent complete from client 2
+2021-04-28 18:56:42.934: Prime          : Warm heartbeat client 3: 100.018 Ops/sec
+2021-04-28 18:56:44.728: Prime          : Starting RUN phase
+2021-04-28 18:56:44.728: Prime          : Waiting for RUN phase to finish
+2021-04-28 18:57:46.528: Prime          : Run heartbeat client 0: 74.082 Ops/sec
+2021-04-28 18:58:12.733: Prime          : Run 30 percent complete from client 4
+2021-04-28 18:58:21.968: Prime          : Prime received SIGINT signal. Sig = 0
+2021-04-28 18:58:21.968: Prime          : 	Launching 1 nodeManager kill processes.
+Detected keyboard interrupt event. Waiting for netmist to terminate child processes...
+Netmist finished child process termination and cleanup. Netmist error code 1
+<<< Wed Apr 28 19:02:53 2021: Starting EDA_BLENDED run 1 of 2: JOBS=1 >>
+
+     SPECstorage(TM) Solution 2020 Release        $Revision: 2512 $
+
+     This product contains benchmarks acquired from several sources who
+     understand and agree with SPEC's goal of creating fair and objective
+     benchmarks to measure computer performance.
+
+     This copyright notice is placed here only to protect SPEC in the
+     event the source is misused in any manner that is contrary to the
+     spirit, the goals and the intent of SPEC.
+
+     The source code is provided to the user or company under the license
+     agreement for the SPEC Benchmark Suite for this product.
+
+     -----------------------------------------------------------------------
+     This program contains contributions from Iozone.org.
+
+     Copyright (C) 2002-2020, Don Capps
+     All rights reserved.
+
+     This program contains a 64-bit version of Mersenne Twister pseudorandom 
+     number generator.
+
+     Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura
+     All rights reserved.
+
+     Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions 
+     are met:
+
+     1. Redistributions of source code must retain the above copyright
+        notices, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notices, this list of conditions and the following disclaimer in 
+        the documentation and/or other materials provided with the 
+        distribution.
+     3. The names of its contributors may not be used to endorse or 
+        promote products derived from this software without specific prior 
+        written permission.
+
+     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+     A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT 
+     OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+     SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+     LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+     DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    -----------------------------------------------------------------------
+
+     Test run time = 300 seconds, Warmup = 60 seconds.
+     Results directory: /usr/local/bin/SPECstorage2020/results
+     Op latency reporting activated
+     Importing workloads from storage2020.yml
+[INFO][Wed Apr 28 19:02:53 2021]Exec validation successful
+
+     SPECstorage(TM) Solution 2020 Release        $Revision: 2512 $
+
+     This product contains benchmarks acquired from several sources who
+     understand and agree with SPEC's goal of creating fair and objective
+     benchmarks to measure computer performance.
+
+     This copyright notice is placed here only to protect SPEC in the
+     event the source is misused in any manner that is contrary to the
+     spirit, the goals and the intent of SPEC.
+
+     The source code is provided to the user or company under the license
+     agreement for the SPEC Benchmark Suite for this product.
+
+     -----------------------------------------------------------------------
+     This program contains contributions from Iozone.org.
+
+     Copyright (C) 2002-2020, Don Capps
+     All rights reserved.
+
+     This program contains a 64-bit version of Mersenne Twister pseudorandom 
+     number generator.
+
+     Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura
+     All rights reserved.
+
+     Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions 
+     are met:
+
+     1. Redistributions of source code must retain the above copyright
+        notices, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notices, this list of conditions and the following disclaimer in 
+        the documentation and/or other materials provided with the 
+        distribution.
+     3. The names of its contributors may not be used to endorse or 
+        promote products derived from this software without specific prior 
+        written permission.
+
+     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+     A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT 
+     OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+     SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+     LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+     DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    -----------------------------------------------------------------------
+
+     Test run time = 300 seconds, Warmup = 60 seconds.
+     Results directory: /usr/local/bin/SPECstorage2020/results
+     Op latency reporting activated
+     Importing workloads from storage2020.yml
+2021-04-28 19:02:53.469: Prime          : Starting tests...
+2021-04-28 19:02:53.469: Prime          : 	Launching 1 nodeManager processes.
+2021-04-28 19:02:53.469: Prime          : 	Starting test nodeManager:   0 Host: 10.0.40.11
+2021-04-28 19:02:58.814: Prime          : Version check successful: $Revision: 2512 $
+2021-04-28 19:02:58.818: Prime          : Waiting for each NodeManager to spawn client processes
+2021-04-28 19:03:01.002: Prime          : Starting INIT phase
+2021-04-28 19:03:01.003: Prime          : Sending Init to NodeManager 0
+2021-04-28 19:03:01.004: Prime          : Waiting to finish initialization.
+2021-04-28 19:03:01.159: Prime          : Init 10 percent complete from client 0
+2021-04-28 19:03:01.560: Prime          : Init 20 percent complete from client 2
+2021-04-28 19:03:02.161: Prime          : Init 40 percent complete from client 2
+2021-04-28 19:03:02.362: Prime          : Init 60 percent complete from client 4
+2021-04-28 19:03:02.559: Prime          : Init 70 percent complete from client 3
+2021-04-28 19:03:03.193: Prime          : Init 100 percent complete from client 2
+2021-04-28 19:03:03.193: Prime          : Initialization finished
+2021-04-28 19:03:03.195: Prime          : Sending INIT results to NodeManager 0
+2021-04-28 19:03:03.287: Prime          : Starting WARM phase
+2021-04-28 19:03:03.288: Prime          : Sending warmup to NodeManager 0
+2021-04-28 19:03:03.288: Prime          : Waiting for WARMUP phase to finish
+2021-04-28 19:03:07.392: Prime          : Warm-up 10 percent complete from client 4
+2021-04-28 19:03:13.373: Prime          : Warm-up 20 percent complete from client 4
+2021-04-28 19:03:19.383: Prime          : Warm-up 30 percent complete from client 3
+2021-04-28 19:03:25.470: Prime          : Warm-up 40 percent complete from client 1
+2021-04-28 19:03:37.372: Prime          : Warm-up 60 percent complete from client 2
+2021-04-28 19:03:43.392: Prime          : Warm-up 70 percent complete from client 3
+2021-04-28 19:03:49.364: Prime          : Warm-up 80 percent complete from client 1
+2021-04-28 19:04:04.564: Prime          : Starting RUN phase
+2021-04-28 19:04:04.564: Prime          : Waiting for RUN phase to finish
+2021-04-28 19:04:33.061: Prime          : Run 10 percent complete from client 0
+2021-04-28 19:05:02.462: Prime          : Run 20 percent complete from client 4
+2021-04-28 19:06:01.053: Prime          : Run heartbeat client 2: 100.027 Ops/sec
+2021-04-28 19:06:33.412: Prime          : Run 50 percent complete from client 4
+2021-04-28 19:07:01.231: Prime          : Run heartbeat client 1: 76.147 Ops/sec
+2021-04-28 19:07:03.563: Prime          : Run 60 percent complete from client 2
+2021-04-28 19:08:01.097: Prime          : Run heartbeat client 2: 100.009 Ops/sec
+2021-04-28 19:08:33.617: Prime          : Run 90 percent complete from client 1
+2021-04-28 19:09:01.155: Prime          : Run heartbeat client 3: 100.040 Ops/sec
+2021-04-28 19:09:02.983: Prime          : Run 100 percent complete from client 3
+2021-04-28 19:09:03.434: Prime          : Tests finished
+2021-04-28 19:09:03.436: Prime          : Sending Asking results to NodeManager 0
+	----------------------------------------------------------------
+	Overall average latency                       0.606 Milli-seconds
+	Overall SPECstorage(TM) Solution 2020       450.029 Ops/sec
+	Overall Read_throughput                ~   3805.238 Kbytes/sec
+	Overall Write_throughput               ~   3465.802 Kbytes/sec
+	Overall throughput                     ~   7271.040 Kbytes/sec
+	Total file space initialized           ~          0 Mbytes
+	----------------------------------------------------------------
+	Workload                             MD5
+	SWBUILD               0xfb8c79f3ac48f9c99f453c482e0c5442
+	VDA1                  0x9cbfa68f9db422f6e02bc223beb7147c
+	VDA2                  0xc65b6fbf99d4ae7ac2a049d14992765d
+	EDA_FRONTEND          0x5fdd3373676e6463e84f44935ac8c9a9
+	EDA_BACKEND           0x2286a2138b5b0a1b36b022e64bda0b72
+	AI_SF                 0xf51719f24e46718977a87336e15d2119
+	AI_TF                 0xa181505bbf17e674e3b880de5c1ded38
+	AI_TR                 0x771bc069d10527f982be855e6f3b1d66
+	AI_CP                 0x7851f91ddf3e9b83d4cbf074cde9498e
+	NGS                   0x62bc6fc32ba443fc84da7c426268bbbb
+	Registered Finger Print         2881026553
+	----------------------------------------------------------------
+	Latency Bands:
+	Band 1:  20us:45883    40us:15998    60us:8118     80us:3684    100us:641     
+	Band 2: 200us:1166    400us:514     600us:3922    800us:4440      1ms:3346    
+	Band 3:   2ms:5379      4ms:9320      6ms:2875      8ms:345      10ms:115     
+	Band 4:  12ms:34       14ms:22       16ms:14       18ms:14       20ms:7       
+	Band 5:  40ms:19       60ms:0        80ms:0       100ms:0       
+	Band 6: 200ms:0       400ms:0       600ms:0       800ms:0          1s:0       
+	Band 7:    2s:0          4s:0          6s:0          8s:0         10s:0       
+	Band 8:   20s:0         40s:0         60s:0         80s:0        120s:0       
+	Band 9: 120+s:0       
+
+	----------------------------------------------------------------
+	Contributing workloads:       
+
+	EDA_FRONTEND   Procs    3   Ops/sec   300.0  Avg Latency      0.430
+	EDA_BACKEND    Procs    2   Ops/sec   150.0  Avg Latency      0.869
+	----------------------------------------------------------------
+2021-04-28 19:09:03.483: Prime          : Client results ready
+2021-04-28 19:09:03.485: Prime          : Sending shutdown to NodeManager 0
+2021-04-28 19:09:03.485: Prime          : Shutting down
+2021-04-28 19:09:03.485: Prime          : Closing sockets
+2021-04-28 19:09:03.485: Prime          : Closing keepalive sockets
+2021-04-28 19:09:03.485: Prime          : Closing file handles
+2021-04-28 19:09:03.485: Prime          : Freeing memory
+netmist completed successfully, summarizing.
+<<< Wed Apr 28 19:09:03 2021: Starting EDA_BLENDED run 2 of 2: JOBS=11 >>
+
+     SPECstorage(TM) Solution 2020 Release        $Revision: 2512 $
+
+     This product contains benchmarks acquired from several sources who
+     understand and agree with SPEC's goal of creating fair and objective
+     benchmarks to measure computer performance.
+
+     This copyright notice is placed here only to protect SPEC in the
+     event the source is misused in any manner that is contrary to the
+     spirit, the goals and the intent of SPEC.
+
+     The source code is provided to the user or company under the license
+     agreement for the SPEC Benchmark Suite for this product.
+
+     -----------------------------------------------------------------------
+     This program contains contributions from Iozone.org.
+
+     Copyright (C) 2002-2020, Don Capps
+     All rights reserved.
+
+     This program contains a 64-bit version of Mersenne Twister pseudorandom 
+     number generator.
+
+     Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura
+     All rights reserved.
+
+     Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions 
+     are met:
+
+     1. Redistributions of source code must retain the above copyright
+        notices, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notices, this list of conditions and the following disclaimer in 
+        the documentation and/or other materials provided with the 
+        distribution.
+     3. The names of its contributors may not be used to endorse or 
+        promote products derived from this software without specific prior 
+        written permission.
+
+     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+     A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT 
+     OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+     SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+     LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+     DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    -----------------------------------------------------------------------
+
+     Test run time = 300 seconds, Warmup = 60 seconds.
+     Results directory: /usr/local/bin/SPECstorage2020/results
+     Op latency reporting activated
+     Importing workloads from storage2020.yml
+[INFO][Wed Apr 28 19:09:03 2021]Exec validation successful
+
+     SPECstorage(TM) Solution 2020 Release        $Revision: 2512 $
+
+     This product contains benchmarks acquired from several sources who
+     understand and agree with SPEC's goal of creating fair and objective
+     benchmarks to measure computer performance.
+
+     This copyright notice is placed here only to protect SPEC in the
+     event the source is misused in any manner that is contrary to the
+     spirit, the goals and the intent of SPEC.
+
+     The source code is provided to the user or company under the license
+     agreement for the SPEC Benchmark Suite for this product.
+
+     -----------------------------------------------------------------------
+     This program contains contributions from Iozone.org.
+
+     Copyright (C) 2002-2020, Don Capps
+     All rights reserved.
+
+     This program contains a 64-bit version of Mersenne Twister pseudorandom 
+     number generator.
+
+     Copyright (C) 2004, Makoto Matsumoto and Takuji Nishimura
+     All rights reserved.
+
+     Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions 
+     are met:
+
+     1. Redistributions of source code must retain the above copyright
+        notices, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notices, this list of conditions and the following disclaimer in 
+        the documentation and/or other materials provided with the 
+        distribution.
+     3. The names of its contributors may not be used to endorse or 
+        promote products derived from this software without specific prior 
+        written permission.
+
+     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+     A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT 
+     OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+     SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+     LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+     DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    -----------------------------------------------------------------------
+
+     Test run time = 300 seconds, Warmup = 60 seconds.
+     Results directory: /usr/local/bin/SPECstorage2020/results
+     Op latency reporting activated
+     Importing workloads from storage2020.yml
+2021-04-28 19:09:03.598: Prime          : Starting tests...
+2021-04-28 19:09:03.599: Prime          : 	Launching 1 nodeManager processes.
+2021-04-28 19:09:03.600: Prime          : 	Starting test nodeManager:   0 Host: 10.0.40.11
+2021-04-28 19:09:08.942: Prime          : Version check successful: $Revision: 2512 $
+2021-04-28 19:09:08.945: Prime          : Waiting for each NodeManager to spawn client processes
+2021-04-28 19:09:15.848: Prime          : Starting INIT phase
+2021-04-28 19:09:15.850: Prime          : Sending Init to NodeManager 0
+2021-04-28 19:09:15.850: Prime          : Waiting to finish initialization.
+2021-04-28 19:09:16.271: Prime          : Init 10 percent complete from client 2
+2021-04-28 19:09:21.965: Prime          : Init 20 percent complete from client 2
+2021-04-28 19:09:52.425: Prime          : Init 40 percent complete from client 2
+2021-04-28 19:10:15.894: Prime          : Init heartbeat __/\_/\__ client 13
+2021-04-28 19:10:27.483: Prime          : Init 60 percent complete from client 3
+2021-04-28 19:11:14.009: Prime          : Init 90 percent complete from client 2
+2021-04-28 19:11:15.930: Prime          : Init heartbeat __/\_/\__ client 14
+2021-04-28 19:11:27.630: Prime          : Init 100 percent complete from client 4
+2021-04-28 19:12:16.042: Prime          : Init heartbeat __/\_/\__ client 21
+2021-04-28 19:13:16.191: Prime          : Init heartbeat __/\_/\__ client 20
+2021-04-28 19:13:43.173: Prime          : Initialization finished
+2021-04-28 19:13:43.175: Prime          : Sending INIT results to NodeManager 0
+2021-04-28 19:13:43.830: Prime          : Starting WARM phase
+2021-04-28 19:13:43.832: Prime          : Sending warmup to NodeManager 0
+2021-04-28 19:13:43.832: Prime          : Waiting for WARMUP phase to finish
+2021-04-28 19:13:48.456: Prime          : Warm-up 10 percent complete from client 40
+2021-04-28 19:13:54.449: Prime          : Warm-up 20 percent complete from client 22
+2021-04-28 19:14:00.448: Prime          : Warm-up 30 percent complete from client 27
+2021-04-28 19:14:06.442: Prime          : Warm-up 40 percent complete from client 2
+2021-04-28 19:14:12.446: Prime          : Warm-up 50 percent complete from client 47
+2021-04-28 19:14:18.447: Prime          : Warm-up 60 percent complete from client 47
+2021-04-28 19:14:24.437: Prime          : Warm-up 70 percent complete from client 35
+2021-04-28 19:14:30.442: Prime          : Warm-up 80 percent complete from client 45
+2021-04-28 19:14:36.439: Prime          : Warm-up 90 percent complete from client 20
+2021-04-28 19:14:42.439: Prime          : Warm-up 100 percent complete from client 22
+2021-04-28 19:14:44.439: Prime          : Warm heartbeat client 19: 100.014 Ops/sec
+2021-04-28 19:14:45.813: Prime          : Starting RUN phase
+2021-04-28 19:14:45.813: Prime          : Waiting for RUN phase to finish
+2021-04-28 19:15:13.238: Prime          : Run 10 percent complete from client 27
+2021-04-28 19:15:43.616: Prime          : Run 20 percent complete from client 32
+2021-04-28 19:16:13.645: Prime          : Run 30 percent complete from client 17
+2021-04-28 19:16:16.129: Prime          : Run heartbeat client 21: 74.122 Ops/sec
+2021-04-28 19:16:43.395: Prime          : Run 40 percent complete from client 1
+2021-04-28 19:16:59.719: Prime          : Prime received SIGINT signal. Sig = 0
+2021-04-28 19:16:59.719: Prime          : 	Launching 1 nodeManager kill processes.
+Detected keyboard interrupt event. Waiting for netmist to terminate child processes...
+Netmist finished child process termination and cleanup. Netmist error code 1

@@ -1,0 +1,16 @@
+#  -*- mode: makefile; -*-
+# Makefile customization for Netmist Pro product.
+
+CFLAGS += -DSPEC_DIST
+
+ifeq ($(OS),aix)
+else ifeq ($(OS),hpux)
+else ifeq ($(OS),linux)
+else ifeq ($(OS),sunos)
+else ifeq ($(OS),freebsd)
+else ifeq ($(OS),darwin)
+else ifeq ($(OS),VMware)
+endif
+
+CFLAGS += -I$(TRUNK_DIR)/netmist/dist
+

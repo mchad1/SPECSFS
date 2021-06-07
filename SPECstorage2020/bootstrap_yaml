@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Unzip this from the kit
+(cd redistributable_sources; unzip libyaml-master.zip)
+# Run the bootstrap, configure, and make for the lib.
+(cd redistributable_sources/libyaml-master; ./bootstrap ; ./configure ; make)

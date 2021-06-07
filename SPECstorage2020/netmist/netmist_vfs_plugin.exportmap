@@ -1,0 +1,4 @@
+{
+global: netmist_vfs_init;
+local: *;
+};

@@ -1,0 +1,111 @@
+- Netmist in deployment, as of SPECstorage2020 :
+
+    - "Prime" coordinator node per run, oversees
+    - "Node manager" processes per workload generator host, oversees
+    - "Client" processes that actually generate workload.
+
+- Hierarchy is necessary for netmist design to scale to immense workloads:
+
+    - Each client maintains an active connection to its manager
+    - Before Prime/NodeManager split, the coordinator would be overwhelmed
+
+- The rest of this tour is going to focus on the clients only.
+
+- Clients also layered in operation
+
+    - State machine in `netmist_client.c`; calls down to...
+
+    - Workload task generator
+	- `complete_client_run_work` calls `gen_op` at the right schedule
+	- `gen_op` samples from the workload distribution
+
+    - `gen_op` then invokes the worker function:
+	- Actually: `makepath`, `prefix_op`, worker, `postfix_op`.
+	- These sandwiching functions may also generate load
+	    - Path resolution, open, close
+	    - "chaff" operations
+
+    - These worker functions know how to do a few things:
+	- Maintain netmist statistics (we are, after all, a benchmark!)
+
+	- Optionally, emulate a client LRU caching policy
+	    - May improve realism of the workload by avoiding duplicate path resolution
+
+	- Actually generate the appropriate load.
+	    - Range from "read at random location" to "copy whole file"
+	    - Single FS operation, loops around one type, or a pre-selected sequence
+
+    - The worker functions are invoked through an indirection table
+
+	- See `netmist_methodtable.h`
+	- Plug your own implementation in if desired
+	- But, somewhat tricky!  Should play along with stats, LRU, &c.
+
+- VFS work adds another indirection table *beneath* the worker functions.
+
+    - Defined in `netmist_vfs.h`
+
+    - Currently, a "common denominator"
+	- Just the aspects netmist needs
+	- No high-level operations (no "copy file")
+
+    - All platform-specific details are fully encapsulated behind opaque structs.
+
+    - Available implementations for POSIX and Win32
+	- Refactored from netmist's existing implementation
+
+- Given the exact feature parity with existing implementations, what's interesting?
+
+    - Ease of porting to new platforms, if desired
+
+    - Including *userland filesystems* that do not demultiplex through the kernel
+	- New targets for netmist
+	- Emulate multiple hosts on one host
+
+    - Completely opaque API means that VFS implementations...
+	- Can be developed separately from netmist itself
+	- Can be loaded as plugins, rather than being part of the netmist binary
+
+- New targets?
+
+    - Auristor userland client implementation
+    - Parallel I/O APIs, e.g., https://www.mcs.anl.gov/projects/romio/
+    - Other userland-only filesystems, e.g, https://www.lstore.org/
+
+- Emulating multiple hosts on one client?
+
+    - The client kernel has one block/vnode cache, and multiplexes all clients through it.
+    - Now that VFS impl. entirely in userland, each netmist client has its own cache.
+	- Increases load on servers, which is exactly what we wanted.
+
+- State of implementation relative to pre-VFS netmist:
+
+    - VFS layer is fully defined, netmist uses it
+	- Linux, WIN32 passing on all default workloads
+	- Some lingering nits on various architectures getting hammered out
+
+    - Preliminary plugin support on POSIX (`dlopen`)
+	- Platform variance is higher here than elsewhere
+	    - Example rule for building with GNU ld in source tree
+	- POSIX VFS implementation tested in both static and dynamic load form
+	    - `VFS_PLUGIN` configuration option passed from prime thru to clients
+
+    - Requisite refactoring likely to pay dividends going forward, too:
+	- More static type enforcement in indirection tables (I kept getting it wrong)
+	- Less string manipulation for file paths (VFS makes paths opaque)
+	    - Many fewer places care about '\\' vs '/' now!
+	- Netmist is a little smaller:
+	    - 33 files changed, 4880 insertions(+), 7944 deletions(-)
+	    - `netmist.c` itself substantially smaller: 2091 insertions(+), 7304 deletions(-)
+
+    - Missing features:
+	- optional high-level interfaces
+	    - e.g., some FSes export cheap copyfile
+
+	- xattr support, not used by netmist in any workload yet
+	    - will require plumbing all the way up the stack
+
+	- Better directory enumeration API; not used by netmist yet, but could want
+
+    - Some VFS APIs are said to be optional, but we've never tested without
+	- e.g. mmap, locking

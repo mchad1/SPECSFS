@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{93F10ADF-8F10-490D-9CB8-B8A378D6ADD5}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NetmistProd>dist</NetmistProd>
+    <ProdIncludePath>$(SolutionDir)\dist_pro;$(SolutionDir)\dist</ProdIncludePath>
+    <ProdPreprocessorDefinitions>SPEC_DIST</ProdPreprocessorDefinitions>
+    <MixTableDir>..\..\dist_pro</MixTableDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\win32lib\win32_getopt.c" />
+    <ClCompile Include="..\..\..\win32lib\win32_sub.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\win32lib\win32_getopt.h" />
+    <ClInclude Include="..\..\..\win32lib\win32_sub.h" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>
+	..;..\..\dist_pro;..\..\;$(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="../../msbuild/netmist_modify.target" />
+</Project>

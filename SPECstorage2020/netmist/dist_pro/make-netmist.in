@@ -1,0 +1,24 @@
+#  -*- mode: makefile; -*-
+# Netmist dist, pro settings
+ifeq ($(OS),aix)
+CC := xlc
+CFLAGS += -O5
+else ifeq ($(OS),hpux)
+else ifeq ($(OS),linux)
+CFLAGS += -O3
+# If user wishes to attach debugger to prime/nodeManager/Client, add these flags with -g option
+# If added, this will insert a 'DEBUG' state in FSM with 30 sec delay so gdb can be attached.
+#CFLAGS += -g -DPRIME_ATTACH_DEBUGGER -DNM_ATTACH_DEBUGGER -DCLIENT_ATTACH_DEBUGGER
+CFLAGS += -Wimplicit-function-declaration -Wextra
+else ifeq ($(OS),sunos)
+CFLAGS += -O3
+else ifeq ($(OS),freebsd)
+CFLAGS += -O3
+else ifeq ($(OS),darwin)
+CFLAGS += -O3
+else ifeq ($(OS),VMware)
+CFLAGS += -O3
+endif
+CFLAGS += -I$(TRUNK_DIR)/netmist/dist_pro
+export CFLAGS
+

@@ -1,0 +1,86 @@
+
+                   ----------------------------------
+	           A quick list of future directions:
+                   ----------------------------------
+
+This list is just a list. There is currently no prioritization.
+
+1.  Create more workload files that can be read in to create
+    the desired mix for each type of workload. Imagine
+    having workload files like:
+
+      Email: Exchange, Pop, Yahoo
+      CADCAM
+      Web_server
+      Block device workloads
+      Medical Imaging, Genetics
+
+2.  Add more op types to increase realism and test coverage.
+    * POSIX Async I/O
+
+3.  Think about adding more file behavior mechanisms. For example
+    Perhaps some other new forms of COLAs ? (Clusters Of Logical Accesses)
+
+    We have a few already in the code:
+	Append            Append op  (Write sequential file access at eof)
+	Read              Read op    (sequential file access)
+	Read_rand         Read rand op (random file access)
+        Read_entire_file  Read an entire file in large chunks.
+	Write             Write op   (sequential file access)
+	Write_rand        Write rand op (random file access)
+        Write_entire_file Write an entire file in large chunks.
+	RMW               Read modify write op 
+	Mmap_read         Mmap read op
+	Mmap_write        Mmap Write op
+	Copyfile          copyfile op (copy a file, in chunks)
+
+4.  Add network performance test to permit folks to do a 
+    sanity check on the clients and networks before running
+    a long running test, only to find one of the NICs was
+    in 10Mbit mode :-)
+
+5.  Add a mechanism for tuning/adjusting the number of outstanding
+    I/Os, as a property of a workload object so that it could be
+    modified by the dynamic workload object update suggestion 
+    above. (Suggestion was hinting tune for adjusting number 
+    of client async I/O ops)
+
+6.  Permit infrastructure folks to help prioritize this list of
+    works, as they will be the consumers that will be most impacted
+    by the order of delivery of features.
+
+7.  Add a case (if possible) that can exercise an access 
+    to a file after a clone of the VM or the file.
+
+8.  Add more details on errors. perror, xfer size, and anything
+    else that might help debug the problem.
+
+9.  Add an option for a very very brief summary output that only
+    contains information that needs to be rolled up for the overall
+    summary, publication, and graph generation.
+
+Rejected requests for enhancement:
+
+1.  Add an op type that can exercise NFSv4.1 copy offload.
+
+    This is not currently possible. There is NO POSIX API that can cause
+    an NFSv4.1 or NFSv4.2 copy offload. This can only happen
+    at the NFS protocol level, there is no application interface.
+    Perhaps someday, someone, will make sendfile() work with
+    files and trigger a copy offload, but today sendfile()
+    only works with sockets and doesn't even come close to 
+    anything that might trigger an NFS copy offload. 
+
+2.  Addition of async I/O API usage. This was rejected due to the fact
+    that not all of the platforms support async I/O.
+
+3.  Per proc, or thread, file sharing with locking ?
+    The suggestion was to permit file sharing across threads/procs
+    and to use locking. This may or may not make sense in a benchmark
+    as the locking models are complex, divergent, and in some cases
+    performed in the app itself (DNFS).  The suggestion here is to
+    just explore the idea and see what makes sense, if anything.
+    The idea of shared files with locking interaction was rejected, however
+    the idea of shared files and directories without locking is now
+    implemented at a command line, as well as within workload attributes. 
+

@@ -1,0 +1,2284 @@
+#!/usr/bin/python
+##############################################################################
+# Copyright (c) 2014, 2015 Standard Performance Evaluation Corporation
+#               All rights reserved.
+#
+# Author: Vernon Miller
+# This source code is provided as is, without any express or implied warranty.
+#
+#  History:
+#  Date        ID, Company               Description
+#  -------  --------------------  --------------------------------------------
+#
+#
+##############################################################################
+from __future__ import print_function
+
+
+# standard help screen
+def usage():
+    """Prints syntax and limits each line to 50 characters + tab."""
+    print("\tUsage: python %s [options] " % sys.argv[0])
+    print("")
+    print("\tCommand line option:")
+    print("\tRequired for Benchmark Execution:")
+    print('\t{0:.<50} {1}'.format("[-r <file>] or [--rc-file=<file>]",
+          "Specify rc file"))
+    print("\tRequired for Benchmark Installation:")
+    print('\t{0:.<50} {1}'.format("[--install-dir=<directory>]",
+          "Specify an installation directory (must not exist)"))
+    print("\tOptional:")
+    print('\t{0:.<50} {1}'.format("[-s <suffix>] or [--suffix=<suffix>]",
+          "Suffix to be used in log and summary files (default=SPECstorage2020)"))
+    print('\t{0:.<50} {1}'.format("[-b <file>] or [--benchmark-file=<file>]",
+          "benchmark definition file"))
+    print('\t{0:.<50} {1}'.format("[-d <dir>] or [--results-dir=<dir>]",
+          "Results directory, use full path"))
+    print('\t{0:.<50} {1}'.format("[-i] or [--ignore-override]",
+          "Bypass override of official workload parameters"))
+    print('\t{0:.<50} {1}'.format("[-e <filename>] or [--export=<filename>]",
+          "Export workload definitions to a file"))
+    print('\t{0:.<50} {1}'.format("[-a]",
+          "Auto mode (max): finds maximum passing load value"))
+    print('\t{0:.<50} {1}'.format("[-A <scaling>]",
+          "Auto mode (curve): generate 10 point curve based on result of -a (if used) or LOAD"))
+    print('\t{0:.<50} {1}'.format("[-A] (continued)",
+          "<scaling> is a percentage between 0-100 to scale the maximum LOAD."))
+    print('\t{0:.<50} {1}'.format("[-A] (continued)",
+          "If -A and -a are used together a '<suffix>.auto' is used for finding the maximum."))
+    print('\t{0:.<50} {1}'.format("[--save-config=<file>]",
+          "Save the token config file and executeable command line args"))
+    print('\t{0:.<50} {1}'.format("[--test-only]",
+          "Simulate a set of load points without actually running."))
+    print('\t{0:.<50} {1}'.format("[-h]", "Show usage info"))
+    print('\t{0:.<50} {1}'.format("[-v]", "Show version number"))
+    print('\t{0:.<50} {1}'.format("[--debug]", "Detailed output"))
+
+#
+# Utility functions
+#
+
+
+def message(msg, pad="", ctime=False, log=None, exit=False):
+    """Formats messages to stdout and exits if necessary."""
+    msg_str = pad
+    if ctime:
+        msg_str += "[%s]" % time.ctime()
+    msg_str += msg
+    print(msg_str)
+    if log:
+        log.write("%s\n" % msg_str)
+        log.flush()
+    if exit:
+        sys.exit(1)
+
+
+def check_string_bool(s):
+    """Convert common binary responses to a standard format."""
+    if s == 0 or s == 1:
+        return s
+    else:
+        T = ["1", "y", "yes", "on", "true"]
+        F = ["0", "n", "no", "off", "false"]
+        if T.count(s.lower()):
+            return 1
+        elif F.count(s.lower()):
+            return 0
+        else:
+            return -1
+
+
+def ten_points(max_value, scaling):
+    """Returns a list of 10 loadpoints given a maximum value with a scale factor."""
+    N = 10
+    MAX = (scaling / 100.0) * max_value
+    if MAX < 10.0:
+        N = int(MAX)
+    points = [int(round((MAX * i)/ N)) for i in range(1, N+1)]
+    return points
+
+def signal_handler(a, b):
+    """Handles Ctrl+C events to shutdown benchmark."""
+    print("Caught interrupt signal, stopping gracefully.")
+    print("Press Enter after all clients have been stopped.")
+    sys.exit(1)
+
+
+def make_human_readable(element):
+    """Print XML in an easy to read format."""
+    xmlstring = et.tostring(element, encoding="UTF-8")
+    prettystring = str(minidom.parseString(xmlstring).toprettyxml(indent="  ",
+        newl="\n", encoding="utf-8").decode('ascii'))
+    return prettystring.replace("\n\n", "\n")
+
+
+def file_parser(filename, delimiter, comment, minfields, log=None):
+    """A general parser with support for comments and expected syntax."""
+    f = open(filename)
+    lines = f.readlines()
+    f.close()
+    lines = [l.strip() for l in lines]
+    valid_lines = []
+    for l in lines:
+        if len(l):
+            if l[0] == comment:
+                continue
+            elif l.count(delimiter):
+                fields = l.split(delimiter)
+                if len(fields) >= minfields:
+                    valid_lines.append(fields)
+                else:
+                    message("Not enough fields on line in %s: %s" % \
+                        (filename, l), "[ERROR]", True, log)
+                    return None
+            else:
+                message("Invalid line in file %s: %s" % (filename, l),
+                    "[ERROR]", True, log)
+                return None
+    return valid_lines
+
+
+def string_cap(txt):
+    if txt is "":
+        return None
+    num = int(txt[:-1])
+    multiplier = txt.lower()[-1]
+    if multiplier == "m":
+        num *= 1024
+    elif multiplier == "g":
+        num *= 1024*1024
+    return num
+
+
+# Create the command line string for the executeable
+def create_cmd(rc, token_config_file, sfslog_name, results_dir, client_procs,
+    current_run, total_runs, current_load, oprate=None):
+    using_mon_script = False
+    netmist_cmd = rc.parms["EXEC_PATH"]
+    netmist_cmd += " -b %s" % rc.parms["CLIENT_MEM"]
+    netmist_cmd += " -B %s" % rc.parms["AGGR_CAP"]
+    netmist_cmd += " -d %d" % client_procs
+    netmist_cmd += " -g %s" % token_config_file
+    netmist_cmd += " -R %s" % results_dir
+    if oprate > 0:
+        netmist_cmd += " -O %.2f" % oprate  # set the oprate if it's specified
+    if rc.parms["LATENCY_GRAPH"] == 1:
+        netmist_cmd += " -N"
+    if rc.parms["UNLINK_FILES"] == 0:
+        netmist_cmd += " -K"
+    if rc.parms["HEARTBEAT_NOTIFICATIONS"] == 1:
+        netmist_cmd += " -G"
+        netmist_cmd += " -q %s" % sfslog_name
+    if rc.parms["WORKLOAD_FILE"]:
+        netmist_cmd += " -I %s" % rc.parms["WORKLOAD_FILE"]
+    if rc.parms["FILE_SIZE"]:
+        netmist_cmd += " -r %s" % rc.parms["FILE_SIZE"]
+    if rc.parms["IPV6_ENABLE"] == 1:
+        netmist_cmd += " -y 6"
+    if rc.parms["DISABLE_FSYNCS"] == 1:
+        netmist_cmd += " -F"
+    if rc.parms["LOCAL_ONLY"] == 1:
+        netmist_cmd += " -z"
+    if rc.parms["USE_RSHRCP"] == 1:
+        netmist_cmd += " -u"
+    if rc.parms["NO_OP_VALIDATE"] == 1:
+        netmist_cmd += " -3"
+    if rc.parms["NO_SHARED_BUCKETS"] == 1:
+        netmist_cmd += " -4"
+    if rc.parms["UNLINK2_NO_RECREATE"] == 1:
+        netmist_cmd += " -5"
+    if rc.parms["FILE_ACCESS_LIST"] == 1:
+        netmist_cmd += " -Y"
+    if rc.parms["TRACEDEBUG"]:
+        netmist_cmd += " -2 %d" % rc.parms["TRACEDEBUG"]
+    if rc.parms["SHARING_MODE"] == 1:
+        netmist_cmd += " -X"
+    if rc.parms["SOCK_DEBUG"] == 1:
+        netmist_cmd += " -x"
+    if rc.parms["MAX_FD"]:
+        netmist_cmd += " -J %d" % rc.parms["MAX_FD"]
+    if rc.parms["BYTE_OFFSET"] > 0:
+        netmist_cmd += " -a %d" % rc.parms["BYTE_OFFSET"]
+    if rc.parms["PIT_SERVER"]:
+        netmist_cmd += " -H %s" % rc.parms["PIT_SERVER"]
+    if rc.parms["PIT_PORT"]:
+        netmist_cmd += " -S %d" % rc.parms["PIT_PORT"]
+    if rc.parms["PRIME_MON_SCRIPT"]:
+        using_mon_script = True
+        netmist_cmd += " -f %s" % rc.parms["PRIME_MON_SCRIPT"]
+        if rc.parms["PRIME_MON_ARGS"]:
+            netmist_cmd += " -j \" %d %d %d %s \" " % (current_run, total_runs,
+        current_load, rc.parms["PRIME_MON_ARGS"])
+        else:
+            netmist_cmd += " -j \" %d %d %d \" " % (current_run, total_runs,
+        current_load)
+    if rc.parms["NETMIST_LOGS"]:
+        netmist_cmd += " -U %s" % rc.parms["NETMIST_LOGS"]
+
+    if rc.parms["DIR_COUNT"]:
+        netmist_cmd += " -T %d" % rc.parms["DIR_COUNT"]
+    if rc.parms["FILES_PER_DIR"]:
+        netmist_cmd += " -Q %d" % rc.parms["FILES_PER_DIR"]
+    netmist_cmd += " -w %d" % rc.parms["WARMUP_TIME"]
+    netmist_cmd += " -t %d" % rc.parms["RUNTIME"]
+    netmist_cmd += " -l %s" % sfslog_name
+    return netmist_cmd
+
+
+# validate cmd with -i flag
+def will_it_run(cmd, log, debug=False):
+    if debug:
+        message("Starting exec validation: '%s'" % cmd, "[DEBUG]", True, log)
+    validate_proc = subprocess.Popen("%s -i" % cmd, shell=True,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    out, err = validate_proc.communicate()
+    if validate_proc.returncode != 0:
+        message("Validation failed: command will not run successfully.",
+            "[ERROR]", True, log)
+        if out:
+            message(str(out.decode('ascii')), "", True, log)
+        if err:
+            message(str(err.decode('ascii')), "", True, log, True)
+        sys.exit(1)
+    else:
+        message("Exec validation successful", "[INFO]", True, log)
+
+
+def then_run_it(cmd, log):
+    """Executes netmist and waits for the process to complete."""
+    exec_proc = subprocess.Popen(cmd, shell=True)
+    try:
+        rc = exec_proc.wait()
+    except:
+        message("Error while waiting for netmist processes to complete", "", \
+            False, log, True)
+    if rc != 0:
+        message("netmist did not complete successfully.", "", False, log)
+        message("The netmist return code was: %s" % str(rc), "", False, log, \
+            True)
+    else:
+        message("netmist completed successfully, summarizing.", "", False, log)
+
+
+# save contents of the token config file and the
+# command that was used with the file
+def save_token_config_file(token_config_file, save_tcf, cmd):
+    cmd = cmd.replace(token_config_file, save_tcf)
+    g = open(save_tcf, 'a')
+    g.write("#\n# saving config file at %s\n#\n" % time.ctime())
+    f = open(token_config_file, 'r')
+    g.write(f.read())
+    f.close()
+    g.write("#\n# command with above token config file is:\n")
+    g.write("# %s\n" % cmd)
+    g.write("#\n")
+    g.close()
+
+
+# Class for storing a set of benchmarks
+# to run, either from the default file
+# or a custom set of benchmarks
+class Benchmarks:
+    def __init__(self, bfile, debug, log=None):
+        """Class for representing the set of all available benchmarks."""
+        self.benchmarks_file = bfile
+        self.debug = debug
+        self.log = log
+        self.identifier = None
+        self.benchmarks = {}  # map of name -> Benchmark
+        self.parse_benchmarks(self.benchmarks_file)
+
+    def parse_benchmarks(self, bfile):
+        """Read the XML and verify it has the correct syntax."""
+        xmltree = et.ElementTree(file=bfile)
+        root = xmltree.getroot()
+        treetxt = et.tostring(root).decode('unicode_escape')
+        treetxt = re.sub('\s', '', treetxt)
+        self.identifier = self.get_id(treetxt)
+        if not root.tag == 'benchmarks':
+            self.syntax_error("Unknown root tag <%s>" % root.tag)
+        for child in root:
+            bname = None
+            if child.tag == 'benchmark':
+                keys = sorted(list(child.attrib.keys()))
+                if keys.count('name') and keys.count('business_metric'):
+                    bname = child.attrib['name']
+                    bmetric = child.attrib['business_metric']
+                    self.benchmarks[bname] = Benchmark(bname, bmetric)
+                    if self.debug:
+                        message("Adding benchmark %s with business metric %s" \
+                            % (bname, bmetric), "[DEBUG]", True, self.log,
+                            False)
+                else:
+                    self.syntax_error()
+                for grandchild in child:
+                    if grandchild.tag == 'workload':
+                        if 'name' in grandchild.attrib:
+                            wname = grandchild.attrib['name']
+                            self.benchmarks[bname].workloads[wname] = \
+                                Workload(wname)
+                            for greatgrandchild in grandchild:
+                                if greatgrandchild.tag == 'oprate':
+                                    text = greatgrandchild.text.strip()
+                                    if text != '':
+                                        rc = self.benchmarks[bname].\
+                                            workloads[wname].set_oprate(text)
+                                        if rc:
+                                            self.syntax_error(rc)
+                                    else:
+                                        self.syntax_error()
+                                elif greatgrandchild.tag == 'instances':
+                                    text = greatgrandchild.text.strip()
+                                    if text != '':
+                                        rc = self.benchmarks[bname].\
+                                            workloads[wname].\
+                                            set_instances(text)
+                                        if rc:
+                                            self.syntax_error(rc)
+                                    else:
+                                        self.syntax_error()
+                                elif greatgrandchild.tag == 'shared_files':
+                                    self.benchmarks[bname].\
+                                        workloads[wname].shared_files = True
+                                elif greatgrandchild.tag == 'override_parm':
+									if 'name' in greatgrandchild.attrib:
+										name = greatgrandchild.attrib['name']
+										text = greatgrandchild.text.strip()
+										if text != '':
+											rc = self.benchmarks[bname].\
+												workloads[wname].\
+													add_override_parm(name, text)
+											if rc:
+												self.syntax_error(rc)
+										else:
+											self.syntax_error(("No value for tag"
+												"<%s name='%s'>. in workload %s of benchmark %s") % \
+												(greatgrandchild.tag, name, wname, bname))
+                                else:
+                                    self.syntax_error("Unrecognized tag %s" % \
+                                        greatgrandchild.tag)
+                    elif grandchild.tag == "oprate_scale":
+                        for greatgrandchild in grandchild:
+                            if greatgrandchild.tag == 'min':
+                                text = greatgrandchild.text.strip()
+                                if text != '':
+                                    rc = self.benchmarks[bname].\
+                                        set_oprate_scale(minimum=text)
+                                    if rc:
+                                        self.syntax_error(rc)
+                                else:
+                                    self.syntax_error(("No value for tag"
+                                        " <%s>. in benchmark %s") % \
+                                        (greatgrandchild.tag, bname))
+                            elif greatgrandchild.tag == 'default':
+                                text = greatgrandchild.text.strip()
+                                if text != '':
+                                    rc = self.benchmarks[bname].\
+                                        set_oprate_scale(default=text)
+                                    if rc:
+                                        self.syntax_error(rc)
+                                else:
+                                    self.syntax_error(("No value for tag"
+                                        " <%s>. in benchmark %s") % \
+                                        (greatgrandchild.tag, bname))
+                            elif greatgrandchild.tag == 'max':
+                                text = greatgrandchild.text.strip()
+                                if text != '':
+                                    rc = self.benchmarks[bname].\
+                                        set_oprate_scale(maximum=text)
+                                    if rc:
+                                        self.syntax_error(rc)
+                                else:
+                                    self.syntax_error(("No value for tag"
+                                        "<%s>. in benchmark %s") % \
+                                        (greatgrandchild.tag, bname))
+                            else:
+                                self.syntax_error("Unrecognized tag %s" % \
+                                    greatgrandchild.tag)
+                    elif grandchild.tag == "dedicated_subdirectory":
+                        self.benchmarks[bname].dedicated_dir = True
+                    elif grandchild.tag == "override_parm":
+                        if 'name' in grandchild.attrib:
+                            name = grandchild.attrib['name']
+                            text = grandchild.text.strip()
+                            if text != '':
+                                rc = self.benchmarks[bname].\
+                                    add_override_parm(name, text)
+                                if rc:
+                                    self.syntax_error(rc)
+                            else:
+                                self.syntax_error(("No value for tag"
+                                    "<%s>. in benchmark %s") % \
+                                    (greatgrandchild.tag, bname))
+                    elif grandchild.tag == "threshold":
+                        if 'type' in grandchild.attrib:
+                            name = grandchild.attrib['type']
+                            text = grandchild.text.strip()
+                            if text != '':
+                                rc = self.benchmarks[bname].\
+                                    add_threshold(name, text)
+                                if rc:
+                                    self.syntax_error(rc)
+                            else:
+                                self.syntax_error(("No value for tag <%s>."
+                                " in benchmark %s") % \
+                                (greatgrandchild.tag, bname))
+                    else:
+                        self.syntax_error("Unrecognized tag %s" % \
+                            grandchild.tag)
+            else:
+                self.syntax_error("Unrecognized tag %s" % grandchild.tag,
+                    "[ERROR]")
+
+    def get_id(self, data):
+        i = data.encode('utf-8', 'ignore')
+        return "{0:x}".format(zlib.crc32(i) & 0xffffffff)
+
+    def get_names(self):
+        """Returns a sorted list of all the benchmark names."""
+        names = sorted(list(self.benchmarks.keys()))
+        return names
+
+    def get_benchmark(self, name):
+        """Returns a Benchmark object for the given name."""
+        return self.benchmarks[name]
+
+    def syntax_error(self, context=None):
+        """Error handler for the XML validation."""
+        if context:
+            message(context, "[ERROR]", True, self.log, False)
+        message("Benchmarks file %s does not have the correct syntax" % \
+            self.benchmarks_file, "[ERROR]", True, self.log, True)
+
+
+# Class for storing the definition
+# of a single benchmark
+class Benchmark:
+    def __init__(self, name=None, business_metric=None):
+        """Class characterizing a single benchmark."""
+        self.name = name
+        self.business_metric = business_metric
+        self.parms = Parms()
+        self.workloads = {}
+        self.dedicated_dir = False
+        self.override_parms = {}
+        self.thresholds = {
+            'proc oprate': None,
+            'global oprate': None,
+            'proc latency': None,
+            'global latency': None,
+            'workload variance': None}
+        self.oprate_scale = [0.01, 1.0, 1000000000.0]     # min, default, max
+
+    def set_oprate_scale(self, minimum=None, default=None, maximum=None):
+        """Sets min, max, and default for oprate scale."""
+        rc = None
+        if minimum:
+            try:
+                value = float(minimum)
+                if value > self.oprate_scale[1] or value > \
+                self.oprate_scale[2]:
+                    rc = ("Oprate scale minimum value must be less than or"
+                          " equal to the default and maximum values.")
+                else:
+                    self.oprate_scale[0] = value
+            except ValueError:
+                rc = "Invalid value for oprate scale minimum"
+        if default:
+            try:
+                value = float(default)
+                if value < self.oprate_scale[0] or value > \
+                self.oprate_scale[2]:
+                    rc = "Oprate scale default value not in valid range."
+                else:
+                    self.oprate_scale[1] = value
+            except ValueError:
+                rc = "Invalid value for oprate scale default"
+        if maximum:
+            try:
+                value = float(maximum)
+                if value < self.oprate_scale[1] or value < \
+                self.oprate_scale[0]:
+                    rc = ("Oprate scale maximum value must be greater than or"
+                          "equal to the default and minimum values.")
+                else:
+                    self.oprate_scale[2] = value
+            except ValueError:
+                rc = "Invalid value for oprate scale maximum"
+        return rc
+
+    def add_override_parm(self, key, value):
+        """Adds required parameter (overrides RC file) for this benchmark."""
+        rc = None
+        if key in self.override_parms:
+            rc = "Override parameter %s already specified with value %s" % \
+                (key, self.override_parms[key])
+        else:
+            self.parms.set_parm(key, value)
+            # if the above worked, we get the right type for value
+            # otherwise the program will exit gracefully
+            retval = self.parms.get_parm(key)
+            if retval:
+                self.override_parms[key] = retval
+            else:
+                rc = ("There was a problem setting the override parameter"
+                      " (%s = %s)." % (key, value))
+        return rc
+
+    def add_threshold(self, key, value):
+        """Adds a success criterion in the form of a threshold."""
+        rc = None
+        if key in self.thresholds:
+            if self.thresholds[key] == None:
+                if key == 'proc oprate' or key == 'global oprate' or \
+                key == 'workload variance':
+                    try:
+                        value = float(value)
+                        if value <= 0 or value > 100:
+                            rc = ("Threshold %s not in valid range.  The"
+                                  " valid range is greater than 0 and less"
+                                  " than or equal to 100" % key)
+                        else:
+                            self.thresholds[key] = value
+                    except ValueError:
+                        rc = "Invalid value %s for threshold %s" % \
+                        (value, key)
+                else:  # proc latency or global latency
+                    try:
+                        value = float(value)
+                        if value <= 0:
+                            rc = ("Threshold %s not in valid range.  The"
+                                  "valid range is greater than zero" % key)
+                        else:
+                            self.thresholds[key] = value
+                    except ValueError:
+                        rc = "Invalid value %s for threshold %s" % (value, key)
+            else:
+                rc = "Threshold %s already specified" % key
+        else:
+            rc = "Unknown threshold %s" % key
+        return rc
+
+    def evaluate_thresholds(self, perfdata):
+        """Checks all sucess criteria against data."""
+        failed_thresholds = []
+        workloads = perfdata.workloads
+        workloads.sort()
+        if self.thresholds['proc oprate']:
+            t = self.thresholds['proc oprate']
+            if t:
+                for workload in workloads:
+                    if self.workloads[workload].oprate:
+                        perc = 100 * perfdata.min_proc_oprate(workload) / \
+                        self.workloads[workload].oprate
+                        if perc < t:
+                            failed_thresholds.append(("At least one process"
+                                " fell below the threshold of %.2f%% (%.2f%%)"
+                                " for workload %s" % (t, perc, workload)))
+        if self.thresholds['global oprate']:
+            t = self.thresholds['global oprate']
+            if t:
+                for workload in workloads:
+                    if self.workloads[workload].oprate:
+                        perc = 100 * perfdata.avg_oprate(workload) / \
+                        self.workloads[workload].oprate
+                        if perc < t:
+                            failed_thresholds.append(("The average oprate"
+                                " fell below the threshold of %.2f%% (%.2f%%)"
+                                "for workload %s" % (t, perc, workload)))
+        if self.thresholds['proc latency']:
+            t = self.thresholds['proc latency']
+            if t:
+                for workload in workloads:
+                    lat = perfdata.max_proc_latency(workload)
+                    if lat > t:
+                        failed_thresholds.append(("At least one process"
+                            " exceeded the latency threshold of %.2fms"
+                            " (%.2fms) for workload %s" % (t, lat, workload)))
+        if self.thresholds['global latency']:
+            t = self.thresholds['global latency']
+            if t:
+                for workload in workloads:
+                    lat = perfdata.avg_latency(workload)
+                    if lat > t:
+                        failed_thresholds.append(("The average latency"
+                            " exceeded the latency threshold of %.2fms"
+                            " (%.2fms) for workload %s" % (t, lat, workload)))
+        if self.thresholds['workload variance']:
+            t = self.thresholds['workload variance']
+            if t:
+                ratios = perfdata.oprate_ratios()
+                pairs = sorted(list(ratios.keys()))
+                for a, b in pairs:
+                    if self.workloads[a].oprate and self.workloads[b].oprate:
+                        ideal_ratio = self.workloads[a].oprate / \
+                        self.workloads[b].oprate
+                        achieved_ratio = ratios[(a, b)]
+                        ratio = 100 * abs(1 - ideal_ratio / achieved_ratio)
+                        if ratio > t:
+                            failed_thresholds.append(("The workload variance"
+                                " between %s and %s exceeded the threshold of"
+                                "+/- %.2f%% (%.2f%%)" % (a, b, t, ratio)))
+        return failed_thresholds
+
+    def check_multiplier(self, multiplier):
+        """Checks that oprate mutiplier is within the defined limits."""
+        rc = None
+        if multiplier != self.oprate_scale[1]:
+            if multiplier < self.oprate_scale[0] or multiplier > \
+            self.oprate_scale[2]:
+                return -1
+            else:
+                return 1
+
+    def get_workloads(self):
+        """Returns a sorted list of workload object names in the benchmark."""
+        names = sorted(list(self.workloads.keys()))
+        return names
+
+    def get_procs(self):
+        """Returns the total number processes for all workload objects."""
+        nprocs = 0
+        for workload in self.workloads:
+            nprocs += self.workloads[workload].instances
+        return nprocs
+
+    def get_total_oprate(self):
+        """Returns the sum of all the oprates from all workloads objects."""
+        oprate = None
+        for workload in self.workloads:
+            if self.workloads[workload].oprate:
+                if oprate:
+                    oprate += self.workloads[workload].instances * \
+                    self.workloads[workload].oprate
+                else:
+                    oprate = self.workloads[workload].instances * \
+                    self.workloads[workload].oprate
+        return oprate
+
+    def unique_proc_count(self):
+        """Returns the total process count in shared environments."""
+        procs = 0
+        for workload in self.workloads:
+            if self.workloads[workload].shared_files:
+                procs += 1
+            else:
+                procs += self.workloads[workload].instances
+        return procs
+
+    def space_info(self, load, clients, rcparms):
+        active_cap = 0
+        max_cap = 0
+        fsize_numerator = 0
+        nfiles = 0
+        for workload in self.workloads:
+            winfo = self.workloads[workload].space_info(rcparms)
+            fsize_numerator += winfo[0] * winfo[1]
+            nfiles += winfo[0]
+            active_cap += load * winfo[2]
+            max_cap += load * winfo[3]
+        client_cap = active_cap / clients
+        start_size = active_cap
+        fsize = fsize_numerator / nfiles
+        return (fsize, client_cap, start_size, active_cap, max_cap)
+
+
+# Class for storing workload runtime parameters
+# for use in Benchmark objects
+class Workload:
+    def __init__(self, name):
+        """Class representing netmist workloads objects."""
+        self.name = name
+        self.oprate = None
+        self.instances = 1
+        self.shared_files = False
+        self.override_parms = {}
+        self.valid_parms = {"FILES_PER_DIR": "Filesperdir",
+        	"DIR_COUNT": "Dircount",
+        	"FILE_SIZE": "Filesize"}
+
+    def set_oprate(self, rate):
+        """Sets the oprate for the workload object, default is unthrottled."""
+        rc = None
+        try:
+            self.oprate = float(rate)
+        except ValueError:
+            rc = "Invalid value for oprate in workload %s" % self.name
+        return rc
+
+    def set_instances(self, instances):
+        """Sets the number of processes for the workload objects."""
+        rc = None
+        try:
+            self.instances = int(instances)
+        except ValueError:
+            rc = "Invalid value for instances in workload %s" % self.name
+        return rc
+
+    def add_override_parm(self, key, value):
+        """Adds required parameter (overrides RC file) for this workload."""
+        rc = None
+        if self.valid_parms[key] in self.override_parms:
+            rc = "Override parameter %s already specified with value %s" % \
+                (key, self.override_parms[self.valid_parms[key]])
+        else:
+        	if key == "FILE_SIZE":
+        		num = int(value[:-1])
+        		multiplier = value.lower()[-1]
+        		if multiplier == "m":
+        			num *= 1024
+        		elif multiplier == "g":
+        			num *= 1024*1024
+        		self.override_parms[self.valid_parms[key]] = "%d" % num
+        	else:
+        		self.override_parms[self.valid_parms[key]] = value
+        return rc
+
+    def space_info(self, rcparms):
+        """Calculates the capacity requirements for the benchmark."""
+        active_cap = 0
+        max_cap = 0
+        nonempty_dirs = 11
+        procs = self.instances
+        if self.shared_files:
+            procs = 1
+        if "Filesize" in self.override_parms:
+            file_size = int(self.override_parms["Filesize"])
+        else:
+            if rcparms is not "":
+                file_size = rcparms[0]
+        if "Dircount" in self.override_parms:
+            dir_count = int(self.override_parms["Dircount"])
+        else:
+            dir_count = rcparms[1]
+        if "Filesperdir" in self.override_parms:
+            files_per_dir = int(self.override_parms["Filesperdir"])
+        else:
+            files_per_dir = rcparms[2]
+        active_cap = procs * file_size * dir_count * files_per_dir * nonempty_dirs / 1024
+        max_cap = procs * file_size * dir_count * files_per_dir * \
+            (nonempty_dirs + 1) / 1024
+        nfiles = files_per_dir * dir_count * nonempty_dirs
+        return (nfiles, file_size, active_cap, max_cap)
+
+
+# Class for storing and validating parameters used
+# for both Benchmark and RcParms objects
+class Parms:
+    def __init__(self, log=None):
+        """Class for storing and validating benchmark paramaters."""
+        self.log = log
+        self.parms = {
+            "WORKLOAD_FILE": "",
+            "RUNTIME": 300,
+            "WARMUP_TIME": 300,
+            "FILE_SIZE": "",
+            "CLIENT_MEM": "1g",
+            "AGGR_CAP": "1g",
+            "DIR_COUNT": "",
+            "FILES_PER_DIR": "",
+            "UNLINK_FILES": 0,
+            "LATENCY_GRAPH": 1,
+            "HEARTBEAT_NOTIFICATIONS": 1,
+            "IPV6_ENABLE": 0,
+            "DISABLE_FSYNCS": 0,
+            "USE_RSHRCP": 0,
+            "BYTE_OFFSET": 0,
+            "MAX_FD": "",
+            "PIT_SERVER": "",
+            "PIT_PORT": "",
+            "LOCAL_ONLY": 0,
+            "FILE_ACCESS_LIST": 0,
+            "TRACEDEBUG": 0,
+            "NO_OP_VALIDATE": 0,
+            "NO_SHARED_BUCKETS": 0,
+            "UNLINK2_NO_RECREATE": 0,
+            "SHARING_MODE": 0,
+            "SOCK_DEBUG": 0,
+            "NETMIST_LOGS": ""}
+        self.aggr_cap = 1024    # aggregate data set size in MiB
+        self.client_mem = 1024  # client memory in MiB
+        self.file_size = None   # file size in KiB
+
+    def set_parm(self, parm, value):
+        """Sets and validates a value for a parameter."""
+        if not parm in self.parms:
+            message("Unknown parameter %s" % parm, "[ERROR]",
+                    True, self.log, True)
+        if parm == 'WORKLOAD_FILE':
+            if value != "":
+                if not os.access(value, os.R_OK):
+                    message("Invalid WORKLOAD_FILE %s" % value, "[ERROR]",
+                            True, self.log, True)
+                else:
+                    self.parms[parm] = value
+        elif parm in ['WARMUP_TIME', 'RUNTIME']:
+            if value != "":
+                try:
+                    i = int(value)
+                    if i >= 60:
+                        self.parms[parm] = i
+                    else:
+                        message(("Invalid value for %s, must be greater than"
+                            " 60" % parm), "[ERROR]", True, self.log, True)
+                except ValueError:
+                    message("Invalid value for %s" % parm, "[ERROR]",
+                            True, self.log, True)
+        elif parm in ['CLIENT_MEM', 'AGGR_CAP']:
+            if value != "":
+                if not re.match('^[0-9]+[mMbGgtT]\Z', value):
+                    message(("Invalid value for %s, must be of the form"
+                    " #[mMbGgtT]" % parm), "[ERROR]", True, self.log, True)
+                else:
+                    self.parms[parm] = value
+                    num = int(value[:-1])
+                    multiplier = value[-1].lower()
+                    if multiplier == "g":
+                        num *= 1024
+                    elif multiplier == "t":
+                        num *= (1024 * 1024)
+                    if parm == "CLIENT_MEM":
+                        self.client_mem = num
+                    elif parm == "AGGR_CAP":
+                        self.aggr_cap = num
+        elif parm == 'FILE_SIZE':
+            if value != "":
+                if not re.match('^[0-9]+[kKmMgG]\Z', value):
+                    message(("Invalid value for %s, must be of the form"
+                    " #[kKmMgG]" % parm), "[ERROR]", True, self.log, True)
+                else:
+                    self.parms[parm] = value
+                    num = int(value[:-1])
+                    multiplier = value[-1].lower()
+                    if multiplier == "m":
+                        num *= 1024
+                    elif multiplier == "g":
+                        num *= (1024 * 1024)
+                    self.file_size = num
+        # validate greater than or equal to zero parameters (integer)
+        elif parm in ['BYTE_OFFSET', 'TRACEDEBUG']:
+            if value != "":
+                try:
+                    i = int(value)
+                    if i >= 0:
+                        self.parms[parm] = i
+                    else:
+                        message(("Invalid value for %s, must be"
+                        " greater than or equal to zero" % parm), "[ERROR]",
+                        True, self.log, True)
+                except ValueError:
+                    message(("Invalid value for %s, must be greater than"
+                    " or equal to zero" % parm), "[ERROR]", True,
+                    self.log, True)
+        # validate positive integer value parameters
+        elif parm in ['DIR_COUNT', 'FILES_PER_DIR', 'MAX_FD', 'PIT_PORT']:
+            if value != "":
+                try:
+                    i = int(value)
+                    if i >= 1:
+                        self.parms[parm] = i
+                    else:
+                        message(("Invalid value for %s, must be a positive"
+                        " integer" % parm), "[ERROR]", True, self.log, True)
+                except ValueError:
+                    message(("Invalid value for %s, must be a positive"
+                    " integer" % parm), "[ERROR]", True, self.log, True)
+        # validate boolean value parameters, convert to 1 or 0
+        elif parm in ['IPV6_ENABLE', 'UNLINK_FILES', 'DISABLE_FSYNCS', \
+                'USE_RSHRCP', 'LOCAL_ONLY', 'HEARTBEAT_NOTIFICATIONS', \
+                'LATENCY_GRAPH', 'FILE_ACCESS_LIST', 'SHARING_MODE', \
+                'SOCK_DEBUG','NO_OP_VALIDATE', 'NO_SHARED_BUCKETS', \
+                'UNLINK2_NO_RECREATE']:
+            if value != "":
+                retval = check_string_bool(value)
+                if retval == -1:
+                    message("Invalid value for %s" % parm, "[ERROR]", True,
+                    self.log, True)
+                else:
+                    self.parms[parm] = retval
+        else:
+            self.parms[parm] = value
+
+    def get_parm(self, parm):
+        """Returns the value of a given parameter."""
+        retval = None
+        if parm in self.parms:
+            retval = self.parms[parm]
+        return retval
+
+
+# Class for holding and validating
+# all parameters specifed in the rc file
+class RcParms(Parms):
+    def __init__(self, rc_file, debug, log=None):
+        """Class for storing additional benchmark parameters and an RC file"""
+        self.debug = debug
+        self.log = log
+        Parms.__init__(self, self.log)
+        self.rcparms = {
+            "BENCHMARK": "",
+            "LOAD": "",
+            "INCR_LOAD": "",
+            "NUM_RUNS": 1,
+            "PROC_MULTIPLIER": 1,
+            "OPRATE_MULTIPLIER": "",
+            "CLIENT_MOUNTPOINTS": "",
+            "EXEC_PATH": "/usr/local/bin/netmist",
+            "USER": "",
+            "PASSWORD": "",
+            "PRIME_MON_SCRIPT": "",
+            "PRIME_MON_ARGS": ""}
+        self.benchmark_name = None
+        self.workload_parms = {}
+        self.debug = debug
+        self.loadpoints = []
+        self.procs_per_client = 1
+        self.client_mountpoints = None
+        self.bench_space = None
+        if rc_file:
+            self.read_rc_file(rc_file)
+            self.validate()
+            for parm in self.rcparms.keys():
+                self.parms[parm] = self.rcparms[parm]
+
+    def read_rc_file(self, rc_file):
+        """Parses the RC file and assigns values to parameters."""
+        filedata = file_parser(rc_file, "=", "#", 2)
+        if filedata == None:
+            message("Error reading the RC file", "[ERROR]", True, self.log,
+            True)
+        for parm, value in filedata:
+            parm = parm.strip()
+            # none of the parms need any quotes around them
+            value = value.strip().replace('"', '').replace("'", "")
+            if parm in self.parms:
+                self.set_parm(parm, value)
+                if self.debug:
+                    message("reading rc file, got parameter %s = %s" % \
+                    (parm, value), "[DEBUG]", True, self.log)
+            elif parm in self.rcparms:
+                self.rcparms[parm] = value
+                if self.debug:
+                    message("reading rc file, got parameter %s = %s" % \
+                    (parm, value), "[DEBUG]", True, self.log)
+            else:
+                message("Unknown parameter %s" % parm, "[ERROR]", True,
+                self.log, True)
+
+    def validate(self):
+        """Validates the values of each specifed parameter."""
+        if self.rcparms['BENCHMARK']:
+            self.benchmark_name = self.rcparms['BENCHMARK']
+        #
+        # Look for client/mountpoint string
+        #
+        cm = 'CLIENT_MOUNTPOINTS'
+        if self.rcparms[cm]:
+            if len(self.rcparms[cm].strip().split()) == 1:
+                if os.access(self.rcparms[cm].strip().split()[0], os.R_OK):
+                    cmfile = self.rcparms[cm].strip().split()[0]
+                    if self.debug:
+                        message("found client mountpoints file %s" % cmfile,
+                        "[DEBUG]", True, self.log)
+                    self.client_mountpoints = ClientMountpoints(cmfile,
+                    debug=self.debug, log=self.log)
+                else:
+                    self.client_mountpoints = ClientMountpoints(
+                        cm_str=self.rcparms[cm], debug=self.debug,
+                        log=self.log)
+            else:
+                self.client_mountpoints = ClientMountpoints(
+                    cm_str=self.rcparms[cm], debug=self.debug, log=self.log)
+        else:
+            message("CLIENT_MOUNTPOINTS must have at least one entry",
+                "[ERROR]", True, self.log, True)
+        #
+        # If LOAD is a list, use it only, otherwise look at value and use
+        # with INCR_LOAD and NUM_RUNS
+        #
+        self.loadpoints = self.rcparms['LOAD'].split()
+        if len(self.loadpoints) == 0:
+            message("LOAD parameter must be specified.", "[ERROR]", True,
+            self.log, True)
+        elif len(self.loadpoints) == 1:
+            incr_load, num_runs = None, None
+            try:
+                self.loadpoints[0] = int(self.loadpoints[0])
+                if self.loadpoints[0] <= 0:
+                    message("All values for LOAD must be greater than zero.",
+                    "[ERROR]", True, self.log, True)
+            except ValueError:
+                message("Invalid list of LOAD points", "[ERROR]", True,
+                self.log, True)
+            if self.rcparms['INCR_LOAD']:
+                try:
+                    incr_load = int(self.rcparms['INCR_LOAD'])
+                    if incr_load < 0:
+                        message(("INCR_LOAD must be greater than or equal to"
+                        " zero"), "[ERROR]", True, self.log, True)
+                except ValueError:
+                    message("Invalid value for INCR_LOAD", "[ERROR]",
+                    True, self.log, True)
+            else:
+                incr_load = 0
+            if self.rcparms['NUM_RUNS']:
+                try:
+                    num_runs = int(self.rcparms['NUM_RUNS'])
+                    if num_runs <= 0:
+                        message("NUM_RUNS must be greater than zero",
+                        "[ERROR]", True, self.log, True)
+                except ValueError:
+                    message("Invalid value for NUM_RUNS", "[ERROR]", True,
+                    self.log, True)
+            else:
+                num_runs = 1
+            # create full list of load points
+            for i in range(num_runs - 1):
+                self.loadpoints.append(self.loadpoints[i] + incr_load)
+        else:  # list of load points
+            try:
+                self.loadpoints = [int(i) for i in self.loadpoints]
+            except ValueError:
+                message("Invalid list of LOAD points", "[ERROR]", True,
+                self.log, True)
+        if self.rcparms['PROC_MULTIPLIER']:  # must be a positive integer
+            try:
+                i = int(self.rcparms['PROC_MULTIPLIER'])
+                if i > 0:
+                    self.procs_per_client = i
+                else:
+                    message(("Invalid value for PROC_MULTIPLIER, must be a"
+                    " positive integer"), "[ERROR]", True, self.log, True)
+            except ValueError:
+                message("Invalid value for PROC_MULTIPLIER", "[ERROR]", True,
+                self.log, True)
+        if self.rcparms['OPRATE_MULTIPLIER']:
+            try:
+                i = int(self.rcparms['OPRATE_MULTIPLIER'])
+                if i > 0:
+                    self.rcparms['OPRATE_MULTIPLIER'] = i
+                else:
+                    message(("Invalid value for OPRATE_MULTIPLIER, must be"
+                    " greater than 0"), "[ERROR]", True, self.log, True)
+            except ValueError:
+                message("Invalid value for OPRATE_MULTIPLIER", "[ERROR]",
+                True, self.log, True)
+        if self.rcparms['PRIME_MON_SCRIPT']:
+            script_path = os.path.abspath(self.rcparms['PRIME_MON_SCRIPT'])
+            if not os.access(script_path, os.R_OK | os.X_OK):
+                message(("Monitoring script %s must be readable and"
+                " executable" % script_path), "[ERROR]", True, self.log, True)
+            else:
+                self.rcparms['PRIME_MON_SCRIPT'] = script_path
+
+    def client_count(self):
+        """Returns the total number of unique clients."""
+        count = len(self.client_mountpoints.clients)
+        if not count:
+            count = 1
+        return count
+
+    def get_proc_fsize(self, clients=1, procs=1):
+        """Returns the average process file size in KiB."""
+        if self.parms["FILE_SIZE"]:
+            value = self.parms["FILE_SIZE"]
+            num = int(value[:-1])
+            multiplier = value[-1].lower()
+            if multiplier == "m":
+                num *= 1024
+            elif multiplier == "g":
+                num *= (1024 * 1024)
+            return num
+        else:
+            fsize = 0
+            if (self.client_mem * clients) >= self.aggr_cap:
+                fsize = self.client_mem * clients * 1024 / procs
+            else:
+                fsize = self.aggr_cap * 1024 / procs
+            return fsize
+
+    def space_info(self, clients=1, procs=1):
+        """Calculates the capacity requirements for the benchmark."""
+        active_cap = 0
+        client_cap = 0
+        start_size = 0
+        max_cap = 0
+        nonempty_dirs = 11
+        file_size = self.get_proc_fsize(clients, procs)
+        dir_count = self.parms["DIR_COUNT"]
+        if not dir_count:
+            dir_count = 10
+        files_per_dir = self.parms["FILES_PER_DIR"]
+        if not files_per_dir:
+            files_per_dir = 100
+        active_cap = procs * file_size * dir_count * files_per_dir * \
+            nonempty_dirs / 1024
+        client_cap = active_cap / clients
+        max_cap = procs * file_size * dir_count * files_per_dir * \
+            (nonempty_dirs + 1) / 1024
+        start_size = active_cap
+        if self.bench_space:
+            return self.bench_space
+        else:
+            return (file_size, client_cap, start_size, active_cap, max_cap)
+
+
+# Class for containing and validating
+# all data in the client/mountpoint file
+# or client mountpoint string from the
+# RC file
+class ClientMountpoints:
+    def __init__(self, client_file=None, cm_str=None, debug=None, log=None):
+        self.clients = []
+        self.mountpoints = {}
+        self.cm = []  # list with (client, workdir, [extraopts]) pairs
+        self.log = log
+        self.debug = debug
+        self.wd = 0
+        if client_file:
+            self.read_client_file(client_file)
+        else:
+            self.parse_cm_str(cm_str)
+
+    def read_client_file(self, client_file):
+        """Parses the optional external client/mountpoint file."""
+        filedata = file_parser(client_file, " ", "#", 2)
+        if filedata == None:
+            message("Error reading the client file", "[ERROR]", True,
+                self.log)
+            sys.exit(1)
+        for l in filedata:
+            client = l[0]
+            mountpoints = []
+            extraopts = []
+            for i in l[1:]:
+                if "=" in i:
+                    extraopts.append(i)
+                else:
+                    mountpoints.append(i)
+            for i in mountpoints:
+                self.cm.append((client, i, extraopts))
+            self.wd += len(mountpoints)
+            if client in self.mountpoints:
+                self.mountpoints[client].extend(mountpoints)
+                if self.debug:
+                    message("adding mountpoints to client %s: %s" % \
+                    (client, mountpoints), "[DEBUG]", True, self.log)
+            else:
+                self.clients.append(client)
+                self.mountpoints[client] = mountpoints
+                if self.debug:
+                    message("adding new client %s with mountpoints: %s" % \
+                    (client, mountpoints), "[DEBUG]", True, self.log)
+
+    def parse_cm_str(self, cm_str):
+        """Validates the value for the CLIENT_MOUNTPOINTS parameter."""
+        # quick sanity check
+        cms = cm_str.split()
+        if not len(cms):
+            message(("CLIENT_MOUNTPOINTS does not have the correct syntax"
+                        ", please see the User's Guide for more details."),
+                        "", False, self.log, True)
+        for i in cms:
+            if not len(i.split(":", 1)) > 1:
+                message(("CLIENT_MOUNTPOINTS does not have the correct syntax"
+                         ", please see the User's Guide for more details."),
+                         "", False, self.log, True)
+        for i, j in [k.split(":", 1) for k in cm_str.split()]:
+            client, mountpoint = i, j
+            self.cm.append((i, j, []))
+            if client in self.mountpoints:
+                self.mountpoints[client].append(mountpoint)
+                if self.debug:
+                    message("adding mountpoint to client %s: %s" % \
+                    (client, mountpoint), "[DEBUG]", True, self.log)
+            else:
+                self.clients.append(client)
+                self.mountpoints[client] = [mountpoint]
+                if self.debug:
+                    message("adding new client %s with mountpoint: %s" % \
+                    (client, mountpoint), "[DEBUG]", True, self.log)
+
+    def get_unique_list(self):
+        """Returns a unique list of client/mountpoint pairs."""
+        cm_list = []
+        for c in self.clients:
+            for m in self.mountpoints[c]:
+                if not cm_list.count((c, m)):
+                    cm_list.append((c, m))
+        return cm_list
+
+    def get_avg_wd(self):
+        """Returns the average number of workdirs per client."""
+        wd = 0
+        for i in self.clients:
+            wd += len(self.mountpoints[i])
+        avg_wd = wd / float(len(self.clients))
+        return avg_wd
+
+
+class BenchmarkResults:
+    def __init__(self, sfslog, suffix, results_dir, runid=None, savetcf=None):
+        """Class for evaluating measured data and creating summary files."""
+        self.sfslog = sfslog
+        self.suffix = suffix
+        self.results_dir = results_dir
+        self.sfslog_name = os.path.join(results_dir, "sfslog_%s.log" % suffix)
+        self.sfssum = os.path.join(results_dir, "sfssum_%s.txt" % suffix)
+        self.runid = runid
+        self.savetcf = savetcf
+        self.genid = str(time.time())
+        self.isValid = True
+
+    def combine_output_files(self, nfiles, sepstr="#######"):
+        """Combine all proc results files associated with a physical client"""
+        rc = None
+        filenames = glob.glob(os.path.join(self.results_dir,
+            "Client_*_results"))
+        if nfiles != -1 and  len(filenames) != nfiles:
+            rc = "Only found %d of %d client results files" % \
+            (len(filenames), nfiles)
+        else:
+            client_output = {}
+            nclients = 0
+            for i in filenames:
+                f = open(i)
+                lines = f.readlines()
+                f.close()
+                thisclient = None
+                reline = re.compile('^Client\s+\S+\s+ID:\s+\d+\n\Z')
+                for j in lines:
+                    if reline.match(j):
+                        thisclient = j.split()[1]
+                        break
+                if thisclient:
+                    if not thisclient in client_output:
+                        nclients += 1
+                        client_output[thisclient] = \
+                            open(os.path.join(self.results_dir,
+                            'sfsc%03d.%s' % (nclients, self.suffix)), 'a')
+                        client_output[thisclient].write("\n%s\n" % sepstr)
+                    client_output[thisclient].writelines(lines)
+                else:
+                    print("could not find client name in file %s" % i)
+            for client in client_output.keys():
+                client_output[client].close()
+        for i in filenames:
+            os.remove(i)
+        return rc
+
+    def get_id(self, data):
+        i = data.encode('utf-8', 'ignore')
+        return "{0:x}".format(zlib.crc32(i) & 0xffffffff)
+
+    def summarize_output(self, benchmark_name, business_metric="",
+            req_oprate="", valid_run=True, space_calc=None, nclients=None,
+            client_procs=None):
+        """Reduce data from exec output, append to summary file."""
+        last_header = -1
+        prev_header = -1
+        f = open(self.sfslog_name)
+        i = 0
+        for line in f:
+            if line.find("SPECstorage(TM) Solution 2020 Release") != -1:
+                prev_header = last_header
+                last_header = i
+            i += 1
+        f.close()
+        sfslog_data = []
+        f = open(self.sfslog_name)
+        i = 0
+        for line in f:
+            if i > (last_header - 1):
+                sfslog_data.append(line)
+            i += 1
+        f.close()
+
+        version = "-1"
+        revstr = sfslog_data[0].find("Revision:")
+        if revstr != -1:
+                v = sfslog_data[0][revstr:].strip().strip("Revision: ").strip(" $")
+                if v.isdigit():
+                        version = v
+
+        metrics = [
+            ('^\s+(Request Op_rate = )\d{0,11}[.]\d{3}( ops/second)\n\Z',
+                '\d{0,10}[.]\d{2}', 0, 'op rate', 'ops/s'),
+            (('^\s+(Overall SPECstorage(TM) Solution 2020)\s+\d{0,11}[.]\d{3}\s+'
+                '(Ops/sec)\n\Z'), '\d{0,11}[.]\d{3}', 0, 'achieved rate',
+                'ops/s'),
+            (('^\s+(Overall average latency)\s+\d{0,11}[.]\d{3}\s+'
+                '(Milli-seconds)\n\Z'), '\d{0,11}[.]\d{3}', 0,
+                'average latency', 'milliseconds'),
+            (('^\s+(Overall throughput)\s+[~]\s*\d{0,11}[.]\d{3}\s+'
+                '(Kbytes/sec)\n\Z'), '\d{0,11}[.]\d{3}', 0,
+                'overall throughput', 'KB/s'),
+            (('^\s+(Overall Read_throughput)\s+[~]\s*\d{0,11}[.]\d{3}\s+'
+                '(Kbytes/sec)\n\Z'), '\d{0,10}[.]\d{3}', 0, 'read throughput',
+                'KB/s'),
+            (('^\s+(Overall Write_throughput)\s+[~]\s*\d{0,11}[.]\d{3}\s+'
+                '(Kbytes/sec)\n\Z'), '\d{0,11}[.]\d{3}', 0,
+                'write throughput', 'KB/s'),
+            (('^\s+(Test run time = )\d+( seconds, Warmup = )\d+'
+                '( seconds.)\n\Z'), '\d+', 0, 'run time', 'seconds'),
+            ('^\s+(Running )\d+( copies of the test on )\d+( clients)\n\Z',
+                '\d+', 1, 'clients', None),
+            ('^\s+(Clients each have )\d+( processes)\n\Z', '\d+', 0,
+                'processes per client', None),
+            ('^\s+(Each process file size = )\d+( kbytes)\n\Z', '\d+', 0,
+                'file size', 'KB'),
+            ('^\s+(Client data set size       = )\d+( MiBytes)\n\Z', '\d+', 0,
+                'client data set size', 'MiB'),
+            ('^\s+(Total starting data set size = )\d+( MiBytes)\n\Z', '\d+',
+                0, 'starting data set size', 'MiB'),
+            ('^\s+(Total initial file space   = )\d+( MiBytes)\n\Z', '\d+', 0,
+                'initial file space', 'MiB'),
+            ('^\s+(Total max file space       = )\d+( MiBytes)\n\Z', '\d+', 0,
+                'maximum file space', 'MiB'),
+            ('^\s+(Registered Finger Print)\s+\d+\n\Z', '\d+', 0,
+                'registered finger print', 'n/a')
+            ]
+
+        # Error-# so we know which values we're missing
+        values = ["Error-%d" % (i + 2) for i in range(len(metrics))]
+
+        for line in sfslog_data:
+            for i in range(len(metrics)):
+                if re.match(metrics[i][0], line):
+                    if values[i] == "Error-%d" % (i + 2):
+                        matches = re.findall(metrics[i][1], line)
+                        if len(matches) > metrics[i][2]:
+                            values[i] = matches[metrics[i][2]]
+
+        if values[0] == "Error-2":
+            values[0] = req_oprate  # no requested op rate
+
+        # write txt version
+        summary_str = "%10s" % business_metric  # business metric value
+        summary_str += " %12s" % values[0]   # requested op rate
+        summary_str += " %12s" % values[1]   # achieved rate
+        summary_str += " %11s" % values[2]   # avg latency
+        summary_str += " %12s" % values[3]   # overall throughput
+        summary_str += " %12s" % values[4]   # read throughput
+        summary_str += " %12s" % values[5]   # write throughput
+        summary_str += " %5s" % values[6]    # run time
+        if nclients:
+            summary_str += " %4d" % nclients
+            values[7] = nclients
+        else:
+            summary_str += " %4s" % values[7]    # number of clients
+        if client_procs:
+            summary_str += " %5d" % client_procs   # procs per client
+            values[8] = client_procs
+        else:
+            summary_str += " %5s" % values[8]    # procs per client
+        if space_calc:
+            summary_str += " %10d" % space_calc[0]
+            values[9] = space_calc[0]
+            summary_str += " %12d" % space_calc[1]  # client data set size
+            values[10] = space_calc[1]
+            summary_str += " %12d" % space_calc[2]  # starting data set size
+            values[11] = space_calc[2]
+            summary_str += " %12d" % space_calc[3]  # initial file space
+            values[12] = space_calc[3]
+            summary_str += " %12d" % space_calc[4]  # max file space
+            values[13] = space_calc[4]
+        else:
+            summary_str += " %10s" % values[9]   # file size
+            summary_str += " %12s" % values[10]  # client data set size
+            summary_str += " %12s" % values[11]  # starting data set size
+            summary_str += " %12s" % values[12]  # initial file space
+            summary_str += " %12s" % values[13]  # max file space
+        summary_str += " %10s" % benchmark_name    # workload
+        fingerprint = values[14]
+        if fingerprint.count("Error"):
+            fingerprint = "-1"
+        else:
+            fingerprint = "{0:x}".format(int(values[14]))
+        if not self.runid:
+            self.runid = "-1"
+        if valid_run:
+            summary_str += "            \n"
+        else:
+            self.isValid = False
+            summary_str += " INVALID_RUN\n"
+
+        if os.access(self.sfssum, os.F_OK):
+            f = open(self.sfssum, 'a')
+        else:  # add header if this is the first time creating a summary file
+            f = open(self.sfssum, 'w')
+            f.write(('  Business    Requested     Achieved     Avg Lat       '
+                'Total          Read        Write   Run    #    Cl   Avg File'
+                '      Cl Data   Start Data    Init File     Max File   '
+                'Workload       Valid\n'))
+            f.write(('    Metric      Op Rate      Op Rate        (ms)        '
+                'KBps          KBps         KBps   Sec   Cl  Proc    Size KB'
+                '      Set MiB      Set MiB      Set MiB    Space MiB       '
+                'Name         Run\n'))
+        f.write(summary_str)
+        f.close()
+        f = open(self.sfssum)
+        lines = f.readlines()
+        f.close()
+        summary_id = self.get_id(re.sub("\s", "", "".join(lines[2:])))
+        # xml version
+        xmlfile = "%s.xml" % self.sfssum[:-4]
+        if os.access(xmlfile, os.F_OK):
+            f = open(xmlfile)
+            xmlstring = ""
+            for line in f:
+                xmlstring += line.strip()
+            f.close()
+            if xmlstring:
+                root = et.fromstring(xmlstring)
+            else:
+                message("Could not find any data in %s" % xmlfile, "[DEBUG]",
+                    True, self.sfslog)
+                root = et.Element('summary')
+        else:  # create xml data
+            root = et.Element('summary')
+        root.set("id", summary_id)
+        thisrun = et.SubElement(root, 'run')
+        thisrun.set('time', self.genid)
+        thisrun.set('fingerprint', fingerprint)
+        thisrun.set('id', self.runid)
+        thisrun.set('version', version)
+        business_metric_child = et.SubElement(thisrun, 'business_metric')
+        business_metric_child.text = business_metric
+        for i in range(len(metrics) - 1):
+            m = et.SubElement(thisrun, 'metric')
+            m.set('name', metrics[i][3])
+            if metrics[i][4]:
+                m.set('units', metrics[i][4])
+            m.text = str(values[i])
+        benchmark_child = et.SubElement(thisrun, 'benchmark')
+        benchmark_child.set('name', benchmark_name)
+        valid_run_child = et.SubElement(thisrun, 'valid_run')
+        if not valid_run:
+            valid_run_child.text = "INVALID_RUN"
+        f = open(xmlfile, 'w')
+        f.write(make_human_readable(root))
+        f.close()
+
+
+class PerfData:
+    def __init__(self):
+        """Container for measured performance data."""
+        self.workloads = []
+        # map of workload -> number of procs
+        self.procs = {}
+        # map of workload -> [total_ops, min_oprate]
+        self.oprates = {}
+        # map of workload -> [total_read_kbps, min_read_kbps
+        self.read_kbps = {}
+        # map of workload -> [total_write_kbps, min_write_kbps
+        self.write_kbps = {}
+          # map of workloads -> [total_accum_time, max_latency]
+        self.latencies = {}
+
+    def add_data(self, filename):
+        """Adds performance data parsed from a single client output file."""
+        rc = None
+        client = None
+        procid = None
+        workload = None
+        oprate = None
+        fileops = None
+        latency = None
+        read_kbps = None
+        write_kbps = None
+        # define long re's here so we can be pep8 compliant later
+        readxput_re = '^(Read throughput)\s+\d{0,10}[.]\d{3} Kbytes/sec\n\Z'
+        writexput_re = '^(Write throughput)\s+\d{0,10}[.]\d{3} Kbytes/sec\n\Z'
+        try:
+            f = open(filename)
+            lines = f.readlines()
+            f.close()
+            for l in lines:
+                if re.match('^Client\s+\S+\s+ID:\s+\d+\n\Z', l):
+                    linedata = l.strip().split()
+                    client = linedata[1]
+                    procid = int(linedata[3])
+                elif re.match('^(Workload Name):\s+\S+\n\Z', l):
+                    workload = l.strip().split()[-1]
+                elif re.match('^(Ops/sec)\s+\d{0,10}[.]\d{2}\n\Z', l):
+                    oprate = float(l.strip().split()[-1])
+                elif re.match('(Total file ops)\s+\d+\n\Z', l):
+                    fileops = int(l.strip().split()[-1])
+                elif re.match('^(Avg Latency)\s+\d{0,7}[.]\d{3}\n\Z', l):
+                    latency = float(l.strip().split()[-1])
+                elif re.match(readxput_re, l):
+                    read_kbps = float(l.strip().split()[-2])
+                elif re.match(writexput_re, l):
+                    write_kbps = float(l.strip().split()[-2])
+            if [client, procid, workload, oprate, fileops, latency, read_kbps,
+                    write_kbps].count(None):
+                rc = "Incomplete data from output file.  Could not find:\n"
+                if not client:
+                    rc += "\tclient name\n"
+                if not procid:
+                    rc += "\tproc id\n"
+                if not workload:
+                    rc += "\tworkload name\n"
+                if not oprate:
+                    rc += "\top rate\n"
+                if not fileops:
+                    rc += "\tfile ops\n"
+                if not latency:
+                    rc += "\tlatency\n"
+                if not read_kbps:
+                    rc += "\tread throughput\n"
+                if not write_kbps:
+                    rc += "\twrite throughput\n"
+            else:
+                if not self.workloads.count(workload):
+                    self.workloads.append(workload)
+                    self.procs[workload] = 1
+                    self.oprates[workload] = [oprate, oprate]
+                    self.read_kbps[workload] = [read_kbps, read_kbps]
+                    self.write_kbps[workload] = [write_kbps, write_kbps]
+                    self.latencies[workload] = [oprate * latency, latency]
+                else:
+                    self.procs[workload] += 1
+                    self.oprates[workload][0] += oprate
+                    if oprate < self.oprates[workload][1]:
+                        self.oprates[workload][1] = oprate
+                    if read_kbps < self.read_kbps[workload][1]:
+                        self.read_kbps[workload][1] = read_kbps
+                    if write_kbps < self.write_kbps[workload][1]:
+                        self.write_kbps[workload][1] = write_kbps
+                    self.latencies[workload][0] += (oprate * latency)
+                    if latency > self.latencies[workload][1]:
+                        self.latencies[workload][1] = latency
+        except IOError:
+            rc = "Could not analyze output file."
+        return rc
+
+    def min_proc_oprate(self, workload):
+        """Returns the minimum oprate for all procs."""
+        return self.oprates[workload][1]
+
+    def max_proc_latency(self, workload):
+        """Returns the maximum latency for all procs."""
+        return self.latencies[workload][1]
+
+    def avg_oprate(self, workload):
+        """Calculates the average oprate per proc."""
+        if self.procs[workload]:
+            return self.oprates[workload][0] / self.procs[workload]
+        else:
+            return 0
+
+    def avg_latency(self, workload):
+        """Calculates average latency, which is weighted by oprate."""
+        if self.oprates[workload][0]:
+            return self.latencies[workload][0] / self.oprates[workload][0]
+        else:
+            return 0
+
+    def oprate_ratios(self):
+        """Calculates all pairwise ratios for workload oprates."""
+        ratios = {}
+        workload_pairs = []
+        for i in self.workloads:
+            for j in self.workloads:
+                if i != j:
+                    pair = [i, j]
+                    pair.sort()
+                    if not workload_pairs.count(pair):
+                        workload_pairs.append(pair)
+        for a, b in workload_pairs:
+            ratios[(a, b)] = self.avg_oprate(a) / self.avg_oprate(b)
+        return ratios
+
+
+def run_generic_workload(token_config_file, rc_parms, benchmark_results,
+        ignore_override, testonly, debug=None, sfslog=None):
+    """Entry point for starting a generic workload (single workload object)"""
+    client_instances = rc_parms.procs_per_client
+    cm = rc_parms.client_mountpoints.cm
+    loadpoints = rc_parms.loadpoints
+    client_mountpoints = rc_parms.client_mountpoints
+    benchmark_name = rc_parms.parms["BENCHMARK"]
+    num_runs = len(loadpoints)
+    for i in range(num_runs):
+        message("<<< %s: Starting run %d of %d: %s >>>" % (time.ctime(),
+            i + 1, num_runs, benchmark_name), log=sfslog)
+        #
+        # construct token config file
+        #
+        f = open(token_config_file, 'w')
+        if os.name == 'nt':
+            passwdstr = " Password=%s" % rc_parms.parms["PASSWORD"]
+        else:
+            passwdstr = ""
+        for client, workdir, extraopts in cm:
+            exec_str = "Execpath=%s" % rc_parms.parms["EXEC_PATH"]
+            user_str = "Username=%s" % rc_parms.parms["USER"]
+            opts_str = ""
+            if len(extraopts):
+                for opt in extraopts:
+                    opts_str += " %s" % opt
+                    if "Execpath" in opt:
+                    	exec_str = ""
+                    if "Username" in opt:
+                    	user_str = ""
+                    if "Password" in opt:
+                    	passwdstr = ""
+            f.write(("Clientname=%s %s%s Workdir=%s %s"
+                " Workload=%s%s\n") % (client, user_str,
+                passwdstr, workdir, exec_str,
+                rc_parms.parms["BENCHMARK"], opts_str))
+        f.close()
+        #
+        # build netmist command
+        #
+        # average number of work dirs per client
+        avg_wd = int(client_mountpoints.get_avg_wd())
+        client_procs = avg_wd * client_instances
+        oprate = None
+        if len(rc_parms.loadpoints) > 0:
+            oprate = rc_parms.loadpoints[i]
+        netmist_cmd = create_cmd(rc_parms, token_config_file,
+            benchmark_results.sfslog_name, benchmark_results.results_dir,
+            client_procs, i + 1, num_runs, oprate, oprate)
+        will_it_run(netmist_cmd, sfslog, debug)
+        if benchmark_results.savetcf:
+            save_token_config_file(token_config_file,
+                benchmark_results.savetcf, netmist_cmd)
+        if not testonly:
+            then_run_it(netmist_cmd, sfslog)
+            #
+            # Combine child proc results files by client --> sfsc*
+            #
+            sepstr = "<<< %s: Run %d of %d >>>" % (time.ctime(), i + 1,
+                num_runs)
+            rc = benchmark_results.combine_output_files(-1, sepstr)
+            if rc:
+                message(rc, "[ERROR]", True, sfslog, False)
+                message(("There was a problem aggregating the client results"
+                    " files."), "[ERROR]", True, sfslog, True)
+            #
+            # Summarize run
+            #
+            benchmark_results.summarize_output(benchmark_name, "N/A",
+                str(loadpoints[i]))
+        else:
+            if debug:
+                message("This was just a test.", "[DEBUG]", True, sfslog)
+        os.remove(token_config_file)
+
+
+def run_benchmark(token_config_file, rc_parms, benchmark, benchmark_results,
+        ignore_override, testonly=None, debug=None, sfslog=None, auto=False,
+        auto_loadpoints=None):
+    """Entry point for starting a known benchmark."""
+    if auto_loadpoints:
+        loadpoints = auto_loadpoints
+    else:
+        loadpoints = rc_parms.loadpoints
+    client_mountpoints = rc_parms.client_mountpoints
+    cm = rc_parms.client_mountpoints.cm
+    oprate_multiplier = rc_parms.parms['OPRATE_MULTIPLIER']
+    sharing_mode = rc_parms.parms['SHARING_MODE']
+    # Auto mode variables
+    auto_mode = auto
+    max_attempts = 20
+    current_load = loadpoints[0]
+    max_load = current_load
+    attempts = []
+    # sorted list of workload object names
+    workloads = benchmark.get_workloads()
+    workload_oprates = {}  # store scale oprates
+    workload_instances = {}
+    for workload in workloads:
+        if benchmark.workloads[workload].oprate:
+            if not oprate_multiplier:
+                oprate_multiplier = benchmark.oprate_scale[1]
+            workload_oprates[workload] = oprate_multiplier * \
+            benchmark.workloads[workload].oprate / benchmark.oprate_scale[1]
+        else:
+            workload_oprates[workload] = None
+        workload_instances[workload] = benchmark.workloads[workload].instances
+    if auto_mode:
+        num_runs = max_attempts
+    else:
+        num_runs = len(loadpoints)
+    auto_stop = False
+    for i in range(num_runs):
+        if auto_mode:
+            if auto_stop:
+                break
+            this_load = current_load
+            attempts.append(current_load)
+        else:
+            this_load = loadpoints[i]
+        message("<<< %s: Starting %s run %d of %d: %s=%d >>" % (time.ctime(),
+            benchmark.name, i + 1, num_runs, benchmark.business_metric,
+            this_load), log=sfslog)
+        valid_run = True
+        #
+        # create token config file
+        #
+        f = open(token_config_file, 'w')
+        if os.name == 'nt':
+            passwdstr = " Password=%s" % rc_parms.parms["PASSWORD"]
+        else:
+            passwdstr = ""
+        #
+        # Spread streams among clients and mointpoints
+        # in a round robin fashion
+        #
+        if client_mountpoints.clients:
+            Nc = len(client_mountpoints.clients)  # number of clients
+        else:
+            message(("No clients found.  CLIENT_MOUNTPOINTS must be"
+                " specified." % parm), "[ERROR", True, sfslog, True)
+        total_oprate = 0
+        active_clients = set()
+        for j in range(this_load):
+            client, workdir, extraopts = cm[j % len(cm)]
+            exec_str = "Execpath=%s" % rc_parms.parms["EXEC_PATH"]
+            user_str = "Username=%s" % rc_parms.parms["USER"]
+            opts_str = ""
+            if len(extraopts):
+                for opt in extraopts:
+                    opts_str += " %s" % opt
+                    if "Execpath" in opt:
+                    	exec_str = ""
+                    if "Username" in opt:
+                    	user_str = ""
+                    if "Password" in opt:
+                    	passwdstr = ""
+            active_clients.add(client)
+            if benchmark.dedicated_dir:
+                workdir = os.path.join(workdir, "sfsd%d" % (j + 1))
+            for workload in workloads:
+                oprate = workload_oprates[workload]
+                instances = workload_instances[workload]
+                overrides = benchmark.workloads[workload].override_parms
+                work_parms = sorted(overrides.keys())
+                override_str = " "
+                if oprate and instances:
+                    total_oprate += instances * oprate
+                inststr = ""
+                if instances > 1:
+                    inststr = "Instances=%d" % instances
+                opratestr = " "
+                if oprate:
+                    opratestr = " Oprate=%.2f " % oprate
+                if work_parms:
+                	for p in work_parms:
+                		override_str += "%s=%s " % (p, overrides[p])
+                f.write(("Clientname=%s %s%s Workdir=%s %s"
+                    " Workload=%s%s%s%s%s\n") % (client, user_str,
+                    passwdstr, workdir, exec_str, workload,
+                    opratestr, inststr, opts_str, override_str))
+        f.close()
+        #
+        # Check for bypass of override parameters
+        #
+        override_parms = sorted(list(benchmark.override_parms.keys()))
+        if ignore_override:
+            for parm in override_parms:
+                # see if user set the parm
+                if rc_parms.parms[parm]:  # user specified
+                    if rc_parms.parms[parm] != benchmark.override_parms[parm]:
+                        valid_run = False
+                        if debug:
+                            message("Byassing override of %s" % parm,
+                            "[DEBUG]", True, sfslog)
+                else:  # user did not specify, so use benchmark value
+                    rc_parms.parms[parm] = benchmark.override_parms[parm]
+        else:
+            for parm in override_parms:
+                rc_parms.parms[parm] = benchmark.override_parms[parm]
+        #
+        # Check for valid warmup range
+        #
+        warmup_time = rc_parms.parms['WARMUP_TIME']
+        if warmup_time < 60 or warmup_time > 604800:
+            valid_run = False
+            message(("\nWarmup time must be between 300 and 604800 for a valid"
+                     " run.\n"), "", False, sfslog)
+        #
+        # start building netmist command line string
+        #
+        total_procs = benchmark.get_procs() * this_load
+        unique_procs = benchmark.unique_proc_count()
+        nclients = len(active_clients)
+        client_procs = total_procs / nclients
+        if not client_procs:
+            client_procs = 1
+        netmist_cmd = create_cmd(rc_parms, token_config_file,
+            benchmark_results.sfslog_name, benchmark_results.results_dir,
+                client_procs, i + 1, num_runs, this_load, oprate=0)
+        will_it_run(netmist_cmd, sfslog, debug)
+        if benchmark_results.savetcf:
+            save_token_config_file(token_config_file,
+                benchmark_results.savetcf, netmist_cmd)
+        if not testonly:
+            then_run_it(netmist_cmd, sfslog)
+            #
+            # Analyze child proc results files
+            #
+            perfdata = PerfData()
+            output_files = glob.glob(os.path.join(
+                benchmark_results.results_dir,
+                "Client_*_results"))
+            if len(output_files) != total_procs:
+                message("Expected %d results files, only got %d." % \
+                    (total_procs, len(output_files)), "[ERROR]", True,
+                    sfslog, True)
+            for j in output_files:
+                rc = perfdata.add_data(j)
+                if rc:
+                    message(rc, "[ERROR]", True, sfslog, False)
+                    message(("There was a problem analyzing client result"
+                        " file %s." % j), "[ERROR]", True, sfslog, True)
+                else:
+                    if debug:
+                        message("Analyzed client result file %s" % j,
+                            "[DEBUG]", True, sfslog)
+            #
+            # Combine child proc results files by client --> sfsc*.log
+            #
+            sepstr = "<<< %s: Run %d of %d >>>" % (time.ctime(), i + 1,
+                num_runs)
+            rc = benchmark_results.combine_output_files(total_procs, sepstr)
+            if rc:
+                message(rc, "[ERROR]", True, sfslog, False)
+                message(("There was a problem aggregating the client results"
+                    "files."), "[ERROR]", True, sfslog, True)
+            else:
+                if debug:
+                    message("Aggregated %d client results files." % \
+                        total_procs, "[DEBUG]", True, sfslog)
+            #
+            # Check benchmark thresholds
+            #
+            if debug:
+                message("Evaluating success criteria", "[DEBUG]", True,
+                    sfslog)
+            failed_thresholds = benchmark.evaluate_thresholds(perfdata)
+            if failed_thresholds:
+                valid_run = False
+                for j in failed_thresholds:
+                    message(j, "[INFO]", True, sfslog)
+                message("Failed success criteria", "[INFO]", True, sfslog)
+            #
+            # Summarize run
+            #
+            opratestr = ""
+            if total_oprate:
+                opratestr = "%.2f" % total_oprate
+            space_calc = None
+            #if not sharing_mode:
+            #    p = loadpoints[i] * unique_procs
+            #    rc_parms.bench_space = benchmark.space_info(loadpoints[i], len(active_clients))
+            #    space_calc = rc_parms.space_info(len(active_clients), p)
+            fsize = string_cap(rc_parms.parms["FILE_SIZE"])
+            dcount = rc_parms.parms["DIR_COUNT"]
+            fpd = rc_parms.parms["FILES_PER_DIR"]
+            rc_parms.bench_space = benchmark.space_info(this_load, len(active_clients), (fsize, dcount, fpd))
+            p = this_load * unique_procs
+            space_calc = rc_parms.space_info(len(active_clients), p)
+            benchmark_results.summarize_output(benchmark.name,
+                str(this_load), opratestr, valid_run, space_calc,
+                nclients, client_procs)
+            #print(space_calc)
+        else:
+            fsize = string_cap(rc_parms.parms["FILE_SIZE"])
+            dcount = rc_parms.parms["DIR_COUNT"]
+            fpd = rc_parms.parms["FILES_PER_DIR"]
+            rc_parms.bench_space = benchmark.space_info(this_load, len(active_clients), (fsize, dcount, fpd))
+            p = this_load * unique_procs
+            space_calc = rc_parms.space_info(len(active_clients), p)
+            #print(space_calc)
+            if debug:
+                message("This was just a test.", "[DEBUG]", True, sfslog)
+        os.remove(token_config_file)
+        # Decide if we need another attempt if using auto
+        if auto_mode:
+            valid_result = True
+            if len(failed_thresholds) > 0:
+                valid_result = False
+            attempts.sort()
+            if valid_result:
+                max_load = current_load
+                next_load = bisect.bisect_right(attempts, current_load)
+                if next_load == 0 or next_load >= len(attempts):
+                    current_load *= 2
+                else:
+                    current_load += (attempts[next_load] - current_load) / 2
+                    if current_load in attempts:
+                        if (current_load + 1) in attempts:
+                            auto_stop = True
+                        else:
+                            current_load += 1
+            else:
+                prev_load = bisect.bisect_left(attempts, current_load)
+                if prev_load == 0:
+                    current_load = current_load / 2
+                    if current_load in attempts:
+                        if (current_load + 1) in attempts:
+                            auto_stop = True
+                        else:
+                            current_load += 1
+                else:
+                    current_load -= (current_load - attempts[prev_load - 1]) / 2
+                    if current_load in attempts:
+                        if (current_load + 1) in attempts:
+                            auto_stop = True
+                        else:
+                            current_load += 1
+                if current_load == 0:
+                    auto_stop = True
+            if len(attempts) > max_attempts:
+                auto_stop = True
+    return max_load
+
+
+def main():
+    """Entry point into the program."""
+    rc_file = None
+    token_config_file = "tcf.tmp"
+    benchmarks_file = "benchmarks.xml"
+    save_tcf = None
+    export_file = None
+    version = "1.0"  # try to match svn revision
+    suffix = "SPECstorage2020"
+    results_dir = os.path.join(os.getcwd(), "results")
+    install_dir = None
+    ignore_override = False
+    testonly = False
+    debug = False
+    auto = False
+    auto_curve = False
+    curve_scaling = 100.0
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'A:ab:d:r:s:e:ihv',
+        ['auto', 'suffix=', 'rc-file=', 'benchmarks-file=', 'results-dir=',
+        'save-config=', 'export=', 'install-dir=', 'ignore-override',
+        'test-only', 'debug', 'help', 'version'])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(1)
+    for opt in opts:
+        if opt[0] == '-A':
+            auto_curve = True
+            curve_scaling = float(opt[1])
+            if curve_scaling < 0.0 or curve_scaling > 100.0:
+                print("The scaling value with -A must be between 0 and 100")
+                usage()
+                sys.exit(1)
+        if opt[0] == '-a' or opt[0] == '--auto':
+            auto = True
+        if opt[0] == '-b' or opt[0] == '--benchmarks-file':
+            if os.access(opt[1], os.R_OK):
+                benchmarks_file = opt[1]
+            else:
+                print(("Benchmarks file %s either does not exist or is not"
+                    "readable.") % opt[1])
+                sys.exit(1)
+        if opt[0] == '--save-config':
+            save_tcf = opt[1]
+        if opt[0] == '-r' or opt[0] == '--rc-file':
+            if os.access(opt[1], os.R_OK):
+                rc_file = opt[1]
+            else:
+                print(("RC file %s either does not exist or is not"
+                    " readable.") % opt[1])
+                sys.exit(1)
+        if opt[0] == '-s' or opt[0] == '--suffix':
+            suffix = opt[1]
+        if opt[0] == '-d' or opt[0] == '--results-dir':
+            results_dir = opt[1]
+        if opt[0] == '-i' or opt[0] == '--ignore-override':
+            ignore_override = True
+        if opt[0] == '-e' or opt[0] == '--export':
+            export_file = opt[1]
+        if opt[0] == '--install-dir':
+            install_dir = opt[1]
+        if opt[0] == '--test-only':
+            testonly = True
+        if opt[0] == '--debug':
+            debug = True
+        if opt[0] == '-h' or opt[0] == '--help':
+            usage()
+            sys.exit(0)
+        if opt[0] == '-v' or opt[0] == '--version':
+            print("Version: %s" % version)
+            sys.exit(0)
+    if install_dir:
+        message("Installing SPECstoragee(TM) Solution 2020 to %s." % install_dir)
+        if os.path.isdir(install_dir):
+            message("Installation directory %s already exists." % install_dir)
+            sys.exit(1)
+        else:
+            cwd_contents = glob.glob("*")
+            expected_contents = [
+                'benchmarks.xml',
+                'binaries',
+                'copyright.txt',
+                'docs',
+                'SfsManager',
+                'SpecReport',
+                'sfs_rc',
+                'SPEC_LICENSE.txt']
+            found_expected = True
+            for i in expected_contents:
+                if not i in cwd_contents:
+                    found_expected = False
+            if not found_expected:
+                answer = raw_input(("The current working directory does not"
+                                    " have the expected SPECstorage(TM) Solution 2020 contents."
+                                    "  Proceed anyway? (Yes/No): ")).lower()
+                if answer == "yes":
+                    pass
+                elif answer == "no":
+                    sys.exit(1)
+                else:
+                    message("Unacceptable answer, exiting.")
+                    sys.exit(1)
+            try:
+                shutil.copytree(os.getcwd(), install_dir)
+            except:
+                message("Could not install SPECstorage(TM) Solution 2020 to %s." % install_dir)
+        message("SPECstorage(TM) Solution 2020 successfully installed.")
+        sys.exit(1)
+    if not rc_file:
+        print("Must specify an RC file")
+        usage()
+        sys.exit(1)
+    # cleanup temp config files from previous runs
+    if os.access(token_config_file, os.F_OK):
+        os.remove(token_config_file)
+    #
+    # Setup results directory and naming conventions
+    #
+    if not os.access(results_dir, os.X_OK):
+        os.mkdir(results_dir)
+    if not auto_curve:
+        sfslog_name = os.path.join(results_dir, "sfslog_%s.log" % suffix)
+        sfssum_name = os.path.join(results_dir, "sfssum_%s.txt" % suffix)
+        sfslog = open(sfslog_name, 'a')
+        if os.path.exists(results_dir):
+            if not os.path.isdir(results_dir):
+                message("Invalid name for results directory", "[ERROR]", True,
+                    sfslog, True)
+            else:
+                if debug:
+                    message("Results directory '%s' already exists" % results_dir,
+                        "[DEBUG]", True, sfslog)
+        else:
+            if debug:
+                message("Creating results dir '%s'" % results_dir, "[DEBUG]",
+                    True, sfslog)
+            os.mkdir(results_dir)
+        if debug:
+            message("Reading benchmark file %s" % benchmarks_file, "[DEBUG]",
+                True, sfslog)
+        #
+        # read benchmarks file
+        #
+        benchmarks = Benchmarks(benchmarks_file, debug, sfslog)
+        if debug:
+            message("Reading rc file %s" % rc_file, "[DEBUG]", True, sfslog)
+        #
+        # read rc file
+        #
+        rc_parms = RcParms(rc_file, debug, sfslog)
+        #
+        # If the benchmark is known, run it and evaluate success critera,
+        # otherwise run a generic workload
+        #
+        if export_file:
+            netmist_path = rc_parms.parms['EXEC_PATH']
+            if debug:
+                message("Starting exec validation: '%s'" % cmd, "[DEBUG]", True,
+                    log)
+            validate_proc = subprocess.Popen("%s -E" % netmist_path, shell=True,
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            stdout, stderr = validate_proc.communicate()
+            if validate_proc.returncode != 0:
+                message("Could not export workload definitions.", "[ERROR]", True,
+                    sfslog)
+                message(str(stdout.decode('ascii')), "", False, sfslog)
+                message(str(stderr.decode('ascii')), "", False, sfslog, True)
+            else:
+                f = open(export_file, 'w')
+                f.write(str(stdout.decode('ascii')))
+                f.close()
+                message("Successfully exported workload definitions to %s" % \
+                    export_file, "", True, sfslog)
+            sys.exit()
+        benchmark_name = rc_parms.benchmark_name
+        benchmark_results = BenchmarkResults(sfslog, suffix, results_dir, \
+            benchmarks.identifier, save_tcf)
+        if benchmarks.get_names().count(benchmark_name):  # known benchmark
+            run_benchmark(token_config_file, rc_parms,
+                benchmarks.get_benchmark(benchmark_name), benchmark_results,
+                ignore_override, testonly, debug, sfslog, auto)
+        else:  # generic workload
+            run_generic_workload(token_config_file, rc_parms, benchmark_results,
+                ignore_override, testonly, debug, sfslog)
+        sfslog.close()
+    else:
+        best_load = None
+        autosuffix = "%s.auto" % suffix
+        sfslog_name = os.path.join(results_dir, "sfslog_%s.log" % autosuffix)
+        sfssum_name = os.path.join(results_dir, "sfssum_%s.txt" % autosuffix)
+        sfslog = open(sfslog_name, 'a')
+        if os.path.exists(results_dir):
+            if not os.path.isdir(results_dir):
+                message("Invalid name for results directory", "[ERROR]", True,
+                    sfslog, True)
+            else:
+                if debug:
+                    message("Results directory '%s' already exists" % results_dir,
+                        "[DEBUG]", True, sfslog)
+        else:
+            if debug:
+                message("Creating results dir '%s'" % results_dir, "[DEBUG]",
+                    True, sfslog)
+            os.mkdir(results_dir)
+        if debug:
+            message("Reading benchmark file %s" % benchmarks_file, "[DEBUG]",
+                True, sfslog)
+        #
+        # read benchmarks file
+        #
+        benchmarks = Benchmarks(benchmarks_file, debug, sfslog)
+        if debug:
+            message("Reading rc file %s" % rc_file, "[DEBUG]", True, sfslog)
+        #
+        # read rc file
+        #
+        rc_parms = RcParms(rc_file, debug, sfslog)
+        #
+        # If the benchmark is known, run it and evaluate success critera,
+        # otherwise run a generic workload
+        #
+        if export_file:
+            netmist_path = rc_parms.parms['EXEC_PATH']
+            if debug:
+                message("Starting exec validation: '%s'" % cmd, "[DEBUG]", True,
+                    log)
+            validate_proc = subprocess.Popen("%s -E" % netmist_path, shell=True,
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            stdout, stderr = validate_proc.communicate()
+            if validate_proc.returncode != 0:
+                message("Could not export workload definitions.", "[ERROR]", True,
+                    sfslog)
+                message(str(stdout.decode('ascii')), "", False, sfslog)
+                message(str(stderr.decode('ascii')), "", False, sfslog, True)
+            else:
+                f = open(export_file, 'w')
+                f.write(str(stdout.decode('ascii')))
+                f.close()
+                message("Successfully exported workload definitions to %s" % \
+                    export_file, "", True, sfslog)
+            sys.exit()
+        benchmark_name = rc_parms.benchmark_name
+        benchmark_results = BenchmarkResults(sfslog, autosuffix, results_dir, \
+            benchmarks.identifier, save_tcf)
+        if benchmarks.get_names().count(benchmark_name):  # known benchmark
+            best_load = run_benchmark(token_config_file, rc_parms,
+                benchmarks.get_benchmark(benchmark_name), benchmark_results,
+                ignore_override, testonly, debug, sfslog, auto)
+        else:  # generic workload
+            run_generic_workload(token_config_file, rc_parms, benchmark_results,
+                ignore_override, testonly, debug, sfslog)
+        sfslog.close()
+        # now run again with a curve
+        curve_points = ten_points(best_load, curve_scaling)
+        sfslog_name = os.path.join(results_dir, "sfslog_%s.log" % suffix)
+        sfssum_name = os.path.join(results_dir, "sfssum_%s.txt" % suffix)
+        sfslog = open(sfslog_name, 'a')
+        if os.path.exists(results_dir):
+            if not os.path.isdir(results_dir):
+                message("Invalid name for results directory", "[ERROR]", True,
+                    sfslog, True)
+            else:
+                if debug:
+                    message("Results directory '%s' already exists" % results_dir,
+                        "[DEBUG]", True, sfslog)
+        else:
+            if debug:
+                message("Creating results dir '%s'" % results_dir, "[DEBUG]",
+                    True, sfslog)
+            os.mkdir(results_dir)
+        if debug:
+            message("Reading benchmark file %s" % benchmarks_file, "[DEBUG]",
+                True, sfslog)
+        #
+        # read benchmarks file
+        #
+        benchmarks = Benchmarks(benchmarks_file, debug, sfslog)
+        if debug:
+            message("Reading rc file %s" % rc_file, "[DEBUG]", True, sfslog)
+        #
+        # read rc file
+        #
+        rc_parms = RcParms(rc_file, debug, sfslog)
+        #
+        # If the benchmark is known, run it and evaluate success critera,
+        # otherwise run a generic workload
+        #
+        if export_file:
+            netmist_path = rc_parms.parms['EXEC_PATH']
+            if debug:
+                message("Starting exec validation: '%s'" % cmd, "[DEBUG]", True,
+                    log)
+            validate_proc = subprocess.Popen("%s -E" % netmist_path, shell=True,
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            stdout, stderr = validate_proc.communicate()
+            if validate_proc.returncode != 0:
+                message("Could not export workload definitions.", "[ERROR]", True,
+                    sfslog)
+                message(str(stdout.decode('ascii')), "", False, sfslog)
+                message(str(stderr.decode('ascii')), "", False, sfslog, True)
+            else:
+                f = open(export_file, 'w')
+                f.write(str(stdout.decode('ascii')))
+                f.close()
+                message("Successfully exported workload definitions to %s" % \
+                    export_file, "", True, sfslog)
+            sys.exit()
+        benchmark_name = rc_parms.benchmark_name
+        benchmark_results = BenchmarkResults(sfslog, suffix, results_dir, \
+            benchmarks.identifier, save_tcf)
+        if benchmarks.get_names().count(benchmark_name):  # known benchmark
+            best_load = run_benchmark(token_config_file, rc_parms,
+                benchmarks.get_benchmark(benchmark_name), benchmark_results,
+                ignore_override, testonly, debug, sfslog, False, curve_points)
+        else:  # generic workload
+            run_generic_workload(token_config_file, rc_parms, benchmark_results,
+                ignore_override, testonly, debug, sfslog)
+        sfslog.close()
+
+if __name__ == "__main__":
+    import sys
+    if sys.version_info < (2, 6):
+        print("Must use python version 2.6.x or greater")
+        sys.exit(1)
+    try:
+        import bisect
+        import os
+        import os.path
+        import time
+        import subprocess
+        import getopt
+        import signal
+        import re
+        import glob
+        import shutil
+        import zlib
+        from xml.dom import minidom
+        import xml.etree.ElementTree as et
+    except ImportError as error:
+        print("Import Error: %s" % str(error))
+        sys.exit(1)
+    signal.signal(signal.SIGINT, signal_handler)
+    main()

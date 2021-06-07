@@ -1,0 +1,59 @@
+#  -*- mode: makefile; -*-
+# Makefile for netmist.
+#
+# As one adds new targets one needs to specify REMSH if the system
+# uses remsh instead of rsh to perform remote shell commands.
+# Also add any libraries that are needed.
+#
+#
+# Figure out the name of the target platform Operating system.
+#
+# Variable refinement based on distribution type and os type.
+# include makefile_prod.in
+
+ifndef OS
+	OS := $(shell uname -s | dd conv=lcase 2> /dev/null)
+endif
+
+ifndef ARCH
+	ARCH := $(shell uname -p)
+endif
+
+# Variable definitions that only depend on OS.
+ifeq ($(OS),aix)
+CFLAGS += -D_aix_
+else ifeq ($(OS),hpux)
+CC := cc
+CFLAGS += -D_hpux_
+else ifeq ($(OS),linux)
+CC := gcc
+CFLAGS += -D_linux_
+else ifeq ($(OS),sunos)
+CC := gcc
+CFLAGS += -D_solaris_
+else ifeq ($(OS),freebsd)
+CFLAGS += -D_bsd_
+else ifeq ($(OS),darwin)
+CC = gcc
+CFLAGS += -D_macos_
+else ifeq ($(OS), VMware)
+CC = gcc
+CFLAGS += -D_vmware_
+endif
+
+.DEFAULT_GOAL := all
+
+.PHONY: check-os
+check-os:
+	@if [ $(OS) = "" ]; then \
+		echo "Unable to determine OS try setting OS to one of the following"; \
+		echo "     -> aix"; \
+		echo "     -> bsd"; \
+		echo "     -> hpux"; \
+		echo "     -> linux"; \
+		echo "     -> darwin"; \
+		echo "     -> solaris"; \
+		echo "Example: OS=linux make"; \
+		exit 1; \
+	fi
+	@echo "Building for OS: $(OS)"

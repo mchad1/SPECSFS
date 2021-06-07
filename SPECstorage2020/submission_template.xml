@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<specSPECstorage2020>
+    <solutionInfo>
+        <!-- A collection of vendor, general product, and license info -->
+        <vendorAndProduct
+            testedBy="Company Name"
+            submissionTitle="Submission Title"
+            hardwareAvailable="Month Year"
+            softwareAvailable="Month Year"
+            dateTested="Month Year"
+            licenseNumber="License Number"
+            licenseeLocation="Location">
+            <otherMarketingInfo>
+                <!-- a free-form description of product/solution/highlights -->
+            </otherMarketingInfo>
+        </vendorAndProduct>
+        <!-- The Bill of Materials for the SUT. This list should be sufficient 
+        for anyone to purchase and physically configure an identical system to 
+        the SUT. (Small components such as power and network cables that would 
+        be obviously necessary to complete a configuration may be left out as 
+        long as there are no performance-sensitive differences in part 
+        choices.) This should include the names and versions of any software 
+        used in the SUT. -->
+        <SUTBomList>
+            <bomItem
+                model="Model Number"
+                quantity="Number"
+                type="Type"
+                vendor="Vendor Name">
+                <description>
+                    <!-- A free-form description of the named item. For 
+                    services, include the operational parameters in the 
+                        agreement. -->
+                </description>
+            </bomItem>
+            <!-- next BOM item if applicable, copy from template item -->
+        </SUTBomList>
+        <configDiagramList>
+            <configDiagramItem
+                name="Diagram Name"
+                ref="Diagram File Name"/>
+            <!-- next diagram if applicable, copy from template item -->
+        </configDiagramList>
+        <componentSoftwareList>
+            <componentSoftwareItem
+                componentName="Component Name"
+                softwareType="Software Type"
+                softwareVersion="Sofware Version">
+                <description>
+                    <!-- Description of the software functionality -->
+                </description>
+            </componentSoftwareItem>
+            <!-- next software item if applicable, copy from template item -->
+        </componentSoftwareList>
+        <hardwareConfigAndTuning environmentType="physical|virtual">
+            <hardwareComponentConfig
+                componentName="Component Name">
+                    <hardwareTuningList
+                        paramName="Tuning Param Name"
+                        paramValue="Tuning Param Value"
+                        paramDesc="Tuning Param Description"/>
+            </hardwareComponentConfig>
+            <hardwareConfigAndTuningNotes>
+                <!-- A free-form text field for additional server tuning notes
+                for the system under test. Note changes to any configuration 
+                files or non-standard options used here if they are not covered 
+                in the server tuning table. If any entry in the server tuning 
+                table needs further explanation, that explanation should go 
+                here. -->
+            </hardwareConfigAndTuningNotes>
+        </hardwareConfigAndTuning>
+        <softwareConfigAndTuning environmentType="physical|virtual">
+            <softwareComponentConfig
+                componentName="Component Name">
+                    <softwareTuningList
+                        paramName="Tuning Param Name"
+                        paramValue="Tuning Param Value"
+                        paramDesc="Tuning Param Description"/>
+            </softwareComponentConfig>
+            <softwareConfigAndTuningNotes>
+                <!-- A free-form text field for additional server tuning notes 
+                for the system under test. Note changes to any configuration 
+                files or non-standard options used here if they are not covered 
+                in the server tuning table. If any entry in the server tuning 
+                table needs further explanation, that explanation should go 
+                here. -->
+            </softwareConfigAndTuningNotes>
+            <serviceSLA>
+                <!-- If any component is a service then supply the agreement 
+                details. -->
+            </serviceSLA>
+        </softwareConfigAndTuning>
+        <storageAndFilesystems>
+            <storageSetList>
+                <storageSetItem
+                    quantity="Quantity of Item"
+                    dataProtection="Data Protection"
+                    stableStorage="Stable Storage"
+                    description="Description of Item"/>
+                <!-- next storage set item if applicable, copy from template
+                item -->
+            </storageSetList>
+            <fsInfo
+                fsType="Filesystem Type"
+                fsQuantity="Filesystem Quantity"
+                totalCapacity="Filesystem Capacity"/>
+            <fsCreationNotes>
+                <!-- A free-form description of how the filesystems were 
+                created including any specific options. Include any additional 
+                steps used to configure the storage underlying the filesystem. 
+                -->
+            </fsCreationNotes>
+            <storageAndFsNotes>
+                <!-- An optional free-form block of additional information 
+                about the storage components and filesystem configuration. -->
+            </storageAndFsNotes>
+        </storageAndFilesystems>
+        <transportList environmentType="physical|virtual">
+            <transportInterface
+                transportType="Transport Type"
+                portsUsed="Number of Ports Used"
+                interfaceNotes="Interface Notes"/>
+            <!-- next interface if applicable, copy from template interface -->
+            <transportConfigurationNotes>
+                <!-- A free-form description of additional information about the 
+                interface including any special configuration options used. -->
+            </transportConfigurationNotes>
+        </transportList>
+        <switchList environmentType="physical|virtual">
+            <switchItem
+                switchName="Switch Name"
+                switchType="Switch Type"
+                switchPortCount="Port Count"
+                switchPortAvail="Configured Port Count"
+                switchNotes="Switch Notes"/>
+            <!-- next switch if applicable, copy from template switch item -->
+        </switchList>
+        <processingElements environmentType="physical|virtual">
+            <processingElement
+                procLocation="Processing Element Location"
+                procQuantity="Processing Element Quantity"
+                procType="Processing Element Type"
+                procDecs="ProcessingElement Description"
+                procFunction="Processing Function"/>
+            <!-- next processing element if applicable -->
+            <procElementNotes>
+                <!-- Any other relevant description of the processing 
+                elements, e.g., the location of the elements within the 
+                system architecture.  -->
+            </procElementNotes>
+        </processingElements>
+        <memory environmentType="physical|virtual">
+            <memorySetItem
+                memorySizeGiB="Size in GiB"
+                memoryQuantity="Quantity"
+                nonVolatile="NV or V"
+                memoryDesc="Memory Description"/>
+            <!-- next memory set item if applicable -->
+            <memoryNotes>
+                <!-- An optional free-form description of additional 
+                information about the sut memory or the overall reporting.  -->
+            </memoryNotes>
+        </memory>
+        <stableStorage>
+            <!-- A free-form description of how the SUT conforms to the 
+            SPECstorage Solution 2020 Stable Storage requirement. (See SPEC's Description of 
+            Stable Storage for SPECstorage Solution 2020.)  -->
+        </stableStorage>
+        <sutConfigNotes>
+            <!-- A free-form description of additional information needed to 
+            reproduce the test using the above equipment. This is a description
+            of the solution diagram. -->
+        </sutConfigNotes>
+        <otherSutNotes>
+            <!-- An optional free-form description of additional information 
+            about the SUT. -->
+        </otherSutNotes>
+    </solutionInfo>
+    <testInfo>
+        <dataFlow>
+            <!-- Free form text section that describes the distribution of the
+            load across the workdirs and filesystems.  It would be helpful to
+            reference configuration diagrams -->
+        </dataFlow>
+        <otherTestNotes>
+            <!-- An optional freeForm description of additional information 
+            about the test environment and/or execution.  -->
+        </otherTestNotes>
+    </testInfo>
+    <otherReportNotes>
+        <!-- An optional free-form description of additional information about 
+        the system or the overall reporting.  Examples: Trademarks, Copyrights.
+        -->
+    </otherReportNotes>
+    <submissionInfo>
+        <submitterName>
+            <!-- The name of the person submitting this SPECstorage Solution 2020 result. -->
+        </submitterName>
+        <submitterEmail>
+            <!-- The email address of the person submitting this SPECstorage Solution 2020 
+            result. -->
+        </submitterEmail>
+        <reviewersComments>
+            <!-- Additional comments about the submission to help with the 
+            review process. This might include descriptions of tunables and 
+            other information that might be relevant during the review process.
+            --> 
+        </reviewersComments>
+    </submissionInfo>
+<!-- --------------------- DO NOT EDIT BELOW THIS LINE -------------------- -->
+    <results>
+        <!-- Do not edit the results section, SpecReport will merge the
+        submission xml and the results xml -->
+    </results>
+    <resultCompliance noncompliant="no">
+        <nonComplianceReason>
+        </nonComplianceReason>
+        <nonComplianceRemedy>
+        </nonComplianceRemedy>
+        <nonComplianceNotes>
+        </nonComplianceNotes>
+    </resultCompliance>
+</specSPECstorage2020>

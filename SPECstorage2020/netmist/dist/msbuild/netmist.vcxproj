@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{565D2A6D-4179-41C4-92BF-D32A2EB7EB21}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NetmistProd>dist</NetmistProd>
+    <ProdIncludePath>$(SolutionDir)\dist_pro;$(SolutionDir)\dist</ProdIncludePath>
+    <ProdPreprocessorDefinitions>SPEC_DIST</ProdPreprocessorDefinitions>
+    <MixTableDir>..\..\dist_pro</MixTableDir>
+    <WorkloadDir>..\..\dist_pro</WorkloadDir>
+    <LicenseDir>..\..\dist_pro</LicenseDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\netmist_client.c" />
+    <ClCompile Include="..\..\netmist_copyright.c" />
+    <ClCompile Include="..\..\netmist_fdcache.c" />
+    <ClCompile Include="..\..\netmist_fsm.c" />
+    <ClCompile Include="..\..\netmist_hashtable.c" />
+    <ClCompile Include="..\..\netmist_logger.c" />
+    <ClCompile Include="..\..\netmist_nodeManager.c" />
+    <ClCompile Include="..\..\netmist_prime.c" />
+    <ClCompile Include="..\..\netmist_thread.c" />
+    <ClCompile Include="..\..\netmist_version.c" />
+    <ClCompile Include="..\..\netmist_structures.c" />
+    <ClCompile Include="..\..\netmist_utils.c" />
+    <ClCompile Include="..\..\netmist_vfs_paths_abs.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\netmist_fsm.h" />
+    <ClInclude Include="..\..\netmist_hashtable.h" />
+    <ClInclude Include="..\..\netmist_thread.h" />
+    <ClInclude Include="..\..\netmist_version.h" />
+    <ClInclude Include="..\..\netmist_fdcache.h" />
+    <ClInclude Include="..\..\netmist_logger.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\..\redistributable_sources\libyaml-master\Release\ON.lib" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>
+	..;..\..\dist_pro;..\..\;$(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">YAML_DECLARE_STATIC</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="../../msbuild/netmist.target" />
+</Project>
